@@ -29,6 +29,7 @@ import { Navigation, Pagination } from 'swiper';
 import themeConfig from '../theme.config';
 import { convertFileToBase64 } from '../components/utils/fileUtils'
 import axios, { AxiosResponse } from 'axios';
+import CustomSelect from '../components/core/select';
 
 interface SchoolDetail {
     schoolName: string;
@@ -96,11 +97,13 @@ interface FormValues {
     pdtotal: string;
     pddate: string;
     pdpaymentImage: string;
+    isSchoolDetailVerified: boolean;
+    isPaymentDetailVerified: boolean;
 }
 
 interface MemberData {
     membershipCategory: string;
-    profilePicture: string; // Replace with the actual type of profilePicture
+    profilePicture: string | any; // Replace with the actual type of profilePicture
     title: string;
     firstName: string;
     lastName: string;
@@ -125,13 +128,39 @@ interface MemberData {
     memberStatus: string;
     membershipId: string;
     declinedMessage: string;
-  }
+}
 
 const AddNewMember = () => {
     const dispatch = useDispatch();
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | ArrayBuffer | null>(null);
     const [Loading, setLoading] = useState(false)
+    const [currentDateTime, setCurrentDateTime] = useState<string>('');
+    useEffect(() => {
+        const getCurrentDateTime = () => {
+            const options: Intl.DateTimeFormatOptions = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: true,
+            };
+
+            const formattedDateTime = new Intl.DateTimeFormat('en-US', options).format(new Date());
+
+            setCurrentDateTime(formattedDateTime);
+        };
+
+        getCurrentDateTime(); // Initial call
+
+        // Update every minute
+        const intervalId = setInterval(getCurrentDateTime, 60000);
+
+        // Cleanup interval on component unmount
+        return () => clearInterval(intervalId);
+    }, []);
+
     useEffect(() => {
         dispatch(setPageTitle('AddNewMember Admin'));
     });
@@ -139,7 +168,8 @@ const AddNewMember = () => {
     const toggleTabs = (name: string) => {
         setTabs(name);
     };
-
+    const [isSclChecked, setIsSclChecked] = useState(true);
+    const [ispayChecked, setIsPayChecked] = useState(true);
     const [formValues, setFormValues] = useState<FormValues>({
         // Define your form fields here
         category: '',
@@ -165,10 +195,13 @@ const AddNewMember = () => {
         clubDetails: [],
         cdclubName: '', cdinvloved: '', cdgame: '', cdfrom: '', cdto: '', cdrole: '',
         paymentDetails: [],
-        pdcategory: '', pdbank: '', pdbranch: '', pdtotal: '', pddate: '', pdpaymentImage: ''
+        pdcategory: '', pdbank: '', pdbranch: '', pdtotal: '', pddate: '', pdpaymentImage: '',
+        isSchoolDetailVerified:isSclChecked,
+        isPaymentDetailVerified:ispayChecked,
     });
 
     const items = ['carousel1.jpeg', 'carousel2.jpeg', 'carousel3.jpeg'];
+   
 
     const submitForm = () => {
         const toast = Swal.mixin({
@@ -209,7 +242,8 @@ const AddNewMember = () => {
             padding: '10px 20px',
         });
     };
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+   
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement| HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormValues({
             ...formValues,
@@ -229,24 +263,24 @@ const AddNewMember = () => {
     ];
     const addMember = async (data: MemberData): Promise<AxiosResponse<any>> => {
         try {
-          const response = await axios.post('http://localhost:3000/api/member', data);
-          console.log('Member added successfully:', response.data);
-          // Call your success function here
-          sucessForm()
-          return response;
+            const response = await axios.post('http://localhost:3000/api/member', data);
+            console.log('Member added successfully:', response.data);
+            // Call your success function here
+            sucessForm()
+            return response;
         } catch (error) {
-          console.error('Error adding member:', error);
-          failForm()
-          throw error;
+            console.error('Error adding member:', error);
+            failForm()
+            throw error;
         }
-      };
-      
-      
-    const handleSubmit =async () => {
+    };
+
+
+    const handleSubmit = async () => {
         setLoading(true);
 
         console.log(formValues, "ALL DAta");
-        var data:MemberData = {
+        var data: MemberData = {
             "membershipCategory": formValues.category,
             "profilePicture": formValues.profilePicture,
             "title": "Mr",
@@ -282,12 +316,12 @@ const AddNewMember = () => {
             // Call the addMember function
             await addMember(data);
             // Call your success function here if needed
-          } catch (error) {
+        } catch (error) {
             // Handle error if needed
-          } finally {
+        } finally {
             // Set loading state back to false, whether the request succeeds or fails
             setLoading(false);
-          }
+        }
 
         // const addMember = async (data: MemberData): Promise<AxiosResponse<any>> => {
         //     try {
@@ -381,7 +415,38 @@ const AddNewMember = () => {
         }));
 
     };
+// Array of options for the select box
 
+const options = ['Ordinary Member', 'Life time Member', 'Hon Life time Member'];
+const options2 = ['MR', 'MS', 'MRS'];
+const handleSelectChange2 = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormValues((prevValues) => ({
+        ...prevValues,
+        title:  event.target.value,
+    }));
+  };
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormValues((prevValues) => ({
+        ...prevValues,
+        category:  event.target.value,
+    }));
+  };
+  
+  const handleSchoolCheckboxChange = () => {
+    console.log(formValues.isPaymentDetailVerified);
+    setIsSclChecked(!isSclChecked)
+    setFormValues((prevValues) => ({
+        ...prevValues,
+        isSchoolDetailVerified:  !isSclChecked,
+    }));
+  };
+  const handlePaymentCheckboxChange = () => {
+    setIsPayChecked(!ispayChecked)
+    setFormValues((prevValues) => ({
+        ...prevValues,
+        isPaymentDetailVerified:!ispayChecked  ,
+    })); 
+ };
     return (
         <div className="mb-5 space-y-5">
 
@@ -411,13 +476,13 @@ const AddNewMember = () => {
                                 Luke Ivory
                             </h3>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Membership Type - Hon. Lifetime Member
+                                Membership Type - {formValues.category}
                             </p>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
                                 Status - Pending Request
                             </p>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Member Request - 26 Oct 2020, 4:00 PM
+                                Member Request -{currentDateTime}
                             </p>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
                                 Membership Approval Date - Not Approved Yet
@@ -438,11 +503,11 @@ const AddNewMember = () => {
 
                             <label className="inline-flex mt-5 text-xl">
                                 <span className="peer-checked:text-success">School and Club Details</span>
-                                <input type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
+                                <input onChange={handleSchoolCheckboxChange} checked={formValues.isSchoolDetailVerified}  type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
                             </label>
                             <label className="inline-flex mt-5 ml-10 text-xl">
                                 <span className="peer-checked:text-success">Payment Details</span>
-                                <input type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
+                                <input onChange={handlePaymentCheckboxChange} checked={formValues.isPaymentDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
                             </label>
                             <form className="space-y-5 mt-5">
                                 <div className="sm:flex justify-between items-center md:gap-20">
@@ -452,7 +517,10 @@ const AddNewMember = () => {
                             </form>
 
                             <div className="flex mt-5 ml-5 justify-center">
-                                <button type="button" className="btn btn-outline-success rounded-full ml-5 text-2xl">Approve</button>
+                                <button onClick={handleSubmit} type="button" className="btn btn-outline-success rounded-full ml-5 text-2xl">
+                                {Loading ? 'Loading...' : "Approve"}
+
+                                    </button>
                             </div>
 
                         </div>
@@ -516,8 +584,9 @@ const AddNewMember = () => {
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-5">
                                         <div>
                                             <label htmlFor="name">Category</label>
-                                            <input id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
-                                        </div>
+                                          
+                                            <CustomSelect options={options} value={formValues.category} onChange={handleSelectChange} />
+                                                                                    </div>
                                     </div>
                                 </div>
                                 <h6 className="text-lg font-bold mb-5 mt-5">Personal Information</h6>
@@ -529,11 +598,13 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="title">Title</label>
-                                            <select defaultValue="mr" id="title" className="form-select text-black rounded-full border-dark" required >
+                                            <CustomSelect options={options2} value={formValues.title} onChange={handleSelectChange2} />
+
+                                            {/* <select defaultValue="mr" id="title" className="form-select text-black rounded-full border-dark" required >
                                                 <option value="mr">Mr</option>
                                                 <option value="ms">Ms</option>
                                                 <option value="mrs">Mrs</option>
-                                            </select>
+                                            </select> */}
                                         </div>
                                         <div>
                                             <label htmlFor="name">First Name</label>
@@ -638,8 +709,8 @@ const AddNewMember = () => {
 
                                     </div>
                                 </div>
-                                <div className="sm:col-span-2 mt-6 align-center flex justify-center" onClick={addPayment}  >
-                                    <button type="submit" className="btn btn-outline-primary rounded-full" onClick={handleSubmit} >
+                                <div className="sm:col-span-2 mt-6 align-center flex justify-center"  >
+                                    <button type="submit" className="btn btn-outline-primary rounded-full" onClick={addPayment}  >
                                         Add Payment
                                     </button>
                                 </div>
@@ -754,8 +825,8 @@ const AddNewMember = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="sm:col-span-2 mt-6 align-center flex justify-center" onClick={addSchool}  >
-                                    <button type="submit" className="btn btn-outline-primary rounded-full" onClick={handleSubmit} >
+                                <div className="sm:col-span-2 mt-6 align-center flex justify-center"   >
+                                    <button type="submit" className="btn btn-outline-primary rounded-full" onClick={addSchool}>
                                         Add School
                                     </button>
                                 </div>
@@ -836,8 +907,8 @@ const AddNewMember = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="sm:col-span-2 mt-6 align-center flex justify-center" onClick={addClub}  >
-                                    <button type="submit" className="btn btn-outline-primary rounded-full" onClick={handleSubmit} >
+                                <div className="sm:col-span-2 mt-6 align-center flex justify-center"   >
+                                    <button type="submit" className="btn btn-outline-primary rounded-full"onClick={addClub} >
                                         Add Club
                                     </button>
                                 </div>
@@ -890,13 +961,13 @@ const AddNewMember = () => {
 
             {/* Body End */}
 
-            <div className="sm:col-span-2 mt-6"  >
+            {/* <div className="sm:col-span-2 mt-6"  >
                 <button type="submit" className="btn btn-outline-primary rounded-full" onClick={handleSubmit} >
-                    {Loading ? 'Loading...':"Add Member"}
+                    {Loading ? 'Loading...' : "Add Member"}
 
-                    
+
                 </button>
-            </div>
+            </div> */}
 
 
         </div>
