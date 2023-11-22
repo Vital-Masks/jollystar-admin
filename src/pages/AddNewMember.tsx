@@ -274,7 +274,7 @@ const AddNewMember = () => {
             ],
             "isSchoolDetailVerified": false,
             "isPaymentDetailVerified": false,
-            "memberStatus": "APPROVE",
+            "memberStatus": "APPROVED",
             "membershipId": "",
             "declinedMessage": ""
         }
