@@ -125,7 +125,7 @@ interface MemberData {
     gallery: number[];
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
-    memberStatus: string;
+    memberApprovalStatus: string;
     membershipId: string;
     declinedMessage: string;
 }
@@ -308,7 +308,7 @@ const AddNewMember = () => {
             ],
             "isSchoolDetailVerified": false,
             "isPaymentDetailVerified": false,
-            "memberStatus": "APPROVED",
+            "memberApprovalStatus": "APPROVED",
             "membershipId": "",
             "declinedMessage": ""
         }
