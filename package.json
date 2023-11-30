@@ -34,6 +34,7 @@
         "easymde": "^2.18.0",
         "formik": "^2.2.9",
         "highlight.js": "^11.6.0",
+        "image-size": "^1.0.2",
         "mantine-datatable": "^1.7.17",
         "mongoose": "^8.0.0",
         "nouislider-react": "^3.4.1",
