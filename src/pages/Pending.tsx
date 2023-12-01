@@ -32,12 +32,14 @@ const Pending = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        // setLoading(false)
+
         dispatch(setPageTitle('Dashboard Admin'));
 
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/api/member/getAllmembers');
-                setMembers(response.data);
+                setMembers(response.data.result);
             } catch (error) {
                 setError("error");
             } finally {
@@ -73,9 +75,6 @@ const Pending = () => {
                     </form>
                 </div>
             </div>
-            {
-
-            }
             <div className="table-responsive mb-5">
                 <table>
                     <thead>
@@ -91,7 +90,7 @@ const Pending = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {members
+                        {members && members
                             .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase()))
                                 || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) &&
                                 (data.memberApprovalStatus && data.memberApprovalStatus === 'PENDING'))
@@ -129,7 +128,7 @@ const Pending = () => {
 
                 }
                 {
-                    !loading &&
+                    loading &&
                     (
                         <table>
                             <tbody>
@@ -137,7 +136,7 @@ const Pending = () => {
                                     <td colSpan={3} className="p-4 text-center">
                                         <div className="flex justify-center items-center">
                                             <div className="loader animate-spin mr-4"></div>
-                                            {/* <span className="text-gray-600">Loading...</span> */}
+                                            <span className="text-gray-600">Loading...</span>
                                         </div>
                                     </td>
                                 </tr>

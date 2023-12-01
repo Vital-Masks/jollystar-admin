@@ -30,6 +30,7 @@ import themeConfig from '../theme.config';
 import { convertFileToBase64 } from '../components/utils/fileUtils'
 import axios, { AxiosResponse } from 'axios';
 import CustomSelect from '../components/core/select';
+import imageSize from 'image-size';
 
 interface SchoolDetail {
     schoolName: string;
@@ -196,12 +197,13 @@ const AddNewMember = () => {
         cdclubName: '', cdinvloved: '', cdgame: '', cdfrom: '', cdto: '', cdrole: '',
         paymentDetails: [],
         pdcategory: '', pdbank: '', pdbranch: '', pdtotal: '', pddate: '', pdpaymentImage: '',
-        isSchoolDetailVerified:isSclChecked,
-        isPaymentDetailVerified:ispayChecked,
+        isSchoolDetailVerified: isSclChecked,
+        isPaymentDetailVerified: ispayChecked,
     });
 
     const items = ['carousel1.jpeg', 'carousel2.jpeg', 'carousel3.jpeg'];
    
+
 
     const submitForm = () => {
         const toast = Swal.mixin({
@@ -242,8 +244,8 @@ const AddNewMember = () => {
             padding: '10px 20px',
         });
     };
-   
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement| HTMLInputElement>) => {
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormValues({
             ...formValues,
@@ -377,76 +379,158 @@ const AddNewMember = () => {
             paymentDetails: [...prevValues.paymentDetails, paydetails],
         }));
     }
+    const loadImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            img.onload = () => {
+                resolve({ width: img.width, height: img.height });
+            };
+        });
+    };
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        var base64String = ""
-        if (file) {
-            base64String = await convertFileToBase64(file);
-        }
-        const newPaymentDetail: PaymentDetails = {
-            memberId: formValues.pdcategory,
-            bank: formValues.pdbank,
-            branch: formValues.pdbranch,
-            total: formValues.pdtotal,
-            date: formValues.pddate,
-            paymentSlip: base64String,
-        };
+        console.log(file?.size, "org");
 
-        setFormValues((prevValues) => ({
-            ...prevValues,
-            paymentDetails: [
-                {
-                    ...prevValues.paymentDetails[0], // Preserve other properties
-                    ...newPaymentDetail, // Update specific properties
-                },
-                ...prevValues.paymentDetails.slice(1), // Keep the rest of the array
-            ],
-        }));
+        if (file) {
+            // Load the image using FileReader to get its dimensions
+            const dimensions = await loadImageDimensions(file);
+
+            // Compress the image using canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                // Handle the case where context is null
+                console.error('Canvas context is null');
+                return;
+            }
+            canvas.width = dimensions.width;
+            canvas.height = dimensions.height;
+
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+
+            await new Promise<void>((resolve) => {
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
+                    resolve();
+                };
+            });
+
+            // Convert the compressed image back to a Blob
+            var cimg = null
+            canvas.toBlob((blob) => {
+                //   setSelectedFile(blob);
+                console.log(blob?.size, "compress");
+                cimg = blob
+
+            }, file.type || '');
+
+            var base64String = ""
+            if (cimg) {
+                base64String = await convertFileToBase64(cimg);
+            }
+            const newPaymentDetail: PaymentDetails = {
+                memberId: formValues.pdcategory,
+                bank: formValues.pdbank,
+                branch: formValues.pdbranch,
+                total: formValues.pdtotal,
+                date: formValues.pddate,
+                paymentSlip: base64String,
+            };
+
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                paymentDetails: [
+                    {
+                        ...prevValues.paymentDetails[0], // Preserve other properties
+                        ...newPaymentDetail, // Update specific properties
+                    },
+                    ...prevValues.paymentDetails.slice(1), // Keep the rest of the array
+                ],
+            }));
+        }
+
     };
     const handleImageChange2 = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        var base64String = ""
+
         if (file) {
-            base64String = await convertFileToBase64(file);
+            // Load the image using FileReader to get its dimensions
+            const dimensions = await loadImageDimensions(file);
+
+            // Compress the image using canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                // Handle the case where context is null
+                console.error('Canvas context is null');
+                return;
+            }
+            canvas.width = dimensions.width;
+            canvas.height = dimensions.height;
+
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+
+            await new Promise<void>((resolve) => {
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
+                    resolve();
+                };
+            });
+
+            // Convert the compressed image back to a Blob
+            var cimg = null
+            canvas.toBlob((blob) => {
+                //   setSelectedFile(blob);
+                console.log(blob?.size, "compress");
+                cimg = blob
+
+            }, file.type || '');
+
+            var base64String = ""
+            if (cimg) {
+                base64String = await convertFileToBase64(cimg);
+            }
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                profilePicture: base64String,
+            }));
         }
+    };
+    // Array of options for the select box
+
+    const options = ['Ordinary Member', 'Life time Member', 'Hon Life time Member'];
+    const options2 = ['MR', 'MS', 'MRS'];
+    const handleSelectChange2 = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setFormValues((prevValues) => ({
             ...prevValues,
-            profilePicture: base64String,
+            title: event.target.value,
         }));
-
     };
-// Array of options for the select box
+    const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            category: event.target.value,
+        }));
+    };
 
-const options = ['Ordinary Member', 'Life time Member', 'Hon Life time Member'];
-const options2 = ['MR', 'MS', 'MRS'];
-const handleSelectChange2 = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormValues((prevValues) => ({
-        ...prevValues,
-        title:  event.target.value,
-    }));
-  };
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormValues((prevValues) => ({
-        ...prevValues,
-        category:  event.target.value,
-    }));
-  };
-  
-  const handleSchoolCheckboxChange = () => {
-    console.log(formValues.isPaymentDetailVerified);
-    setIsSclChecked(!isSclChecked)
-    setFormValues((prevValues) => ({
-        ...prevValues,
-        isSchoolDetailVerified:  !isSclChecked,
-    }));
-  };
-  const handlePaymentCheckboxChange = () => {
-    setIsPayChecked(!ispayChecked)
-    setFormValues((prevValues) => ({
-        ...prevValues,
-        isPaymentDetailVerified:!ispayChecked  ,
-    })); 
- };
+    const handleSchoolCheckboxChange = () => {
+        console.log(formValues.isPaymentDetailVerified);
+        setIsSclChecked(!isSclChecked)
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            isSchoolDetailVerified: !isSclChecked,
+        }));
+    };
+    const handlePaymentCheckboxChange = () => {
+        setIsPayChecked(!ispayChecked)
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            isPaymentDetailVerified: !ispayChecked,
+        }));
+    };
     return (
         <div className="mb-5 space-y-5">
 
@@ -503,7 +587,7 @@ const handleSelectChange2 = (event: React.ChangeEvent<HTMLSelectElement>) => {
 
                             <label className="inline-flex mt-5 text-xl">
                                 <span className="peer-checked:text-success">School and Club Details</span>
-                                <input onChange={handleSchoolCheckboxChange} checked={formValues.isSchoolDetailVerified}  type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
+                                <input onChange={handleSchoolCheckboxChange} checked={formValues.isSchoolDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
                             </label>
                             <label className="inline-flex mt-5 ml-10 text-xl">
                                 <span className="peer-checked:text-success">Payment Details</span>
@@ -518,9 +602,9 @@ const handleSelectChange2 = (event: React.ChangeEvent<HTMLSelectElement>) => {
 
                             <div className="flex mt-5 ml-5 justify-center">
                                 <button onClick={handleSubmit} type="button" className="btn btn-outline-success rounded-full ml-5 text-2xl">
-                                {Loading ? 'Loading...' : "Approve"}
+                                    {Loading ? 'Loading...' : "Approve"}
 
-                                    </button>
+                                </button>
                             </div>
 
                         </div>
@@ -584,9 +668,9 @@ const handleSelectChange2 = (event: React.ChangeEvent<HTMLSelectElement>) => {
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-5">
                                         <div>
                                             <label htmlFor="name">Category</label>
-                                          
+
                                             <CustomSelect options={options} value={formValues.category} onChange={handleSelectChange} />
-                                                                                    </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <h6 className="text-lg font-bold mb-5 mt-5">Personal Information</h6>
@@ -908,7 +992,7 @@ const handleSelectChange2 = (event: React.ChangeEvent<HTMLSelectElement>) => {
                                     </div>
                                 </div>
                                 <div className="sm:col-span-2 mt-6 align-center flex justify-center"   >
-                                    <button type="submit" className="btn btn-outline-primary rounded-full"onClick={addClub} >
+                                    <button type="submit" className="btn btn-outline-primary rounded-full" onClick={addClub} >
                                         Add Club
                                     </button>
                                 </div>

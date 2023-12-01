@@ -28,15 +28,15 @@ const Approved = () => {
     const dispatch = useDispatch();
     const [members, setMembers] = useState<Member[]>([]);
     const [search, setSearch] = useState<string>('');
-        const [loading, setLoading] = useState<boolean>(true);
-        const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
     useEffect(() => {
-        setLoading(false)
+        // setLoading(false)
         dispatch(setPageTitle('Dashboard Admin'));
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/api/member/getAllmembers');
-                setMembers(response.data);
+                setMembers(response.data.result);
             } catch (error) {
                 setError("error");
             } finally {
@@ -124,7 +124,7 @@ const Approved = () => {
 
                 }
                 {
-                    !loading &&
+                    loading &&
                     (
                         <table>
                             <tbody>
