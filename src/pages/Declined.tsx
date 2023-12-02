@@ -53,6 +53,9 @@ const Declined = () => {
     const [members, setMembers] = useState<Member[]>([]);
     const [search, setSearch] = useState<string>('');
     const [tabs, setTabs] = useState<string>('requests');
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
     const toggleTabs = (name: string) => {
         setTabs(name);
     };
@@ -60,174 +63,219 @@ const Declined = () => {
     useEffect(() => {
         dispatch(setPageTitle('Dashboard Admin'));
 
-        axios.get('http://localhost:3000/api/member/getAllmembers')
-            .then(response => {
-                setMembers(response.data.result);
-            })
-            .catch(error => {
-                console.error('Error fetching data from MongoDB:', error);
-            });
-    }, [dispatch]);
 
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:3000/api/member/getAllmembers/');
+                setMembers(response.data.result);
+            } catch (error) {
+                setError("error");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+
+    }, [dispatch]);
+    const LoaderData = () => (
+        <div>
+            {
+                !loading && !error && members.length === 0 &&
+                (
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td colSpan={12} style={{ textAlign: 'center' }}>
+                                    No data available.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                )
+
+            }
+            {
+                loading &&
+                (
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td colSpan={3} className="p-4 text-center">
+                                    <div className="flex justify-center items-center">
+                                        <div className="loader animate-spin mr-4"></div>
+                                        {/* <span className="text-gray-600">Loading...</span> */}
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                )
+
+            }
+        </div>
+    )
     return (
         <div className="mb-5 space-y-5">
-            
+
             <div className="sm:flex-1 ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex flex-col sm:flex-row items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
                 <div className="sm:ltr:mr-auto sm:rtl:ml-auto">
                     <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
-                    <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl">
-                        Declined Membership Requests
-                    </h1>
+                        <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl">
+                            Declined Membership Requests
+                        </h1>
                     </div>
                 </div>
             </div>
 
-            
 
-                {/* Body Start */}
 
-                <div>
-            
+            {/* Body Start */}
+
+            <div>
+
                 <div className="pt-5">
-                
-                <div>
-                    <ul className="sm:flex font-semibold border-b border-[#ebedf2] dark:border-[#191e3a] mb-5 whitespace-nowrap overflow-y-auto">
-                        <li className="inline-block">
-                            <button
-                                onClick={() => toggleTabs('requests')}
-                                className={`flex gap-2 p-4 border-b border-transparent hover:border-primary hover:text-primary ${tabs === 'requests' ? '!border-primary text-primary' : ''}`}
-                            >
-                                <IconUser />
-                                Declined Member Requests
-                            </button>
-                        </li>
-                        <li className="inline-block">
-                            <button
-                                onClick={() => toggleTabs('members')}
-                                className={`flex gap-2 p-4 border-b border-transparent hover:border-primary hover:text-primary ${tabs === 'members' ? '!border-primary text-primary' : ''}`}
-                            >
-                                <IconUsers />
-                                Removed Members
-                            </button>
-                        </li>
-                        
-                        
-                    </ul>
-                </div>
-                {tabs === 'requests' ? (
+
                     <div>
-                   <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
-                   <h1>
-                       Declined Membership Requests
-                   </h1>
-                   
-               </div>
+                        <ul className="sm:flex font-semibold border-b border-[#ebedf2] dark:border-[#191e3a] mb-5 whitespace-nowrap overflow-y-auto">
+                            <li className="inline-block">
+                                <button
+                                    onClick={() => toggleTabs('requests')}
+                                    className={`flex gap-2 p-4 border-b border-transparent hover:border-primary hover:text-primary ${tabs === 'requests' ? '!border-primary text-primary' : ''}`}
+                                >
+                                    <IconUser />
+                                    Declined Member Requests
+                                </button>
+                            </li>
+                            <li className="inline-block">
+                                <button
+                                    onClick={() => toggleTabs('members')}
+                                    className={`flex gap-2 p-4 border-b border-transparent hover:border-primary hover:text-primary ${tabs === 'members' ? '!border-primary text-primary' : ''}`}
+                                >
+                                    <IconUsers />
+                                    Removed Members
+                                </button>
+                            </li>
 
-               <div className="table-responsive mb-5">
-               <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
-                            <th>Membership Type</th>
-                            <th>Date Declined</th>
-                            <th>Reason</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {members
-                            .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'DECLINED'))
-                            .map((data) => (
-                                <tr key={data._id}>
-                                    <td>{data._id}</td>
-                                    <td>{data.firstName}</td>
-                                    <td>{data.lastName}</td>
-                                    <td>{data.membershipCategory}</td>
-                                    <td>{data.updated_at}</td>
-                                    <td>{data.declinedMessage}</td>
-                                    <td>
-                                        <button className="badge whitespace-nowrap badge-outline-success">
-                                            <NavLink to={`/declined-requests/${data._id}`}>View</NavLink>
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                    </tbody>
-                </table>
-                   </div>
-                   </div>
-                    
-                ) : (
-                    ''
-                )}
-                {tabs === 'members' ? (
-                    <div>
-                    <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
-                    <h1>
-                        Removed Memberships
-                    </h1>
-                    
+
+                        </ul>
+                    </div>
+                    {tabs === 'requests' ? (
+                        <div>
+                            <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
+                                <h1>
+                                    Declined Membership Requests
+                                </h1>
+
+                            </div>
+
+                            <div className="table-responsive mb-5">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Membership Type</th>
+                                            <th>Date Declined</th>
+                                            <th>Reason</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {members
+                                            .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'DECLINED'))
+                                            .map((data) => (
+                                                <tr key={data._id}>
+                                                    <td>{data._id}</td>
+                                                    <td>{data.firstName}</td>
+                                                    <td>{data.lastName}</td>
+                                                    <td>{data.membershipCategory}</td>
+                                                    <td>{data.updated_at}</td>
+                                                    <td>{data.declinedMessage}</td>
+                                                    <td>
+                                                        <button className="badge whitespace-nowrap badge-outline-success">
+                                                            <NavLink to={`/declined-requests/${data._id}`}>View</NavLink>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                                <LoaderData/>
+                            </div>
+                        </div>
+
+                    ) : (
+                        ''
+                    )}
+                    {tabs === 'members' ? (
+                        <div>
+                            <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
+                                <h1>
+                                    Removed Memberships
+                                </h1>
+
+                            </div>
+
+
+
+                            <div className="table-responsive mb-5">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Membership Type</th>
+                                            <th>Date Declined</th>
+                                            <th>Reason</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {members
+                                            .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'REMOVED'))
+                                            .map((data) => (
+                                                <tr key={data._id}>
+                                                    <td>{data._id}</td>
+                                                    <td>{data.firstName}</td>
+                                                    <td>{data.lastName}</td>
+                                                    <td>{data.membershipCategory}</td>
+                                                    <td>{data.updated_at}</td>
+                                                    <td>{data.declinedMessage}</td>
+                                                    <td>
+                                                        <button className="badge whitespace-nowrap badge-outline-success">
+                                                            <NavLink to={`/removed-members/${data._id}`}>View</NavLink>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                                <LoaderData/>
+                            </div>
+                        </div>
+
+                    ) : (
+                        ''
+                    )}
                 </div>
-
-                
- 
-                <div className="table-responsive mb-5">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
-                            <th>Membership Type</th>
-                            <th>Date Declined</th>
-                            <th>Reason</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {members
-                            .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'REMOVED'))
-                            .map((data) => (
-                                <tr key={data._id}>
-                                    <td>{data._id}</td>
-                                    <td>{data.firstName}</td>
-                                    <td>{data.lastName}</td>
-                                    <td>{data.membershipCategory}</td>
-                                    <td>{data.updated_at}</td>
-                                    <td>{data.declinedMessage}</td>
-                                    <td>
-                                        <button className="badge whitespace-nowrap badge-outline-success">
-                                            <NavLink to={`/removed-members/${data._id}`}>View</NavLink>
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                    </tbody>
-                </table>
-                    </div>
-                    </div>
-
-                ) : (
-                    ''
-                )}
             </div>
+
+            {/* Body End */}
+
+
+
+
+
+
+
         </div>
 
-                {/* Body End */}
 
 
 
-
-
-
-
-        </div>
-
-
-
-        
     );
 };
 

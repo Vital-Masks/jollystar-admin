@@ -17,12 +17,15 @@ interface Member {
     firstName: string; // Add "?" to indicate it's optional
     lastName: string; // Add "?" to indicate it's optional
     membershipCategory: string;
+    created_at: string;
     updated_at: string;
     passportNumber: string;
     phoneNumber: string;
+    email: string;
     memberApprovalStatus: string;
     // Add other properties as needed
 }
+
 
 const Approved = () => {
     const dispatch = useDispatch();
@@ -34,8 +37,9 @@ const Approved = () => {
         // setLoading(false)
         dispatch(setPageTitle('Dashboard Admin'));
         const fetchData = async () => {
+            let status = "APPROVED"
             try {
-                const response = await axios.get('http://localhost:3000/api/member/getAllmembers');
+                const response = await axios.get('http://localhost:3000/api/member/getMemberStatusMembers/' + status);
                 setMembers(response.data.result);
             } catch (error) {
                 setError("error");
