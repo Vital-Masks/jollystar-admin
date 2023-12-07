@@ -85,7 +85,6 @@ interface GalleryItem {
     // Define the properties of your gallery item
 }
 interface FormValues {
-    memberID: string;
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
 }
@@ -106,7 +105,6 @@ const ApprovedMember = () => {
     const [formValues, setFormValues] = useState<FormValues>({
         isSchoolDetailVerified: isSclChecked,
         isPaymentDetailVerified: ispayChecked,
-        memberID: ""
     });
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -170,12 +168,8 @@ const ApprovedMember = () => {
     ];
     const hableRemove = () => {
 
-        if (formValues.memberID !== "") {
             setRemoveLoading(true);
             handleStatus("REMOVED")
-        } else {
-            setMemberIdErrorMsg("Required")
-        }
 
     }
     const handleStatus = async (status: string) => {
@@ -283,7 +277,7 @@ const ApprovedMember = () => {
                                 <div className="sm:flex justify-between items-center md:gap-20">
                                     <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership Id</label>
                                     <div>
-                                        <input onChange={handleChange} name="memberID" value={formValues.memberID} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
+                                        <input onChange={handleChange} name="memberID" value={ members?.membershipId} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
                                         <p className="w-full sm:w-1/2 text-sm text-red-400 ps-4"  >{memberIdErrorMsg}</p>
 
                                     </div>
