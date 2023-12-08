@@ -7,17 +7,21 @@ import Declined from '../pages/Declined';
 import DeclineRequest from '../pages/DeclineRequest';
 import RemovedMembers from '../pages/RemovedMembers';
 import FileManagement from '../pages/FileManagement';
-
 import Posts from '../pages/Posts';
+import Login from '../pages/Login';
 import AddNewMember from '../pages/AddNewMember';
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Error = lazy(() => import('../components/Error'));
-
 
 const routes = [
     // dashboard
     {
         path: '/',
+        element: <Login />,
+        layout: 'blank'
+    },
+    {
+        path: '/dashboard',
         element: <Dashboard />,
     },
     {
