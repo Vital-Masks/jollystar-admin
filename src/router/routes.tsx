@@ -10,10 +10,19 @@ import FileManagement from '../pages/FileManagement';
 
 import Posts from '../pages/Posts';
 import AddNewMember from '../pages/AddNewMember';
+import Login from '../pages/login';
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Error = lazy(() => import('../components/Error'));
 
-
+const publicRoute = [{
+    path: '/',
+    element: <Login />,
+    layout: '',
+}, {
+    path: '*',
+    element: <Login />,
+    layout: 'blank',
+},]
 const routes = [
     // dashboard
     {
@@ -67,4 +76,4 @@ const routes = [
     },
 ];
 
-export { routes };
+export { routes, publicRoute };
