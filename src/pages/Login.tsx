@@ -19,9 +19,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import { isEmpty } from '../utils/utils';
 // import { toast } from "react-toastify";
 // import { isEmpty } from "../utils/isAuthData";
-const isEmpty = () => { return true }
+// const isEmpty = () => { return true }
 const validationSchema = Yup.object().shape({
     email: Yup.string()
         .email("Invalid email address")
@@ -57,7 +58,9 @@ const Login = () => {
                 if (response) {
                     toast.success("Login successfully");
                     // navigate('/');
-                    // window.location.href='/info';
+                    localStorage.setItem('userData', JSON.stringify(response));
+                    window.location.href = '/dashboard';
+
                 } else {
 
                     toast.error("email or password incorrect");

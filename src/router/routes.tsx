@@ -16,7 +16,7 @@ const Error = lazy(() => import('../components/Error'));
 const publicRoute = [{
     path: '/',
     element: <Login />,
-    layout: '',
+    layout: 'blank',
 }, {
     path: '*',
     element: <Login />,
@@ -25,9 +25,13 @@ const publicRoute = [{
 const routes = [
     // dashboard
     {
-        path: '/',
+        path: '/login',
         element: <Login />,
         layout: 'blank'
+    },
+    {
+        path: '/',
+        element: <Dashboard />,
     },
     {
         path: '/dashboard',
