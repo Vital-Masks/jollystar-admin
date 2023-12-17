@@ -10,6 +10,7 @@ import FileManagement from '../pages/FileManagement';
 import Posts from '../pages/Posts';
 import Login from '../pages/Login';
 import AddNewMember from '../pages/AddNewMember';
+import Gallery from '../pages/Gallery';
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Error = lazy(() => import('../components/Error'));
 
@@ -76,6 +77,10 @@ const routes = [
     {
         path: '/add-new-members',
         element: <AddNewMember />,
+    },
+    {
+        path: '/gallery',
+        element: <Gallery />,
     },
     {
         path: '*',

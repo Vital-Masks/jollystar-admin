@@ -9,11 +9,8 @@ import IconUser from '../components/Icon/IconUser';
 import IconX from '../components/Icon/IconX';
 import IconFolder from '../components/Icon/IconFolder';
 import IconSearch from '../components/Icon/IconSearch';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 
-
-const Posts = () => {
+const Gallery = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('File Management'));
@@ -36,10 +33,6 @@ const Posts = () => {
         const { value, id } = e.target;
         setParams({ ...params, [id]: value });
     };
-
-    const [quilvalue, setQuilValue] = useState(
-        '<h1>This is a heading text...</h1><br /><p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla dui arcu, pellentesque id mattis sed, mattis semper erat. Etiam commodo arcu a mollis consequat. Curabitur pretium auctor tortor, bibendum placerat elit feugiat et. Ut ac turpis nec dui ullamcorper ornare. Vestibulum finibus quis magna at accumsan. Praesent a purus vitae tortor fringilla tempus vel non purus. Suspendisse eleifend nibh porta dolor ullamcorper laoreet. Ut sit amet ipsum vitae lectus pharetra tincidunt. In ipsum quam, iaculis at erat ut, fermentum efficitur ipsum. Nunc odio diam, fringilla in auctor et, scelerisque at lorem. Sed convallis tempor dolor eu dictum. Cras ornare ornare imperdiet. Pellentesque sagittis lacus non libero fringilla faucibus. Aenean ullamcorper enim et metus vestibulum, eu aliquam nunc placerat. Praesent fringilla dolor sit amet leo pulvinar semper. </p><br /><p> Curabitur vel tincidunt dui. Duis vestibulum eget velit sit amet aliquet. Curabitur vitae cursus ex. Aliquam pulvinar vulputate ullamcorper. Maecenas luctus in eros et aliquet. Cras auctor luctus nisl a consectetur. Morbi hendrerit nisi nunc, quis egestas nibh consectetur nec. Aliquam vel lorem enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc placerat, enim quis varius luctus, enim arcu tincidunt purus, in vulputate tortor mi a tortor. Praesent porta ornare fermentum. Praesent sed ligula at ante tempor posuere a at lorem. </p><br /><p> Curabitur vel tincidunt dui. Duis vestibulum eget velit sit amet aliquet. Curabitur vitae cursus ex. Aliquam pulvinar vulputate ullamcorper. Maecenas luctus in eros et aliquet. Cras auctor luctus nisl a consectetur. Morbi hendrerit nisi nunc, quis egestas nibh consectetur nec. Aliquam vel lorem enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc placerat, enim quis varius luctus, enim arcu tincidunt purus, in vulputate tortor mi a tortor. Praesent porta ornare fermentum. Praesent sed ligula at ante tempor posuere a at lorem. </p><br /><p> Aliquam diam felis, vehicula ut ipsum eu, consectetur tincidunt ipsum. Vestibulum sed metus ac nisi tincidunt mollis sed non urna. Vivamus lacinia ullamcorper interdum. Sed sed erat vel leo venenatis pretium. Sed aliquet sem nunc, ut iaculis dolor consectetur et. Vivamus ligula sapien, maximus nec pellentesque ut, imperdiet at libero. Vivamus semper nulla lectus, id dapibus nulla convallis id. Quisque elementum lectus ac dui gravida, ut molestie nunc convallis. Pellentesque et odio non dolor convallis commodo sit amet a ante. </p>'
-    );
 
     const [search, setSearch] = useState<any>('');
     const [contactList] = useState<any>([
@@ -282,7 +275,7 @@ const Posts = () => {
     return (
         <div>
             <div className="flex items-center justify-between flex-wrap gap-4">
-                <h2 className="text-xl">Post/News Management</h2>
+                <h2 className="text-xl">Gallery</h2>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                     <div className="flex gap-3">
                         
@@ -308,7 +301,8 @@ const Posts = () => {
                         <table className="table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>Title</th>
+                                    <th>Album Name</th>
+                                    <th>Description</th>
                                     <th>Posted On</th>
                                     <th></th>
                                 </tr>
@@ -331,6 +325,7 @@ const Posts = () => {
                                                     <div>{contact.name}</div>
                                                 </div>
                                             </td>
+                                            <div>{contact.name}</div>
                                             <td>{contact.email}</td>
                                             <td>
                                                 <div className="flex gap-4 items-center justify-center">
@@ -383,15 +378,22 @@ const Posts = () => {
                                     <div className="p-5">
                                         <form>
                                             <div className="mb-5">
-                                                <label htmlFor="name">Title</label>
-                                                <input id="name" type="text" placeholder="Enter Title" className="form-input" value={params.name} onChange={(e) => changeValue(e)} />
+                                                <label htmlFor="name">Album Name</label>
+                                                <input id="name" type="text" placeholder="Enter Album Name" className="form-input" value={params.name} onChange={(e) => changeValue(e)} />
                                             </div>
                                             <div className="mb-5">
                                                 <label htmlFor="address">Description</label>
-                                                <ReactQuill theme="snow" value={value} onChange={setQuilValue} />
+                                                <textarea
+                                                    id="description"
+                                                    rows={3}
+                                                    placeholder="Enter description"
+                                                    className="form-textarea resize-none min-h-[130px]"
+                                                    value={params.location}
+                                                    onChange={(e) => changeValue(e)}
+                                                ></textarea>
                                             </div>
                                             <div className="mb-5">
-                                            <label htmlFor="ctnFile">Upload File</label>
+                                            <label htmlFor="ctnFile">Cover Image</label>
                                                 <input
                                                     id="ctnFile"
                                                     type="file"
@@ -400,14 +402,8 @@ const Posts = () => {
                                                 />
                                             </div>
                                             <div className="mb-5">
-                                            <label htmlFor="ctnFile">Upload Gallery</label>
-                                                <input
-                                                    id="ctnFile"
-                                                    type="file"
-                                                    className="form-input rounded-full border-dark file:py-2 file:px-4 file:border-0 file:font-semibold p-0 file:bg-primary/90 ltr:file:mr-5 rtl:file-ml-5 file:text-white file:hover:bg-primary"
-                                                    required
-                                                    multiple  
-                                                />
+                                                <label htmlFor="name">Album Link</label>
+                                                <input id="name" type="text" placeholder="Enter Link" className="form-input" value={params.name} onChange={(e) => changeValue(e)} />
                                             </div>
                                             <div className="flex justify-end items-center mt-8">
                                                 <button type="button" className="btn btn-outline-danger" onClick={() => setAddContactModal(false)}>
@@ -429,4 +425,4 @@ const Posts = () => {
     );
 };
 
-export default Posts;
+export default Gallery;
