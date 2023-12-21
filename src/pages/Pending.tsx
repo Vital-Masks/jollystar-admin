@@ -17,28 +17,41 @@ interface Member {
     firstName: string; // Add "?" to indicate it's optional
     lastName: string; // Add "?" to indicate it's optional
     membershipCategory: string;
+    created_at: string;
     updated_at: string;
     passportNumber: string;
     phoneNumber: string;
+    email: string;
     memberApprovalStatus: string;
     // Add other properties as needed
+    Reason:string
 }
 
 const Pending = () => {
     const dispatch = useDispatch();
     const [members, setMembers] = useState<Member[]>([]);
     const [search, setSearch] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        // setLoading(false)
+
         dispatch(setPageTitle('Dashboard Admin'));
 
-        axios.get('http://localhost:3000/api/member/getAllmembers')
-            .then(response => {
+        const fetchData = async () => {
+            let status = "PENDING"
+            try {
+                const response = await axios.get('http://localhost:3000/api/member/getMemberStatusMembers/' + status);
                 setMembers(response.data.result);
-            })
-            .catch(error => {
-                console.error('Error fetching data from MongoDB:', error);
-            });
+            } catch (error) {
+                setError("error");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, [dispatch]);
 
     return (
@@ -66,7 +79,6 @@ const Pending = () => {
                     </form>
                 </div>
             </div>
-
             <div className="table-responsive mb-5">
                 <table>
                     <thead>
@@ -82,8 +94,10 @@ const Pending = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {members
-                            .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'PENDING'))
+                        {members && members
+                            .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase()))
+                                || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) &&
+                                (data.memberApprovalStatus && data.memberApprovalStatus === 'PENDING'))
                             .map((data) => (
                                 <tr key={data._id}>
                                     <td>{data._id}</td>
@@ -102,6 +116,39 @@ const Pending = () => {
                             ))}
                     </tbody>
                 </table>
+                {
+                    !loading && !error && members.length === 0 &&
+                    (
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td colSpan={12} style={{ textAlign: 'center' }}>
+                                        No data available.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    )
+
+                }
+                {
+                    loading &&
+                    (
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td colSpan={3} className="p-4 text-center">
+                                        <div className="flex justify-center items-center">
+                                            <div className="loader animate-spin mr-4"></div>
+                                            <span className="text-gray-600">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    )
+
+                }
             </div>
         </div>
     );

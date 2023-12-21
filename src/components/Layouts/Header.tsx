@@ -301,7 +301,7 @@ const Header = () => {
                         </button>
                         <ul className="sub-menu">
                             <li>
-                                <NavLink to="/dashboard">{t('sales')}</NavLink>
+                                <NavLink to="/">{t('sales')}</NavLink>
                             </li>
                             <li>
                                 <NavLink to="/analytics">{t('analytics')}</NavLink>

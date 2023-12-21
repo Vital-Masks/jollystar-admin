@@ -17,9 +17,11 @@ interface Member {
     firstName: string; // Add "?" to indicate it's optional
     lastName: string; // Add "?" to indicate it's optional
     membershipCategory: string;
+    created_at: string;
     updated_at: string;
     passportNumber: string;
     phoneNumber: string;
+    email: string;
     memberApprovalStatus: string;
     // Add other properties as needed
 }
@@ -28,31 +30,38 @@ const Approved = () => {
     const dispatch = useDispatch();
     const [members, setMembers] = useState<Member[]>([]);
     const [search, setSearch] = useState<string>('');
-
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
     useEffect(() => {
+        // setLoading(false)
         dispatch(setPageTitle('Dashboard Admin'));
-
-        axios.get('http://localhost:3000/api/member/getAllmembers')
-            .then(response => {
+        const fetchData = async () => {
+            let status = "APPROVED"
+            try {
+                const response = await axios.get('http://localhost:3000/api/member/getMemberStatusMembers/' + status);
                 setMembers(response.data.result);
-            })
-            .catch(error => {
-                console.error('Error fetching data from MongoDB:', error);
-            });
+            } catch (error) {
+                setError("error");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, [dispatch]);
-    
+
     return (
         <div className="mb-5 space-y-5">
-            
+
             <div className="sm:flex-1 ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex flex-col sm:flex-row items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
-            <div className="sm:ltr:mr-auto sm:rtl:ml-auto">
-                <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
-                <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl">
-                    Approved Members
-                </h1>
+                <div className="sm:ltr:mr-auto sm:rtl:ml-auto">
+                    <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
+                        <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl">
+                            Approved Members
+                        </h1>
+                    </div>
                 </div>
-            </div>
-            <div className="sm:ltr:mr-auto sm:rtl:ml-auto flex space-x-2">
+                <div className="sm:ltr:mr-auto sm:rtl:ml-auto flex space-x-2">
                     <form className="mx-auto mt-5 mb-5">
                         <div className="relative">
                             <input
@@ -102,9 +111,43 @@ const Approved = () => {
                             ))}
                     </tbody>
                 </table>
-                    </div>
+                {
+                    !loading && !error && members.length === 0 &&
+                    (
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td colSpan={12} style={{ textAlign: 'center' }}>
+                                        No data available.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    )
 
-            
+                }
+                {
+                    loading &&
+                    (
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td colSpan={3} className="p-4 text-center">
+                                        <div className="flex justify-center items-center">
+                                            <div className="loader animate-spin mr-4"></div>
+                                            {/* <span className="text-gray-600">Loading...</span> */}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    )
+
+                }
+
+            </div>
+
+
         </div>
     );
 };
