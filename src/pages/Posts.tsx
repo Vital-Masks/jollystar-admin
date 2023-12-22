@@ -3,14 +3,13 @@ import { Dialog, Transition } from '@headlessui/react';
 import Swal from 'sweetalert2';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../store/themeConfigSlice';
-import IconLayoutGrid from '../components/Icon/IconLayoutGrid';
-import IconUserPlus from '../components/Icon/IconUserPlus';
-import IconUser from '../components/Icon/IconUser';
 import IconX from '../components/Icon/IconX';
 import IconFolder from '../components/Icon/IconFolder';
 import IconSearch from '../components/Icon/IconSearch';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import axios from 'axios';
+import { convertFileToBase64 } from '../components/utils/fileUtils';
 
 
 const Posts = () => {
@@ -22,12 +21,14 @@ const Posts = () => {
 
     const [value, setValue] = useState<any>('list');
     const [defaultParams] = useState({
-        id: null,
-        name: '',
-        email: '',
-        phone: '',
-        role: '',
-        location: '',
+
+        "_id": "",
+        "title": "",
+        "description": "",
+        "coverImage": "",
+        "gallery": [
+        ],
+        "isDeleted": true,
     });
 
     const [params, setParams] = useState<any>(JSON.parse(JSON.stringify(defaultParams)));
@@ -42,206 +43,147 @@ const Posts = () => {
     );
 
     const [search, setSearch] = useState<any>('');
-    const [contactList] = useState<any>([
-        {
-            id: 1,
-            path: 'profile-35.png',
-            name: 'Alan Green',
-            role: 'Web Developer',
-            email: 'alan@mail.com',
-            location: 'Boston, USA',
-            phone: '+1 202 555 0197',
-            posts: 25,
-            followers: '5K',
-            following: 500,
-        },
-        {
-            id: 2,
-            path: 'profile-35.png',
-            name: 'Linda Nelson',
-            role: 'Web Designer',
-            email: 'linda@mail.com',
-            location: 'Sydney, Australia',
-            phone: '+1 202 555 0170',
-            posts: 25,
-            followers: '21.5K',
-            following: 350,
-        },
-        {
-            id: 3,
-            path: 'profile-35.png',
-            name: 'Lila Perry',
-            role: 'UX/UI Designer',
-            email: 'lila@mail.com',
-            location: 'Miami, USA',
-            phone: '+1 202 555 0105',
-            posts: 20,
-            followers: '21.5K',
-            following: 350,
-        },
-        {
-            id: 4,
-            path: 'profile-35.png',
-            name: 'Andy King',
-            role: 'Project Lead',
-            email: 'andy@mail.com',
-            location: 'Tokyo, Japan',
-            phone: '+1 202 555 0194',
-            posts: 25,
-            followers: '21.5K',
-            following: 300,
-        },
-        {
-            id: 5,
-            path: 'profile-35.png',
-            name: 'Jesse Cory',
-            role: 'Web Developer',
-            email: 'jesse@mail.com',
-            location: 'Edinburgh, UK',
-            phone: '+1 202 555 0161',
-            posts: 30,
-            followers: '20K',
-            following: 350,
-        },
-        {
-            id: 6,
-            path: 'profile-35.png',
-            name: 'Xavier',
-            role: 'UX/UI Designer',
-            email: 'xavier@mail.com',
-            location: 'New York, USA',
-            phone: '+1 202 555 0155',
-            posts: 25,
-            followers: '21.5K',
-            following: 350,
-        },
-        {
-            id: 7,
-            path: 'profile-35.png',
-            name: 'Susan',
-            role: 'Project Manager',
-            email: 'susan@mail.com',
-            location: 'Miami, USA',
-            phone: '+1 202 555 0118',
-            posts: 40,
-            followers: '21.5K',
-            following: 350,
-        },
-        {
-            id: 8,
-            path: 'profile-35.png',
-            name: 'Raci Lopez',
-            role: 'Web Developer',
-            email: 'traci@mail.com',
-            location: 'Edinburgh, UK',
-            phone: '+1 202 555 0135',
-            posts: 25,
-            followers: '21.5K',
-            following: 350,
-        },
-        {
-            id: 9,
-            path: 'profile-35.png',
-            name: 'Steven Mendoza',
-            role: 'HR',
-            email: 'sokol@verizon.net',
-            location: 'Monrovia, US',
-            phone: '+1 202 555 0100',
-            posts: 40,
-            followers: '21.8K',
-            following: 300,
-        },
-        {
-            id: 10,
-            path: 'profile-35.png',
-            name: 'James Cantrell',
-            role: 'Web Developer',
-            email: 'sravani@comcast.net',
-            location: 'Michigan, US',
-            phone: '+1 202 555 0134',
-            posts: 100,
-            followers: '28K',
-            following: 520,
-        },
-        {
-            id: 11,
-            path: 'profile-35.png',
-            name: 'Reginald Brown',
-            role: 'Web Designer',
-            email: 'drhyde@gmail.com',
-            location: 'Entrimo, Spain',
-            phone: '+1 202 555 0153',
-            posts: 35,
-            followers: '25K',
-            following: 500,
-        },
-        {
-            id: 12,
-            path: 'profile-35.png',
-            name: 'Stacey Smith',
-            role: 'Chief technology officer',
-            email: 'maikelnai@optonline.net',
-            location: 'Lublin, Poland',
-            phone: '+1 202 555 0115',
-            posts: 21,
-            followers: '5K',
-            following: 200,
-        },
-    ]);
 
-    const [filteredItems, setFilteredItems] = useState<any>(contactList);
+    const [filteredItems, setFilteredItems] = useState<any>([]);
+    const [AllPosts, setAllPosts] = useState<any>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [postLoading, setPostLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/api/newsManagement/getAllNews');
+            setAllPosts(response.data.result);
+        } catch (error) {
+            setError("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+    const postData = async (data: any) => {
+        setPostLoading(true)
+        try {
+            const response = await axios.post('http://localhost:3000/api/newsManagement', data).then((res) => {
+                fetchData()
+            })
+            // setAllPosts(response.data.result);
+        } catch (error) {
+            setError("error");
+        } finally {
+            setPostLoading(false);
+        }
+    };
+    const putData = async (data: any) => {
+        setPostLoading(true)
+        try {
+            const response = await axios.put('http://localhost:3000/api/newsManagement/' + data._id, data).then((res) => {
+                fetchData()
+            })
+            // setAllPosts(response.data.result);
+        } catch (error) {
+            setError("error");
+        } finally {
+            setPostLoading(false);
+        }
+    };
+    const deletePostsData = async (data: any) => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/newsManagement/${data._id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add any other headers if needed, such as authorization headers
+                },
+            });
+
+            if (response.ok) {
+                // File deleted successfully, you may want to update your local state or do other actions.
+                console.log('File deleted successfully');
+                showMessage('Post Data has been deleted successfully.');
+
+                fetchData();
+            } else {
+                // Handle errors, you may want to show an error message to the user.
+                console.error('Failed to delete file. Response:', response);
+            }
+        } catch (error) {
+            // Handle network errors or other exceptions
+            console.error('An error occurred while deleting the file', error);
+        }
+    };
+
+    useEffect(() => {
+        // setLoading(false)
+        dispatch(setPageTitle('Dashboard Admin'));
+
+        fetchData();
+    }, [dispatch]);
 
     useEffect(() => {
         setFilteredItems(() => {
-            return contactList.filter((item: any) => {
-                return item.name.toLowerCase().includes(search.toLowerCase());
+            return AllPosts.filter((item: any) => {
+                return item.title.toLowerCase().includes(search.toLowerCase());
             });
         });
-    }, [search, contactList]);
+    }, [search, AllPosts]);
 
-    const saveUser = () => {
-        if (!params.name) {
-            showMessage('Name is required.', 'error');
+    const saveUser = async () => {
+        console.log(params);
+        console.log(!params.gallery, !params.gallery, params.gallery.length > 0);
+
+        if (!params.title) {
+            showMessage('Title is required.', 'error');
             return true;
         }
-        if (!params.email) {
-            showMessage('Email is required.', 'error');
-            return true;
-        }
-        if (!params.phone) {
-            showMessage('Phone is required.', 'error');
-            return true;
-        }
-        if (!params.role) {
-            showMessage('Occupation is required.', 'error');
+        if (!quilvalue) {
+            showMessage('Description is required.', 'error');
             return true;
         }
 
-        if (params.id) {
+        if (params._id) {
             //update user
-            let user: any = filteredItems.find((d: any) => d.id === params.id);
-            user.name = params.name;
-            user.email = params.email;
-            user.phone = params.phone;
-            user.role = params.role;
-            user.location = params.location;
-        } else {
-            //add user
-            let maxUserId = filteredItems.length ? filteredItems.reduce((max: any, character: any) => (character.id > max ? character.id : max), filteredItems[0].id) : 0;
-
-            let user = {
-                id: maxUserId + 1,
-                path: 'profile-35.png',
-                name: params.name,
-                email: params.email,
-                phone: params.phone,
-                role: params.role,
-                location: params.location,
-                posts: 20,
-                followers: '5K',
-                following: 500,
+            let postObj = {
+                title: params.title,
+                gallery: params.gallery,
+                quilvalue: quilvalue,
+                coverImage: params.coverImage,
+                _id: params._id
             };
-            filteredItems.splice(0, 0, user);
+            putData(postObj)
+
+
+        } else {
+            if (!(params.gallery.length > 0)) {
+                showMessage('Gallery is required.', 'error');
+                return true;
+            }
+            if (!params.coverImage) {
+                showMessage('Cover image is required.', 'error');
+                return true;
+            }
+
+            //add user
+            let gallery64 = [];
+            let coverImage64 = null;
+            if (params.coverImage) {
+                coverImage64 = await convertFileToBase64(params.coverImage);
+            }
+            for (let index = 0; index < params.gallery.length; index++) {
+                const element = params.gallery[index];
+                let binImage = ''
+                binImage = await convertFileToBase64(element);
+                gallery64.push(binImage)
+            }
+            console.log(gallery64, coverImage64, "0000000001");
+
+
+            let postObj = {
+                title: params.title,
+                gallery: gallery64,
+                quilvalue: quilvalue,
+                coverImage: coverImage64
+            };
+            postData(postObj);
+            // filteredItems.splice(0, 0, postData);
             //   searchContacts();
         }
 
@@ -260,8 +202,7 @@ const Posts = () => {
     };
 
     const deleteUser = (user: any = null) => {
-        setFilteredItems(filteredItems.filter((d: any) => d.id !== user.id));
-        showMessage('User has been deleted successfully.');
+        deletePostsData(user)
     };
 
     const showMessage = (msg = '', type = 'success') => {
@@ -279,18 +220,31 @@ const Posts = () => {
         });
     };
 
+    const handleSingleFileChange = (e: any) => {
+        const file = e.target.files[0];
+        // Handle the single file logic
+        console.log('Single file:', file);
+        setParams({ ...params, ['coverImage']: file });
+    };
+
+    const handleMultipleFilesChange = (e: any) => {
+        const files = e.target.files;
+        // Handle the multiple files logic
+        console.log('Multiple files:', files);
+        setParams({ ...params, ['gallery']: files });
+    };
     return (
         <div>
             <div className="flex items-center justify-between flex-wrap gap-4">
                 <h2 className="text-xl">Post/News Management</h2>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                     <div className="flex gap-3">
-                        
+
                         <div className="relative">
-                        <input type="text" placeholder="Search Posts" className="form-input py-2 ltr:pr-11 rtl:pl-11 peer rounded-full" value={search} onChange={(e) => setSearch(e.target.value)} />
-                        <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary">
-                            <IconSearch className="mx-auto" />
-                        </button>
+                            <input type="text" placeholder="Search Posts" className="form-input py-2 ltr:pr-11 rtl:pl-11 peer rounded-full" value={search} onChange={(e) => setSearch(e.target.value)} />
+                            <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary">
+                                <IconSearch className="mx-auto" />
+                            </button>
                         </div>
 
                         <div>
@@ -319,19 +273,17 @@ const Posts = () => {
                                         <tr key={contact.id}>
                                             <td>
                                                 <div className="flex items-center w-max">
-                                                    
-                                                    {!contact.path && contact.name && (
-                                                        <div className="grid place-content-center h-8 w-8 ltr:mr-2 rtl:ml-2 rounded-full bg-primary text-white text-sm font-semibold"></div>
-                                                    )}
-                                                    {!contact.path && !contact.name && (
+
+
+                                                    {/* {!contact.path && !contact.name && (
                                                         <div className="border border-gray-300 dark:border-gray-800 rounded-full p-2 ltr:mr-2 rtl:ml-2">
                                                             <IconUser className="w-4.5 h-4.5" />
                                                         </div>
-                                                    )}
-                                                    <div>{contact.name}</div>
+                                                    )} */}
+                                                    <div>{contact.title}</div>
                                                 </div>
                                             </td>
-                                            <td>{contact.email}</td>
+                                            <td>{contact.created_at}</td>
                                             <td>
                                                 <div className="flex gap-4 items-center justify-center">
                                                     <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
@@ -351,7 +303,7 @@ const Posts = () => {
                 </div>
             )}
 
-            
+
 
             <Transition appear show={addContactModal} as={Fragment}>
                 <Dialog as="div" open={addContactModal} onClose={() => setAddContactModal(false)} className="relative z-[51]">
@@ -378,35 +330,39 @@ const Posts = () => {
                                         <IconX />
                                     </button>
                                     <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                        {params.id ? 'Edit File' : 'Add File'}
+                                        {params._id ? 'Edit File' : 'Add File'}
                                     </div>
                                     <div className="p-5">
                                         <form>
                                             <div className="mb-5">
                                                 <label htmlFor="name">Title</label>
-                                                <input id="name" type="text" placeholder="Enter Title" className="form-input" value={params.name} onChange={(e) => changeValue(e)} />
+                                                <input id="title" type="text" placeholder="Enter Title" className="form-input" value={params.title} onChange={(e) => changeValue(e)} />
                                             </div>
                                             <div className="mb-5">
                                                 <label htmlFor="address">Description</label>
-                                                <ReactQuill theme="snow" value={value} onChange={setQuilValue} />
+                                                <ReactQuill theme="snow" value={quilvalue} onChange={setQuilValue} />
                                             </div>
                                             <div className="mb-5">
-                                            <label htmlFor="ctnFile">Upload File</label>
+                                                <label htmlFor="ctnFile">Upload File</label>
                                                 <input
                                                     id="ctnFile"
                                                     type="file"
                                                     className="form-input rounded-full border-dark file:py-2 file:px-4 file:border-0 file:font-semibold p-0 file:bg-primary/90 ltr:file:mr-5 rtl:file-ml-5 file:text-white file:hover:bg-primary"
                                                     required
+                                                    onChange={handleSingleFileChange}
+
                                                 />
                                             </div>
                                             <div className="mb-5">
-                                            <label htmlFor="ctnFile">Upload Gallery</label>
+                                                <label htmlFor="ctnFile">Upload Gallery</label>
                                                 <input
                                                     id="ctnFile"
                                                     type="file"
                                                     className="form-input rounded-full border-dark file:py-2 file:px-4 file:border-0 file:font-semibold p-0 file:bg-primary/90 ltr:file:mr-5 rtl:file-ml-5 file:text-white file:hover:bg-primary"
                                                     required
-                                                    multiple  
+                                                    multiple
+                                                    onChange={handleMultipleFilesChange}
+
                                                 />
                                             </div>
                                             <div className="flex justify-end items-center mt-8">
@@ -414,7 +370,7 @@ const Posts = () => {
                                                     Cancel
                                                 </button>
                                                 <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={saveUser}>
-                                                    {params.id ? 'Update' : 'Add'}
+                                                    {params._id ? 'Update' : 'Add'}
                                                 </button>
                                             </div>
                                         </form>

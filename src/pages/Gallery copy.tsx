@@ -3,16 +3,14 @@ import { Dialog, Transition } from '@headlessui/react';
 import Swal from 'sweetalert2';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../store/themeConfigSlice';
+import IconLayoutGrid from '../components/Icon/IconLayoutGrid';
+import IconUserPlus from '../components/Icon/IconUserPlus';
+import IconUser from '../components/Icon/IconUser';
 import IconX from '../components/Icon/IconX';
 import IconFolder from '../components/Icon/IconFolder';
 import IconSearch from '../components/Icon/IconSearch';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import axios from 'axios';
-import { convertFileToBase64 } from '../components/utils/fileUtils';
 
-
-const Posts = () => {
+const Gallery = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('File Management'));
@@ -21,13 +19,12 @@ const Posts = () => {
 
     const [value, setValue] = useState<any>('list');
     const [defaultParams] = useState({
-
-        "_id": "",
-        "albumName": "",
-        "albumLink": "",
-        "description": "",
-        "coverImage": "",
-        "isDeleted": true,
+        id: null,
+        name: '',
+        email: '',
+        phone: '',
+        role: '',
+        location: '',
     });
 
     const [params, setParams] = useState<any>(JSON.parse(JSON.stringify(defaultParams)));
@@ -37,151 +34,211 @@ const Posts = () => {
         setParams({ ...params, [id]: value });
     };
 
-    const [quilvalue, setQuilValue] = useState(
-        '<h1>This is a heading text...</h1><br /><p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla dui arcu, pellentesque id mattis sed, mattis semper erat. Etiam commodo arcu a mollis consequat. Curabitur pretium auctor tortor, bibendum placerat elit feugiat et. Ut ac turpis nec dui ullamcorper ornare. Vestibulum finibus quis magna at accumsan. Praesent a purus vitae tortor fringilla tempus vel non purus. Suspendisse eleifend nibh porta dolor ullamcorper laoreet. Ut sit amet ipsum vitae lectus pharetra tincidunt. In ipsum quam, iaculis at erat ut, fermentum efficitur ipsum. Nunc odio diam, fringilla in auctor et, scelerisque at lorem. Sed convallis tempor dolor eu dictum. Cras ornare ornare imperdiet. Pellentesque sagittis lacus non libero fringilla faucibus. Aenean ullamcorper enim et metus vestibulum, eu aliquam nunc placerat. Praesent fringilla dolor sit amet leo pulvinar semper. </p><br /><p> Curabitur vel tincidunt dui. Duis vestibulum eget velit sit amet aliquet. Curabitur vitae cursus ex. Aliquam pulvinar vulputate ullamcorper. Maecenas luctus in eros et aliquet. Cras auctor luctus nisl a consectetur. Morbi hendrerit nisi nunc, quis egestas nibh consectetur nec. Aliquam vel lorem enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc placerat, enim quis varius luctus, enim arcu tincidunt purus, in vulputate tortor mi a tortor. Praesent porta ornare fermentum. Praesent sed ligula at ante tempor posuere a at lorem. </p><br /><p> Curabitur vel tincidunt dui. Duis vestibulum eget velit sit amet aliquet. Curabitur vitae cursus ex. Aliquam pulvinar vulputate ullamcorper. Maecenas luctus in eros et aliquet. Cras auctor luctus nisl a consectetur. Morbi hendrerit nisi nunc, quis egestas nibh consectetur nec. Aliquam vel lorem enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc placerat, enim quis varius luctus, enim arcu tincidunt purus, in vulputate tortor mi a tortor. Praesent porta ornare fermentum. Praesent sed ligula at ante tempor posuere a at lorem. </p><br /><p> Aliquam diam felis, vehicula ut ipsum eu, consectetur tincidunt ipsum. Vestibulum sed metus ac nisi tincidunt mollis sed non urna. Vivamus lacinia ullamcorper interdum. Sed sed erat vel leo venenatis pretium. Sed aliquet sem nunc, ut iaculis dolor consectetur et. Vivamus ligula sapien, maximus nec pellentesque ut, imperdiet at libero. Vivamus semper nulla lectus, id dapibus nulla convallis id. Quisque elementum lectus ac dui gravida, ut molestie nunc convallis. Pellentesque et odio non dolor convallis commodo sit amet a ante. </p>'
-    );
-
     const [search, setSearch] = useState<any>('');
+    const [contactList] = useState<any>([
+        {
+            id: 1,
+            path: 'profile-35.png',
+            name: 'Alan Green',
+            role: 'Web Developer',
+            email: 'alan@mail.com',
+            location: 'Boston, USA',
+            phone: '+1 202 555 0197',
+            posts: 25,
+            followers: '5K',
+            following: 500,
+        },
+        {
+            id: 2,
+            path: 'profile-35.png',
+            name: 'Linda Nelson',
+            role: 'Web Designer',
+            email: 'linda@mail.com',
+            location: 'Sydney, Australia',
+            phone: '+1 202 555 0170',
+            posts: 25,
+            followers: '21.5K',
+            following: 350,
+        },
+        {
+            id: 3,
+            path: 'profile-35.png',
+            name: 'Lila Perry',
+            role: 'UX/UI Designer',
+            email: 'lila@mail.com',
+            location: 'Miami, USA',
+            phone: '+1 202 555 0105',
+            posts: 20,
+            followers: '21.5K',
+            following: 350,
+        },
+        {
+            id: 4,
+            path: 'profile-35.png',
+            name: 'Andy King',
+            role: 'Project Lead',
+            email: 'andy@mail.com',
+            location: 'Tokyo, Japan',
+            phone: '+1 202 555 0194',
+            posts: 25,
+            followers: '21.5K',
+            following: 300,
+        },
+        {
+            id: 5,
+            path: 'profile-35.png',
+            name: 'Jesse Cory',
+            role: 'Web Developer',
+            email: 'jesse@mail.com',
+            location: 'Edinburgh, UK',
+            phone: '+1 202 555 0161',
+            posts: 30,
+            followers: '20K',
+            following: 350,
+        },
+        {
+            id: 6,
+            path: 'profile-35.png',
+            name: 'Xavier',
+            role: 'UX/UI Designer',
+            email: 'xavier@mail.com',
+            location: 'New York, USA',
+            phone: '+1 202 555 0155',
+            posts: 25,
+            followers: '21.5K',
+            following: 350,
+        },
+        {
+            id: 7,
+            path: 'profile-35.png',
+            name: 'Susan',
+            role: 'Project Manager',
+            email: 'susan@mail.com',
+            location: 'Miami, USA',
+            phone: '+1 202 555 0118',
+            posts: 40,
+            followers: '21.5K',
+            following: 350,
+        },
+        {
+            id: 8,
+            path: 'profile-35.png',
+            name: 'Raci Lopez',
+            role: 'Web Developer',
+            email: 'traci@mail.com',
+            location: 'Edinburgh, UK',
+            phone: '+1 202 555 0135',
+            posts: 25,
+            followers: '21.5K',
+            following: 350,
+        },
+        {
+            id: 9,
+            path: 'profile-35.png',
+            name: 'Steven Mendoza',
+            role: 'HR',
+            email: 'sokol@verizon.net',
+            location: 'Monrovia, US',
+            phone: '+1 202 555 0100',
+            posts: 40,
+            followers: '21.8K',
+            following: 300,
+        },
+        {
+            id: 10,
+            path: 'profile-35.png',
+            name: 'James Cantrell',
+            role: 'Web Developer',
+            email: 'sravani@comcast.net',
+            location: 'Michigan, US',
+            phone: '+1 202 555 0134',
+            posts: 100,
+            followers: '28K',
+            following: 520,
+        },
+        {
+            id: 11,
+            path: 'profile-35.png',
+            name: 'Reginald Brown',
+            role: 'Web Designer',
+            email: 'drhyde@gmail.com',
+            location: 'Entrimo, Spain',
+            phone: '+1 202 555 0153',
+            posts: 35,
+            followers: '25K',
+            following: 500,
+        },
+        {
+            id: 12,
+            path: 'profile-35.png',
+            name: 'Stacey Smith',
+            role: 'Chief technology officer',
+            email: 'maikelnai@optonline.net',
+            location: 'Lublin, Poland',
+            phone: '+1 202 555 0115',
+            posts: 21,
+            followers: '5K',
+            following: 200,
+        },
+    ]);
 
-    const [filteredItems, setFilteredItems] = useState<any>([]);
-    const [AllPosts, setAllPosts] = useState<any>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [postLoading, setPostLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
-    const fetchData = async () => {
-        try {
-            const response = await axios.get('http://localhost:3000/api/galleryManagement/getAllGallery');
-            setAllPosts(response.data.result);
-        } catch (error) {
-            setError("error");
-        } finally {
-            setLoading(false);
-        }
-    };
-    const postData = async (data: any) => {
-        setPostLoading(true)
-        try {
-            const response = await axios.post('http://localhost:3000/api/galleryManagement', data).then((res) => {
-                fetchData()
-            })
-            // setAllPosts(response.data.result);
-        } catch (error) {
-            setError("error");
-        } finally {
-            setPostLoading(false);
-        }
-    };
-    const putData = async (data: any) => {
-        setPostLoading(true)
-        try {
-            const response = await axios.put('http://localhost:3000/api/galleryManagement/' + data._id, data).then((res) => {
-                fetchData()
-            })
-            // setAllPosts(response.data.result);
-        } catch (error) {
-            setError("error");
-        } finally {
-            setPostLoading(false);
-        }
-    };
-    const deletePostsData = async (data: any) => {
-        try {
-            const response = await fetch(`http://localhost:3000/api/galleryManagement/${data._id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // Add any other headers if needed, such as authorization headers
-                },
-            });
-
-            if (response.ok) {
-                // File deleted successfully, you may want to update your local state or do other actions.
-                console.log('File deleted successfully');
-                showMessage('Post Data has been deleted successfully.');
-
-                fetchData();
-            } else {
-                // Handle errors, you may want to show an error message to the user.
-                console.error('Failed to delete file. Response:', response);
-            }
-        } catch (error) {
-            // Handle network errors or other exceptions
-            console.error('An error occurred while deleting the file', error);
-        }
-    };
-
-    useEffect(() => {
-        // setLoading(false)
-        dispatch(setPageTitle('Dashboard Admin'));
-
-        fetchData();
-    }, [dispatch]);
+    const [filteredItems, setFilteredItems] = useState<any>(contactList);
 
     useEffect(() => {
         setFilteredItems(() => {
-            return AllPosts.filter((item: any) => {
-                return item.albumName.toLowerCase().includes(search.toLowerCase());
+            return contactList.filter((item: any) => {
+                return item.name.toLowerCase().includes(search.toLowerCase());
             });
         });
-    }, [search, AllPosts]);
+    }, [search, contactList]);
 
-    const saveUser = async () => {
-        console.log(params);
-
-        if (!params.albumName) {
+    const saveUser = () => {
+        if (!params.name) {
             showMessage('Name is required.', 'error');
             return true;
         }
-
-        if (!params.albumLink) {
-            showMessage('Link is required.', 'error');
+        if (!params.email) {
+            showMessage('Email is required.', 'error');
             return true;
         }
-        if (!quilvalue) {
-            showMessage('Description is required.', 'error');
+        if (!params.phone) {
+            showMessage('Phone is required.', 'error');
+            return true;
+        }
+        if (!params.role) {
+            showMessage('Occupation is required.', 'error');
             return true;
         }
 
-        // coverImage
-
-        if (params._id) {
+        if (params.id) {
             //update user
-            let postObj = {
-                albumName: params.albumName,
-                albumLink: params.albumLink,
-                coverImage: params.coverImage64,
-                description: params.description,
-                _id: params._id
-            };
-            putData(postObj)
-
-
+            let user: any = filteredItems.find((d: any) => d.id === params.id);
+            user.name = params.name;
+            user.email = params.email;
+            user.phone = params.phone;
+            user.role = params.role;
+            user.location = params.location;
         } else {
-            if (!params.coverImage) {
-                showMessage('image is required.', 'error');
-                return true;
-            }
             //add user
-            let coverImage64 = null;
-            if (params.coverImage) {
-                coverImage64 = await convertFileToBase64(params.coverImage);
-            }
-            
-            console.log(coverImage64, "0000000001");
+            let maxUserId = filteredItems.length ? filteredItems.reduce((max: any, character: any) => (character.id > max ? character.id : max), filteredItems[0].id) : 0;
 
-
-            let postObj = {
-                albumName: params.albumName,
-                albumLink: params.albumLink,
-                coverImage: params.coverImage64,
-                description: params.description,
+            let user = {
+                id: maxUserId + 1,
+                path: 'profile-35.png',
+                name: params.name,
+                email: params.email,
+                phone: params.phone,
+                role: params.role,
+                location: params.location,
+                posts: 20,
+                followers: '5K',
+                following: 500,
             };
-            postData(postObj);
-            // filteredItems.splice(0, 0, postData);
+            filteredItems.splice(0, 0, user);
             //   searchContacts();
         }
 
-        showMessage('Gallery has been saved successfully.');
+        showMessage('User has been saved successfully.');
         setAddContactModal(false);
     };
 
@@ -196,7 +253,8 @@ const Posts = () => {
     };
 
     const deleteUser = (user: any = null) => {
-        deletePostsData(user)
+        setFilteredItems(filteredItems.filter((d: any) => d.id !== user.id));
+        showMessage('User has been deleted successfully.');
     };
 
     const showMessage = (msg = '', type = 'success') => {
@@ -214,37 +272,24 @@ const Posts = () => {
         });
     };
 
-    const handleSingleFileChange = (e: any) => {
-        const file = e.target.files[0];
-        // Handle the single file logic
-        console.log('Single file:', file);
-        setParams({ ...params, ['coverImage']: file });
-    };
-
-    const handleMultipleFilesChange = (e: any) => {
-        const files = e.target.files;
-        // Handle the multiple files logic
-        console.log('Multiple files:', files);
-        setParams({ ...params, ['gallery']: files });
-    };
     return (
         <div>
             <div className="flex items-center justify-between flex-wrap gap-4">
                 <h2 className="text-xl">Gallery</h2>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                     <div className="flex gap-3">
-
+                        
                         <div className="relative">
-                            <input type="text" placeholder="Search Posts" className="form-input py-2 ltr:pr-11 rtl:pl-11 peer rounded-full" value={search} onChange={(e) => setSearch(e.target.value)} />
-                            <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary">
-                                <IconSearch className="mx-auto" />
-                            </button>
+                        <input type="text" placeholder="Search Posts" className="form-input py-2 ltr:pr-11 rtl:pl-11 peer rounded-full" value={search} onChange={(e) => setSearch(e.target.value)} />
+                        <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary">
+                            <IconSearch className="mx-auto" />
+                        </button>
                         </div>
 
                         <div>
                             <button type="button" className="btn btn-primary" onClick={() => editUser()}>
                                 <IconFolder className="ltr:mr-2 rtl:ml-2" />
-                                Add Gallery
+                                Add Post
                             </button>
                         </div>
                     </div>
@@ -256,7 +301,8 @@ const Posts = () => {
                         <table className="table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>Title</th>
+                                    <th>Album Name</th>
+                                    <th>Description</th>
                                     <th>Posted On</th>
                                     <th></th>
                                 </tr>
@@ -267,17 +313,20 @@ const Posts = () => {
                                         <tr key={contact.id}>
                                             <td>
                                                 <div className="flex items-center w-max">
-
-
-                                                    {/* {!contact.path && !contact.name && (
+                                                    
+                                                    {!contact.path && contact.name && (
+                                                        <div className="grid place-content-center h-8 w-8 ltr:mr-2 rtl:ml-2 rounded-full bg-primary text-white text-sm font-semibold"></div>
+                                                    )}
+                                                    {!contact.path && !contact.name && (
                                                         <div className="border border-gray-300 dark:border-gray-800 rounded-full p-2 ltr:mr-2 rtl:ml-2">
                                                             <IconUser className="w-4.5 h-4.5" />
                                                         </div>
-                                                    )} */}
-                                                    <div>{contact.albumName}</div>
+                                                    )}
+                                                    <div>{contact.name}</div>
                                                 </div>
                                             </td>
-                                            <td>{contact.created_at}</td>
+                                            <div>{contact.name}</div>
+                                            <td>{contact.email}</td>
                                             <td>
                                                 <div className="flex gap-4 items-center justify-center">
                                                     <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
@@ -297,7 +346,7 @@ const Posts = () => {
                 </div>
             )}
 
-
+            
 
             <Transition appear show={addContactModal} as={Fragment}>
                 <Dialog as="div" open={addContactModal} onClose={() => setAddContactModal(false)} className="relative z-[51]">
@@ -324,17 +373,13 @@ const Posts = () => {
                                         <IconX />
                                     </button>
                                     <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                        {params._id ? 'Edit File' : 'Add File'}
+                                        {params.id ? 'Edit File' : 'Add File'}
                                     </div>
                                     <div className="p-5">
                                         <form>
                                             <div className="mb-5">
                                                 <label htmlFor="name">Album Name</label>
-                                                <input id="albumName" type="text" placeholder="Enter album name" className="form-input" value={params.albumName} onChange={(e) => changeValue(e)} />
-                                            </div>
-                                            <div className="mb-5">
-                                                <label htmlFor="name">Album link</label>
-                                                <input id="albumLink" type="text" placeholder="Enter Title" className="form-input" value={params.albumLink} onChange={(e) => changeValue(e)} />
+                                                <input id="name" type="text" placeholder="Enter Album Name" className="form-input" value={params.name} onChange={(e) => changeValue(e)} />
                                             </div>
                                             <div className="mb-5">
                                                 <label htmlFor="address">Description</label>
@@ -343,29 +388,29 @@ const Posts = () => {
                                                     rows={3}
                                                     placeholder="Enter description"
                                                     className="form-textarea resize-none min-h-[130px]"
-                                                    value={params.description}
+                                                    value={params.location}
                                                     onChange={(e) => changeValue(e)}
                                                 ></textarea>
                                             </div>
-                                            {/* albumLink */}
                                             <div className="mb-5">
-                                                <label htmlFor="ctnFile">Upload File</label>
+                                            <label htmlFor="ctnFile">Cover Image</label>
                                                 <input
                                                     id="ctnFile"
                                                     type="file"
                                                     className="form-input rounded-full border-dark file:py-2 file:px-4 file:border-0 file:font-semibold p-0 file:bg-primary/90 ltr:file:mr-5 rtl:file-ml-5 file:text-white file:hover:bg-primary"
                                                     required
-                                                    onChange={handleSingleFileChange}
-
                                                 />
                                             </div>
-
+                                            <div className="mb-5">
+                                                <label htmlFor="name">Album Link</label>
+                                                <input id="name" type="text" placeholder="Enter Link" className="form-input" value={params.name} onChange={(e) => changeValue(e)} />
+                                            </div>
                                             <div className="flex justify-end items-center mt-8">
                                                 <button type="button" className="btn btn-outline-danger" onClick={() => setAddContactModal(false)}>
                                                     Cancel
                                                 </button>
                                                 <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={saveUser}>
-                                                    {params._id ? 'Update' : 'Add'}
+                                                    {params.id ? 'Update' : 'Add'}
                                                 </button>
                                             </div>
                                         </form>
@@ -380,4 +425,4 @@ const Posts = () => {
     );
 };
 
-export default Posts;
+export default Gallery;
