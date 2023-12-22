@@ -146,10 +146,19 @@ const Posts = () => {
 
         if (params._id) {
             //update user
+            let coverImage64 = null;
+            if (params.coverImage) {
+                try {
+
+                    coverImage64 = await convertFileToBase64(params.coverImage);
+                } catch (error) {
+
+                }
+            }
             let postObj = {
                 albumName: params.albumName,
                 albumLink: params.albumLink,
-                coverImage: params.coverImage64,
+                coverImage: coverImage64 ? coverImage64 : params.coverImage64,
                 description: params.description,
                 _id: params._id
             };
@@ -166,14 +175,14 @@ const Posts = () => {
             if (params.coverImage) {
                 coverImage64 = await convertFileToBase64(params.coverImage);
             }
-            
+
             console.log(coverImage64, "0000000001");
 
 
             let postObj = {
                 albumName: params.albumName,
                 albumLink: params.albumLink,
-                coverImage: params.coverImage64,
+                coverImage: coverImage64,
                 description: params.description,
             };
             postData(postObj);
