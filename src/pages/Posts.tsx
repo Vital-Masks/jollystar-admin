@@ -144,7 +144,7 @@ const Posts = () => {
             let postObj = {
                 title: params.title,
                 gallery: params.gallery,
-                quilvalue: quilvalue,
+                description: quilvalue,
                 coverImage: params.coverImage,
                 _id: params._id
             };
@@ -179,7 +179,7 @@ const Posts = () => {
             let postObj = {
                 title: params.title,
                 gallery: gallery64,
-                quilvalue: quilvalue,
+                description: quilvalue,
                 coverImage: coverImage64
             };
             postData(postObj);
