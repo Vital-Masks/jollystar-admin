@@ -8,7 +8,7 @@ import IconThumbUp from '../components/Icon/IconThumbUp';
 import IconTrash from '../components/Icon/IconTrash';
 import IconFolderPlus from '../components/Icon/IconFolderPlus';
 import IconNotesEdit from '../components/Icon/IconNotesEdit';
-import { Link, NavLink, useParams } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useParams } from 'react-router-dom';
 import IconPlus from '../components/Icon/IconPlus';
 import IconHome from '../components/Icon/IconHome';
 import IconDollarSignCircle from '../components/Icon/IconDollarSignCircle';
@@ -29,7 +29,6 @@ import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper';
 import themeConfig from '../theme.config';
 import IconEdit from '../components/Icon/IconEdit';
-import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
 interface Member {
@@ -655,7 +654,6 @@ const ApprovedMember = () => {
 
 
         </div>
-
 
 
 

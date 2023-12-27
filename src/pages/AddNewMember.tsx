@@ -30,7 +30,7 @@ import themeConfig from '../theme.config';
 import { convertFileToBase64 } from '../components/utils/fileUtils'
 import axios, { AxiosResponse } from 'axios';
 import CustomSelect from '../components/core/select';
-import imageSize from 'image-size';
+// import imageSize from 'image-size';
 
 interface SchoolDetail {
     schoolName: string;
@@ -1055,7 +1055,6 @@ const AddNewMember = () => {
 
 
         </div>
-
 
 
 

@@ -7,17 +7,35 @@ import Declined from '../pages/Declined';
 import DeclineRequest from '../pages/DeclineRequest';
 import RemovedMembers from '../pages/RemovedMembers';
 import FileManagement from '../pages/FileManagement';
-
 import Posts from '../pages/Posts';
+import Login from '../pages/Login';
 import AddNewMember from '../pages/AddNewMember';
+import Gallery from '../pages/Gallery';
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Error = lazy(() => import('../components/Error'));
 
-
+const publicRoute = [{
+    path: '/',
+    element: <Login />,
+    layout: 'blank',
+}, {
+    path: '*',
+    element: <Login />,
+    layout: 'blank',
+},]
 const routes = [
     // dashboard
     {
+        path: '/login',
+        element: <Login />,
+        layout: 'blank'
+    },
+    {
         path: '/',
+        element: <Dashboard />,
+    },
+    {
+        path: '/dashboard',
         element: <Dashboard />,
     },
     {
@@ -61,10 +79,14 @@ const routes = [
         element: <AddNewMember />,
     },
     {
+        path: '/gallery',
+        element: <Gallery />,
+    },
+    {
         path: '*',
         element: <Error />,
         layout: 'blank',
     },
 ];
 
-export { routes };
+export { routes ,publicRoute};

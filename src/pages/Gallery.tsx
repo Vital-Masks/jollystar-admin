@@ -23,11 +23,10 @@ const Posts = () => {
     const [defaultParams] = useState({
 
         "_id": "",
-        "title": "",
+        "albumName": "",
+        "albumLink": "",
         "description": "",
         "coverImage": "",
-        "gallery": [
-        ],
         "isDeleted": true,
     });
 
@@ -51,7 +50,7 @@ const Posts = () => {
     const [error, setError] = useState<string | null>(null);
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/newsManagement/getAllNews');
+            const response = await axios.get('http://localhost:3000/api/galleryManagement/getAllGallery');
             setAllPosts(response.data.result);
         } catch (error) {
             setError("error");
@@ -62,7 +61,7 @@ const Posts = () => {
     const postData = async (data: any) => {
         setPostLoading(true)
         try {
-            const response = await axios.post('http://localhost:3000/api/newsManagement', data).then((res) => {
+            const response = await axios.post('http://localhost:3000/api/galleryManagement', data).then((res) => {
                 fetchData()
             })
             // setAllPosts(response.data.result);
@@ -75,7 +74,7 @@ const Posts = () => {
     const putData = async (data: any) => {
         setPostLoading(true)
         try {
-            const response = await axios.put('http://localhost:3000/api/newsManagement/' + data._id, data).then((res) => {
+            const response = await axios.put('http://localhost:3000/api/galleryManagement/' + data._id, data).then((res) => {
                 fetchData()
             })
             // setAllPosts(response.data.result);
@@ -87,7 +86,7 @@ const Posts = () => {
     };
     const deletePostsData = async (data: any) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/newsManagement/${data._id}`, {
+            const response = await fetch(`http://localhost:3000/api/galleryManagement/${data._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -121,17 +120,21 @@ const Posts = () => {
     useEffect(() => {
         setFilteredItems(() => {
             return AllPosts.filter((item: any) => {
-                return item.title.toLowerCase().includes(search.toLowerCase());
+                return item.albumName.toLowerCase().includes(search.toLowerCase());
             });
         });
     }, [search, AllPosts]);
 
     const saveUser = async () => {
         console.log(params);
-        console.log(!params.gallery, !params.gallery, params.gallery.length > 0);
 
-        if (!params.title) {
-            showMessage('Title is required.', 'error');
+        if (!params.albumName) {
+            showMessage('Name is required.', 'error');
+            return true;
+        }
+
+        if (!params.albumLink) {
+            showMessage('Link is required.', 'error');
             return true;
         }
         if (!quilvalue) {
@@ -139,55 +142,55 @@ const Posts = () => {
             return true;
         }
 
+        // coverImage
+
         if (params._id) {
             //update user
+            let coverImage64 = null;
+            if (params.coverImage) {
+                try {
+
+                    coverImage64 = await convertFileToBase64(params.coverImage);
+                } catch (error) {
+
+                }
+            }
             let postObj = {
-                title: params.title,
-                gallery: params.gallery,
-                description: quilvalue,
-                coverImage: params.coverImage,
+                albumName: params.albumName,
+                albumLink: params.albumLink,
+                coverImage: coverImage64 ? coverImage64 : params.coverImage64,
+                description: params.description,
                 _id: params._id
             };
             putData(postObj)
 
 
         } else {
-            if (!(params.gallery.length > 0)) {
-                showMessage('Gallery is required.', 'error');
-                return true;
-            }
             if (!params.coverImage) {
-                showMessage('Cover image is required.', 'error');
+                showMessage('image is required.', 'error');
                 return true;
             }
-
             //add user
-            let gallery64 = [];
             let coverImage64 = null;
             if (params.coverImage) {
                 coverImage64 = await convertFileToBase64(params.coverImage);
             }
-            for (let index = 0; index < params.gallery.length; index++) {
-                const element = params.gallery[index];
-                let binImage = ''
-                binImage = await convertFileToBase64(element);
-                gallery64.push(binImage)
-            }
-            console.log(gallery64, coverImage64, "0000000001");
+
+            console.log(coverImage64, "0000000001");
 
 
             let postObj = {
-                title: params.title,
-                gallery: gallery64,
-                description: quilvalue,
-                coverImage: coverImage64
+                albumName: params.albumName,
+                albumLink: params.albumLink,
+                coverImage: coverImage64,
+                description: params.description,
             };
             postData(postObj);
             // filteredItems.splice(0, 0, postData);
             //   searchContacts();
         }
 
-        showMessage('User has been saved successfully.');
+        showMessage('Gallery has been saved successfully.');
         setAddContactModal(false);
     };
 
@@ -236,7 +239,7 @@ const Posts = () => {
     return (
         <div>
             <div className="flex items-center justify-between flex-wrap gap-4">
-                <h2 className="text-xl">Post/News Management</h2>
+                <h2 className="text-xl">Gallery</h2>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                     <div className="flex gap-3">
 
@@ -250,7 +253,7 @@ const Posts = () => {
                         <div>
                             <button type="button" className="btn btn-primary" onClick={() => editUser()}>
                                 <IconFolder className="ltr:mr-2 rtl:ml-2" />
-                                Add Post
+                                Add Gallery
                             </button>
                         </div>
                     </div>
@@ -280,7 +283,7 @@ const Posts = () => {
                                                             <IconUser className="w-4.5 h-4.5" />
                                                         </div>
                                                     )} */}
-                                                    <div>{contact.title}</div>
+                                                    <div>{contact.albumName}</div>
                                                 </div>
                                             </td>
                                             <td>{contact.created_at}</td>
@@ -335,13 +338,25 @@ const Posts = () => {
                                     <div className="p-5">
                                         <form>
                                             <div className="mb-5">
-                                                <label htmlFor="name">Title</label>
-                                                <input id="title" type="text" placeholder="Enter Title" className="form-input" value={params.title} onChange={(e) => changeValue(e)} />
+                                                <label htmlFor="name">Album Name</label>
+                                                <input id="albumName" type="text" placeholder="Enter album name" className="form-input" value={params.albumName} onChange={(e) => changeValue(e)} />
+                                            </div>
+                                            <div className="mb-5">
+                                                <label htmlFor="name">Album link</label>
+                                                <input id="albumLink" type="text" placeholder="Enter Title" className="form-input" value={params.albumLink} onChange={(e) => changeValue(e)} />
                                             </div>
                                             <div className="mb-5">
                                                 <label htmlFor="address">Description</label>
-                                                <ReactQuill theme="snow" value={quilvalue} onChange={setQuilValue} />
+                                                <textarea
+                                                    id="description"
+                                                    rows={3}
+                                                    placeholder="Enter description"
+                                                    className="form-textarea resize-none min-h-[130px]"
+                                                    value={params.description}
+                                                    onChange={(e) => changeValue(e)}
+                                                ></textarea>
                                             </div>
+                                            {/* albumLink */}
                                             <div className="mb-5">
                                                 <label htmlFor="ctnFile">Upload File</label>
                                                 <input
@@ -353,18 +368,7 @@ const Posts = () => {
 
                                                 />
                                             </div>
-                                            <div className="mb-5">
-                                                <label htmlFor="ctnFile">Upload Gallery</label>
-                                                <input
-                                                    id="ctnFile"
-                                                    type="file"
-                                                    className="form-input rounded-full border-dark file:py-2 file:px-4 file:border-0 file:font-semibold p-0 file:bg-primary/90 ltr:file:mr-5 rtl:file-ml-5 file:text-white file:hover:bg-primary"
-                                                    required
-                                                    multiple
-                                                    onChange={handleMultipleFilesChange}
 
-                                                />
-                                            </div>
                                             <div className="flex justify-end items-center mt-8">
                                                 <button type="button" className="btn btn-outline-danger" onClick={() => setAddContactModal(false)}>
                                                     Cancel

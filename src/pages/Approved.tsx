@@ -26,7 +26,6 @@ interface Member {
     // Add other properties as needed
 }
 
-
 const Approved = () => {
     const dispatch = useDispatch();
     const [members, setMembers] = useState<Member[]>([]);
