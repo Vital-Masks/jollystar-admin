@@ -100,6 +100,7 @@ interface FormValues {
     pdpaymentImage: string;
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
+    membershipId:string;
 }
 
 interface MemberData {
@@ -187,9 +188,9 @@ const AddNewMember = () => {
         maritalStatus: '',
         password: '',
         confirmPassword: '',
-        "workPlaceName": "Virtusa",
-        "occupation": "Software engineer",
-        "officeAddress": "Colombo",
+        workPlaceName: '',
+        occupation: '',
+        officeAddress: '',
         profilePicture: null, // Store the file in the state
         schoolDetails: [],
         sdschoolName: '', sdparticipated: '', sdgame: '', sdfrom: '', sdto: '', sdrole: '',
@@ -199,6 +200,7 @@ const AddNewMember = () => {
         pdcategory: '', pdbank: '', pdbranch: '', pdtotal: '', pddate: '', pdpaymentImage: '',
         isSchoolDetailVerified: isSclChecked,
         isPaymentDetailVerified: ispayChecked,
+        membershipId:'',
     });
 
     const items = ['carousel1.jpeg', 'carousel2.jpeg', 'carousel3.jpeg'];
@@ -311,7 +313,7 @@ const AddNewMember = () => {
             "isSchoolDetailVerified": false,
             "isPaymentDetailVerified": false,
             "memberApprovalStatus": "APPROVED",
-            "membershipId": "",
+            "membershipId": formValues.membershipId,
             "declinedMessage": ""
         }
         try {
@@ -545,7 +547,7 @@ const AddNewMember = () => {
             </div>
 
             <div className="flex flex-col space-y-5 sm:flex-row sm:space-y-0 sm:space-x-5">
-                <div className="max-w-[60rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
+                {/* <div className="max-w-[60rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
                     <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
                         <div className="w-60 h-60 rounded-md overflow-hidden object-cover mb-5 sm:mb-0">
                             <img
@@ -557,7 +559,7 @@ const AddNewMember = () => {
                         </div>
                         <div className="text-center sm:text-left ml-10 mr-5">
                             <h3 className="text-[#3b3f5c] text-2xl sm:text-4xl font-semibold mb-2 dark:text-black bold">
-                                Luke Ivory
+                            {formValues.firstName} {formValues.lastName} 
                             </h3>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
                                 Membership Type - {formValues.category}
@@ -566,17 +568,17 @@ const AddNewMember = () => {
                                 Status - Pending Request
                             </p>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Member Request -{currentDateTime}
+                                Member Request - {currentDateTime}
                             </p>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
                                 Membership Approval Date - Not Approved Yet
                             </p>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Membership ID - Not Assigned Yet
+                                Membership ID - 
                             </p>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="max-w-[40rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
                     <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
@@ -595,8 +597,8 @@ const AddNewMember = () => {
                             </label>
                             <form className="space-y-5 mt-5">
                                 <div className="sm:flex justify-between items-center md:gap-20">
-                                    <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership Id</label>
-                                    <input id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
+                                    <label htmlFor="membershipId" className="w-full sm:w-auto text-2xl">Membership Id</label>
+                                    <input onChange={handleChange} name='membershipId' value={formValues.membershipId} id="name" type="text" placeholder="User Name" className="w-full sm:w-1/2 form-input text-2xl" required />
                                 </div>
                             </form>
 
@@ -678,7 +680,7 @@ const AddNewMember = () => {
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-5">
                                         <div>
                                             <label htmlFor="name">User Name</label>
-                                            <input onChange={handleChange} name='userName' value={formValues.userName} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='userName' value={formValues.userName} id="name" type="text" placeholder="User Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="title">Title</label>
@@ -692,48 +694,48 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="name">First Name</label>
-                                            <input id="name" onChange={handleChange} name='firstName' value={formValues.firstName} type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input id="name" onChange={handleChange} name='firstName' value={formValues.firstName} type="text" placeholder="First Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Last Name</label>
-                                            <input onChange={handleChange} name='lastName' value={formValues.lastName} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='lastName' value={formValues.lastName} id="name" type="text" placeholder="Last Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Date of birth</label>
-                                            <input onChange={handleChange} name='dateOfBirth' value={formValues.dateOfBirth} id="profession" type="date" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='dateOfBirth' value={formValues.dateOfBirth} id="profession" type="date" placeholder="DOB" className="form-input rounded-full border-dark" required />
                                         </div>
 
                                         <div>
                                             <label htmlFor="address">NIC/Passport Id</label>
-                                            <input onChange={handleChange} name='passportNumber' value={formValues.passportNumber} id="address" type="text" placeholder="New York" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='passportNumber' value={formValues.passportNumber} id="address" type="text" placeholder="NIC/Passport No" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="email">Email</label>
-                                            <input onChange={handleChange} name='email' value={formValues.email} id="email" type="email" placeholder="Jimmy@gmail.com" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='email' value={formValues.email} id="email" type="email" placeholder="Email" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
-                                            <label htmlFor="phone">phoneNumber Number</label>
-                                            <input onChange={handleChange} name='phoneNumber' value={formValues.phoneNumber} id="phone" type="tel" placeholder="+1 (530) 555-12121" className="form-input rounded-full border-dark" required />
+                                            <label htmlFor="phone">Phone Number</label>
+                                            <input onChange={handleChange} name='phoneNumber' value={formValues.phoneNumber} id="phone" type="tel" placeholder="Mobile Number" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="phone">Telephone Number</label>
-                                            <input onChange={handleChange} name='telephoneNumber' value={formValues.telephoneNumber} id="phone" type="text" placeholder="+1 (530) 555-12121" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='telephoneNumber' value={formValues.telephoneNumber} id="phone" type="text" placeholder="Telephone Number" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="location">Resident Address</label>
-                                            <input onChange={handleChange} name='address' value={formValues.address} id="location" type="text" placeholder="Location" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='address' value={formValues.address} id="location" type="text" placeholder="Address" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="web">Marital Status</label>
-                                            <input onChange={handleChange} name='maritalStatus' value={formValues.maritalStatus} id="web" type="text" placeholder="Enter URL" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='maritalStatus' value={formValues.maritalStatus} id="web" type="text" placeholder="Marital Status" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Password</label>
-                                            <input onChange={handleChange} name='password' value={formValues.password} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='password' value={formValues.password} id="name" type="text" placeholder="Enter Password" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Confirm Password</label>
-                                            <input onChange={handleChange} name='confirmPassword' value={formValues.confirmPassword} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='confirmPassword' value={formValues.confirmPassword} id="name" type="text" placeholder="Confirm Password" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Profile Picture</label>
@@ -766,23 +768,23 @@ const AddNewMember = () => {
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-5">
                                         <div>
                                             <label htmlFor="profession">Category</label>
-                                            <input onChange={handleChange} name='pdcategory' value={formValues.pdcategory} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='pdcategory' value={formValues.pdcategory} id="profession" type="text" placeholder="Category" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Bank</label>
-                                            <input onChange={handleChange} name='pdbank' value={formValues.pdbank} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='pdbank' value={formValues.pdbank} id="name" type="text" placeholder="Bank Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Branch</label>
-                                            <input onChange={handleChange} name='pdbranch' value={formValues.pdbranch} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='pdbranch' value={formValues.pdbranch} id="name" type="text" placeholder="Branch Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Total</label>
-                                            <input onChange={handleChange} name='pdtotal' value={formValues.pdtotal} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='pdtotal' value={formValues.pdtotal} id="profession" type="text" placeholder="Total" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Date</label>
-                                            <input onChange={handleChange} name='pddate' value={formValues.pddate} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='pddate' value={formValues.pddate} id="name" type="text" placeholder="Date" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Payment Image</label>
@@ -853,15 +855,15 @@ const AddNewMember = () => {
 
                                         <div>
                                             <label htmlFor="name">Workplace Name</label>
-                                            <input onChange={handleChange} name='workPlaceName' value={formValues.workPlaceName} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='workPlaceName' value={formValues.workPlaceName} id="name" type="text" placeholder="Workplace Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Occupation</label>
-                                            <input onChange={handleChange} name='occupation' value={formValues.occupation} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='occupation' value={formValues.occupation} id="name" type="text" placeholder="Occupation" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Office Address</label>
-                                            <input onChange={handleChange} name='officeAddress' value={formValues.officeAddress} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='officeAddress' value={formValues.officeAddress} id="profession" type="text" placeholder="Office Address" className="form-input rounded-full border-dark" required />
                                         </div>
                                     </div>
                                 </div>
@@ -885,27 +887,27 @@ const AddNewMember = () => {
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-5">
                                         <div>
                                             <label htmlFor="name">School Name</label>
-                                            <input onChange={handleChange} name='sdschoolName' value={formValues.sdschoolName} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdschoolName' value={formValues.sdschoolName} id="name" type="text" placeholder="School Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Team you played</label>
-                                            <input onChange={handleChange} name='sdparticipated' value={formValues.sdparticipated} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdparticipated' value={formValues.sdparticipated} id="name" type="text" placeholder="Team Played" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Game</label>
-                                            <input onChange={handleChange} name='sdgame' value={formValues.sdgame} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdgame' value={formValues.sdgame} id="profession" type="text" placeholder="Game" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">From</label>
-                                            <input onChange={handleChange} name='sdfrom' value={formValues.sdfrom} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdfrom' value={formValues.sdfrom} id="name" type="text" placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">To</label>
-                                            <input onChange={handleChange} name='sdto' value={formValues.sdto} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdto' value={formValues.sdto} id="name" type="text" placeholder="To" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Role</label>
-                                            <input onChange={handleChange} name='sdrole' value={formValues.sdrole} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdrole' value={formValues.sdrole} id="profession" type="text" placeholder="Role" className="form-input rounded-full border-dark" required />
                                         </div>
                                     </div>
                                 </div>
@@ -967,23 +969,23 @@ const AddNewMember = () => {
 
                                         <div>
                                             <label htmlFor="name">Club Name</label>
-                                            <input onChange={handleChange} name='cdclubName' value={formValues.cdclubName} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdclubName' value={formValues.cdclubName} id="name" type="text" placeholder="Club Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Team you played</label>
-                                            <input onChange={handleChange} name='cdinvloved' value={formValues.cdinvloved} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdinvloved' value={formValues.cdinvloved} id="name" type="text" placeholder="Team Played" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Game</label>
-                                            <input onChange={handleChange} name='cdgame' value={formValues.cdgame} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdgame' value={formValues.cdgame} id="profession" type="text" placeholder="Game" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">From</label>
-                                            <input onChange={handleChange} name='cdfrom' value={formValues.cdfrom} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdfrom' value={formValues.cdfrom} id="name" type="text" placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">To</label>
-                                            <input onChange={handleChange} name='cdto' value={formValues.cdto} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdto' value={formValues.cdto} id="name" type="text" placeholder="To" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Role</label>

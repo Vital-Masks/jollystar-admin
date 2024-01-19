@@ -188,8 +188,8 @@ const DeclineRequest = () => {
                         </label>
                         <form className="space-y-5 mt-5">
                         <div className="sm:flex justify-between items-center md:gap-20">
-                            <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership Id</label>
-                            <input id="hrLargeinput" type="text" value={members?.membershipId} className="w-full sm:w-1/2 form-input text-2xl" />
+                            <label htmlFor="membershipId" className="w-full sm:w-auto text-2xl">Membership Id</label>
+                            <input name="memberID" value={members?.membershipId} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
                         </div>
                         </form>
 
