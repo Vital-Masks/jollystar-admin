@@ -81,7 +81,7 @@ interface ClubDetail {
     role?: string;
 }
 interface PaymentDetail {
-    memberId: number;
+    membershipId: number;
     bank: string;
     branch: string;
     total: number;
@@ -91,7 +91,7 @@ interface GalleryItem {
     // Define the properties of your gallery item
 }
 interface FormValues {
-    memberID: string;
+    membershipId: string;
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
 }
@@ -111,11 +111,11 @@ const AddMember = () => {
     const [formValues, setFormValues] = useState<FormValues>({
         isSchoolDetailVerified: isSclChecked,
         isPaymentDetailVerified: ispayChecked,
-        memberID: ""
+        membershipId: ""
     });
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLInputElement>) => {
         const { name, value } = e.target;
-        if (name === 'memberID') {
+        if (name === 'membershipId') {
             setMemberIdErrorMsg("")
 
         }
@@ -162,7 +162,7 @@ const AddMember = () => {
 
     const items = ['carousel1.jpeg', 'carousel2.jpeg', 'carousel3.jpeg'];
     const handleApprove = () => {
-        if (formValues.memberID !== "") {
+        if (formValues.membershipId !== "") {
             setApproveLoading(true);
             handleStatus("APPROVED")
 
@@ -174,7 +174,7 @@ const AddMember = () => {
 
     const handleDecline = () => {
 
-        if (formValues.memberID !== "") {
+        if (formValues.membershipId !== "") {
             setDeclineLoading(true);
             handleStatus("DECLINED")
         } else {
@@ -185,15 +185,19 @@ const AddMember = () => {
     const handleStatus = async (status: string) => {
         let data = {
             "memberApprovalStatus": status.toUpperCase(),
-            "declinedMessage": "wrong info"
+            "declinedMessage": "Submission Didn't Meet the Requirements!"
+        }
+        let memUpdate ={
+            "membershipId": formValues.membershipId,
         }
         console.log(status);
         try {
 
-            const response = await axios.put(`http://localhost:3000/api/member/memberApproval/${memberId}`, data
-            );
+            const response = await axios.put(`http://localhost:3000/api/member/memberApproval/${memberId}`, data);
+            const res = await axios.put(`http://localhost:3000/api/member/${memberId}`, memUpdate);
             // Handle the response as needed
             console.log('PUT request successful:', response.data);
+            console.log('PUT request successful:', res.data);
             alertForm1("Sucessfully " + status, "")
             navigate(-1);
 
@@ -293,7 +297,7 @@ const AddMember = () => {
                                 <div className="sm:flex justify-between items-center md:gap-20">
                                     <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership Id</label>
                                     <div>
-                                        <input onChange={handleChange} name="memberID" value={formValues.memberID} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
+                                        <input onChange={handleChange} name="membershipId" value={formValues.membershipId} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
                                         <p className="w-full sm:w-1/2 text-sm text-red-400 ps-4"  >{memberIdErrorMsg}</p>
 
                                     </div>
@@ -450,7 +454,7 @@ const AddMember = () => {
                                             {members.paymentDetails.map((data, index) => (
                                                 <tr key={index}>
                                                     <td>{index + 1}</td>
-                                                    <td>{data.memberId}</td>
+                                                    <td>{data.membershipId}</td>
                                                     <td>{data.bank}</td>
                                                     <td>{data.branch}</td>
                                                     <td>{data.total}</td>

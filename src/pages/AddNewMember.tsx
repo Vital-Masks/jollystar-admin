@@ -203,10 +203,10 @@ const AddNewMember = () => {
         membershipId:'',
     });
 
+    
+
     const items = ['carousel1.jpeg', 'carousel2.jpeg', 'carousel3.jpeg'];
    
-
-
     const submitForm = () => {
         const toast = Swal.mixin({
             toast: true,
@@ -216,7 +216,7 @@ const AddNewMember = () => {
         });
         toast.fire({
             icon: 'success',
-            title: 'Form submitted successfully',
+            title: 'Data Added Successfully!',
             padding: '10px 20px',
         });
     };
@@ -282,63 +282,89 @@ const AddNewMember = () => {
 
     const handleSubmit = async () => {
         setLoading(true);
-
-        console.log(formValues, "ALL DAta");
-        var data: MemberData = {
-            "membershipCategory": formValues.category,
-            "profilePicture": formValues.profilePicture,
-            "title": "Mr",
-            "firstName": formValues.firstName,
-            "lastName": formValues.lastName,
-            "dateOfBirth": formValues.dateOfBirth,
-            "passportNumber": formValues.passportNumber,
-            "email": formValues.email,
-            "userName": formValues.userName,
-            "password": formValues.password,
-            "phoneNumber": formValues.phoneNumber,
-            "telephoneNumber": formValues.telephoneNumber,
-            "address": formValues.address,
-            "maritalStatus": formValues.maritalStatus,
-            "workPlaceName": formValues.workPlaceName,
-            "occupation": formValues.occupation,
-            "officeAddress": formValues.officeAddress,
-            "schoolDetails": formValues.schoolDetails,
-            "clubDetails": formValues.clubDetails,
-            "paymentDetails": formValues.paymentDetails[0],
-            "gallery": [
-                1,
-                2,
-                3
-            ],
-            "isSchoolDetailVerified": false,
-            "isPaymentDetailVerified": false,
-            "memberApprovalStatus": "APPROVED",
-            "membershipId": formValues.membershipId,
-            "declinedMessage": ""
-        }
+    
+        const data: MemberData = {
+            membershipCategory: formValues.category,
+            profilePicture: formValues.profilePicture,
+            title: 'Mr',
+            firstName: formValues.firstName,
+            lastName: formValues.lastName,
+            dateOfBirth: formValues.dateOfBirth,
+            passportNumber: formValues.passportNumber,
+            email: formValues.email,
+            userName: formValues.userName,
+            password: formValues.password,
+            phoneNumber: formValues.phoneNumber,
+            telephoneNumber: formValues.telephoneNumber,
+            address: formValues.address,
+            maritalStatus: formValues.maritalStatus,
+            workPlaceName: formValues.workPlaceName,
+            occupation: formValues.occupation,
+            officeAddress: formValues.officeAddress,
+            schoolDetails: formValues.schoolDetails,
+            clubDetails: formValues.clubDetails,
+            paymentDetails: formValues.paymentDetails[0],
+            gallery: [1, 2, 3],
+            isSchoolDetailVerified: false,
+            isPaymentDetailVerified: false,
+            memberApprovalStatus: 'APPROVED',
+            membershipId: formValues.membershipId,
+            declinedMessage: '',
+        };
+    
         try {
-            // Call the addMember function
             await addMember(data);
-            // Call your success function here if needed
+            setFormValues({
+                category: '',
+                userName: '',
+                title: 'Mr',
+                firstName: '',
+                lastName: '',
+                dateOfBirth: '',
+                passportNumber: '',
+                email: '',
+                phoneNumber: '',
+                telephoneNumber: '',
+                address: '',
+                maritalStatus: '',
+                password: '',
+                confirmPassword: '',
+                workPlaceName: '',
+                occupation: '',
+                officeAddress: '',
+                profilePicture: null,
+                schoolDetails: [],
+                sdschoolName: '',
+                sdparticipated: '',
+                sdgame: '',
+                sdfrom: '',
+                sdto: '',
+                sdrole: '',
+                clubDetails: [],
+                cdclubName: '',
+                cdinvloved: '',
+                cdgame: '',
+                cdfrom: '',
+                cdto: '',
+                cdrole: '',
+                paymentDetails: [],
+                pdcategory: '',
+                pdbank: '',
+                pdbranch: '',
+                pdtotal: '',
+                pddate: '',
+                pdpaymentImage: '',
+                isSchoolDetailVerified: false,
+                isPaymentDetailVerified: false,
+                membershipId: '',
+            });
         } catch (error) {
             // Handle error if needed
         } finally {
-            // Set loading state back to false, whether the request succeeds or fails
             setLoading(false);
         }
-
-        // const addMember = async (data: MemberData): Promise<AxiosResponse<any>> => {
-        //     try {
-        //       const response = await axios.post('http://localhost:3000/api/member', data);
-        //       console.log('Member added successfully:', response.data);
-        //       sucessForm()
-        //       return response;
-        //     } catch (error) {
-        //       console.error('Error adding member:', error);
-        //       throw error;
-        //     }
-        //   };
-    }
+    };
+    
     const addSchool = () => {
         let schoolDetail: SchoolDetail = {
             "schoolName": formValues.sdschoolName,
@@ -685,12 +711,6 @@ const AddNewMember = () => {
                                         <div>
                                             <label htmlFor="title">Title</label>
                                             <CustomSelect options={options2} value={formValues.title} onChange={handleSelectChange2} />
-
-                                            {/* <select defaultValue="mr" id="title" className="form-select text-black rounded-full border-dark" required >
-                                                <option value="mr">Mr</option>
-                                                <option value="ms">Ms</option>
-                                                <option value="mrs">Mrs</option>
-                                            </select> */}
                                         </div>
                                         <div>
                                             <label htmlFor="name">First Name</label>
@@ -989,7 +1009,7 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Role</label>
-                                            <input onChange={handleChange} name='cdrole' value={formValues.cdrole} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdrole' value={formValues.cdrole} id="profession" type="text" placeholder="Role" className="form-input rounded-full border-dark" required />
                                         </div>
                                     </div>
                                 </div>

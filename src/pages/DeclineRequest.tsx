@@ -141,12 +141,12 @@ const DeclineRequest = () => {
                 <div className="max-w-[60rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
                     <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
                     <div className="w-60 h-60 rounded-md overflow-hidden object-cover mb-5 sm:mb-0">
-                        <img
-                        src="/assets/images/profile-34.jpeg"
+                    <img
+                        src={`data:image/png;base64,${members?.profilePicture}`}
                         alt="profile"
                         className="w-full h-full object-cover"
-                        style={{ borderRadius: '30px' }}
-                        />
+                        style={{ borderRadius: '30px', maxWidth: '100%', maxHeight: '300px' }}
+                    />
                     </div>
                     <div className="text-center sm:text-left ml-10 mr-5">
                         <h3 className="text-[#3b3f5c] text-2xl sm:text-4xl font-semibold mb-2 dark:text-black bold">

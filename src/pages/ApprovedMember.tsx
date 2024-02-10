@@ -55,11 +55,21 @@ interface Member {
     schoolDetails?: SchoolDetail[];
     clubDetails?: ClubDetail[];
     gallery?: GalleryItem[];
+    paymentDetails: PaymentDetails[];
     isSchoolDetailVerified?: boolean;
     isPaymentDetailVerified?: boolean;
     membershipId?: string;
     declinedMessage?: string;
     created_at?: string;
+}
+
+interface PaymentDetails {
+    memberId: string;
+    bank: string;
+    branch: string;
+    total: string;
+    date: string;
+    paymentSlip: string;
 }
 
 interface SchoolDetail {
@@ -87,6 +97,25 @@ interface FormValues {
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
 }
+
+const openImageInNewTab = (url: string) => {
+    console.log(url);
+    const src = `data:image/png;base64,${url}`;
+
+    // Replace 'imageURL' with the actual URL of your image
+    const imageURL = `data:image/png;base64,${url}`;
+    // Open the image in a new tab
+    const newWindow = window.open();
+
+    if (newWindow) {
+        // Write the image data to the new window
+        newWindow.document.write(`<img src="${imageURL}" alt="Image" />`);
+    } else {
+        console.error('Failed to open new window');
+    }
+};
+
+
 const ApprovedMember = () => {
     // 
     const navigate = useNavigate();
@@ -414,6 +443,7 @@ const ApprovedMember = () => {
 
                             </div>
 
+                            {members && members.paymentDetails && members.paymentDetails.length > 0 && (
                             <div className="table-responsive mb-5">
                                 <table>
                                     <thead>
@@ -428,31 +458,30 @@ const ApprovedMember = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {tableData.map((data) => {
-                                            return (
-                                                <tr key={data.id}>
-                                                    <td>{data.id}</td>
+                                    {members.paymentDetails.map((data, index) => (
+                                                <tr key={index}>
+                                                    <td>{index+1}</td>
                                                     <td>
-                                                        <div className="whitespace-nowrap">{data.firstname}</div>
+                                                        <div className="whitespace-nowrap">{data.memberId}</div>
                                                     </td>
                                                     <td>
-                                                        <div className="whitespace-nowrap">{data.lastname}</div>
+                                                        <div className="whitespace-nowrap">{data.bank}</div>
                                                     </td>
-                                                    <td>{data.membershiptype}</td>
-                                                    <td>{data.dateapplied}</td>
-                                                    <td>{data.nic}</td>
-                                                    <td><button className="badge whitespace-nowrap badge-outline-primary"
+                                                    <td>{data.branch}</td>
+                                                    <td>{data.total}</td>
+                                                    <td>{data.date}</td>
+                                                    <td><button className="badge whitespace-nowrap badge-outline-primary" onClick={() => openImageInNewTab(data.paymentSlip)}
                                                     >
                                                         View Image
                                                     </button>
                                                     </td>
 
                                                 </tr>
-                                            );
-                                        })}
+                                            ))}
                                     </tbody>
                                 </table>
-                            </div></div>
+                            </div>)} 
+                    </div>
 
                     ) : (
                         ''
