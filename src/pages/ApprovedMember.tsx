@@ -90,6 +90,7 @@ interface ClubDetail {
     role?: string;
 }
 
+
 interface GalleryItem {
     // Define the properties of your gallery item
 }
@@ -444,43 +445,43 @@ const ApprovedMember = () => {
                             </div>
 
                             {members && members.paymentDetails && members.paymentDetails.length > 0 && (
-                            <div className="table-responsive mb-5">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Member Type</th>
-                                            <th>Bank</th>
-                                            <th>Branch</th>
-                                            <th>Total</th>
-                                            <th>Date</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {members.paymentDetails.map((data, index) => (
+                                <div className="table-responsive mb-5">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Member Id</th>
+                                                <th>Bank</th>
+                                                <th>Branch</th>
+                                                <th>Total</th>
+                                                <th>Date</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {members.paymentDetails.map((data, index) => (
                                                 <tr key={index}>
-                                                    <td>{index+1}</td>
-                                                    <td>
-                                                        <div className="whitespace-nowrap">{data.memberId}</div>
-                                                    </td>
-                                                    <td>
-                                                        <div className="whitespace-nowrap">{data.bank}</div>
-                                                    </td>
+                                                    <td>{index + 1}</td>
+                                                    <td>{data.memberId}</td>
+                                                    <td>{data.bank}</td>
                                                     <td>{data.branch}</td>
                                                     <td>{data.total}</td>
                                                     <td>{data.date}</td>
-                                                    <td><button className="badge whitespace-nowrap badge-outline-primary" onClick={() => openImageInNewTab(data.paymentSlip)}
-                                                    >
-                                                        View Image
-                                                    </button>
+                                                    <td>
+                                                        <button
+                                                            className="badge whitespace-nowrap badge-outline-primary"
+                                                            
+                                                        // Add onClick handler or link to view image
+                                                        >
+                                                            View Image
+                                                        </button>
                                                     </td>
-
                                                 </tr>
                                             ))}
-                                    </tbody>
-                                </table>
-                            </div>)} 
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )} 
                     </div>
 
                     ) : (

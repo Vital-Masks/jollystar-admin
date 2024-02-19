@@ -86,6 +86,7 @@ interface PaymentDetail {
     branch: string;
     total: number;
     date: string;
+    paymentSlip: string
 }
 interface GalleryItem {
     // Define the properties of your gallery item
@@ -151,6 +152,8 @@ const AddMember = () => {
                 }
             })
             .catch(error => console.error('Error fetching data:', error));
+
+        
 
     }, [dispatch, memberId]);
 
@@ -462,6 +465,7 @@ const AddMember = () => {
                                                     <td>
                                                         <button
                                                             className="badge whitespace-nowrap badge-outline-primary"
+                                                            
                                                         // Add onClick handler or link to view image
                                                         >
                                                             View Image

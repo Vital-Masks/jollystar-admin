@@ -267,17 +267,33 @@ const AddNewMember = () => {
     ];
     const addMember = async (data: MemberData): Promise<AxiosResponse<any>> => {
         try {
+            
             const response = await axios.post('http://localhost:3000/api/member', data);
             console.log('Member added successfully:', response.data);
-            // Call your success function here
-            sucessForm()
+            
+            
+            sucessForm();
+    
+            const paymentData: PaymentDetails = {
+                memberId: response.data.membershipId, 
+                bank: data.paymentDetails.bank,
+                branch: data.paymentDetails.branch,
+                total: data.paymentDetails.total,
+                date: data.paymentDetails.date,
+                paymentSlip: data.paymentDetails.paymentSlip
+            };
+            
+            const paymentResponse = await axios.post('http://localhost:3000/api/member/memberPayment/', paymentData);
+            console.log('Payment details added successfully:', paymentResponse.data);
+    
             return response;
         } catch (error) {
             console.error('Error adding member:', error);
-            failForm()
+            failForm();
             throw error;
         }
     };
+    
 
 
     const handleSubmit = async () => {
@@ -624,7 +640,7 @@ const AddNewMember = () => {
                             <form className="space-y-5 mt-5">
                                 <div className="sm:flex justify-between items-center md:gap-20">
                                     <label htmlFor="membershipId" className="w-full sm:w-auto text-2xl">Membership Id</label>
-                                    <input onChange={handleChange} name='membershipId' value={formValues.membershipId} id="name" type="text" placeholder="User Name" className="w-full sm:w-1/2 form-input text-2xl" required />
+                                    <input onChange={handleChange} name='membershipId' value={formValues.membershipId} id="name" type="text" placeholder="JSSC0000" className="w-full sm:w-1/2 form-input text-2xl" required />
                                 </div>
                             </form>
 
