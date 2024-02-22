@@ -1,37 +1,48 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { IRootState } from '../store';
+import { IRootState } from '../../store';
 import Tippy from '@tippyjs/react';
-import { useEffect, useState } from 'react';
-import { setPageTitle } from '../store/themeConfigSlice';
-import IconUsersGroup from '../components/Icon/IconUsersGroup';
-import IconThumbUp from '../components/Icon/IconThumbUp';
-import IconTrash from '../components/Icon/IconTrash';
-import IconFolderPlus from '../components/Icon/IconFolderPlus';
-import IconNotesEdit from '../components/Icon/IconNotesEdit';
+import React, { useEffect, useState } from 'react';
+import { setPageTitle } from '../../store/themeConfigSlice';
+import IconUsersGroup from '../../components/Icon/IconUsersGroup';
+import IconThumbUp from '../../components/Icon/IconThumbUp';
+import IconTrash from '../../components/Icon/IconTrash';
+import IconFolderPlus from '../../components/Icon/IconFolderPlus';
+import IconNotesEdit from '../../components/Icon/IconNotesEdit';
 import { Link, NavLink, useNavigate, useParams } from 'react-router-dom';
-import IconPlus from '../components/Icon/IconPlus';
-import IconHome from '../components/Icon/IconHome';
-import IconDollarSignCircle from '../components/Icon/IconDollarSignCircle';
-import IconPhone from '../components/Icon/IconPhone';
-import IconLinkedin from '../components/Icon/IconLinkedin';
-import IconTwitter from '../components/Icon/IconTwitter';
-import IconFacebook from '../components/Icon/IconFacebook';
-import IconGithub from '../components/Icon/IconGithub';
-import IconUser from '../components/Icon/IconUser';
-import IconLaptop from '../components/Icon/IconLaptop';
-import IconPlayCircle from '../components/Icon/IconPlayCircle';
-import IconAt from '../components/Icon/IconAt';
+import IconPlus from '../../components/Icon/IconPlus';
+import IconHome from '../../components/Icon/IconHome';
+import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
+import IconPhone from '../../components/Icon/IconPhone';
+import IconLinkedin from '../../components/Icon/IconLinkedin';
+import IconTwitter from '../../components/Icon/IconTwitter';
+import IconFacebook from '../../components/Icon/IconFacebook';
+import IconGithub from '../../components/Icon/IconGithub';
+import IconUser from '../../components/Icon/IconUser';
+import IconLaptop from '../../components/Icon/IconLaptop';
+import IconPlayCircle from '../../components/Icon/IconPlayCircle';
+import IconAt from '../../components/Icon/IconAt';
 import Swal from 'sweetalert2';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper';
-import themeConfig from '../theme.config';
-import IconEdit from '../components/Icon/IconEdit';
+import themeConfig from '../../theme.config';
+import IconEdit from '../../components/Icon/IconEdit';
 import axios from 'axios';
+import Popover from '@mui/material/Popover';
+interface PaymentDetail {
 
+    memberId?: string;
+    bank?: string;
+    branch?: string;
+    total?: string;
+    date?: string;
+    paymentSlip?: string;
+}
 interface Member {
+    data: Member | (() => Member);
+    paymentDetails?: PaymentDetail[];
     _id: string;
     profilePicture: object;
     firstName?: string;
@@ -55,7 +66,6 @@ interface Member {
     schoolDetails?: SchoolDetail[];
     clubDetails?: ClubDetail[];
     gallery?: GalleryItem[];
-    paymentDetails: PaymentDetails[];
     isSchoolDetailVerified?: boolean;
     isPaymentDetailVerified?: boolean;
     membershipId?: string;
@@ -98,31 +108,29 @@ interface FormValues {
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
 }
+interface ViewAllStatusMemberProps {
+    data: Member[]; // Assuming Member is a type representing your data structure
+}
+const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
 
-const openImageInNewTab = (url: string) => {
-    console.log(url);
-    const src = `data:image/png;base64,${url}`;
+    const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
-    // Replace 'imageURL' with the actual URL of your image
-    const imageURL = `data:image/png;base64,${url}`;
-    // Open the image in a new tab
-    const newWindow = window.open();
+    const [members, setMembers] = useState<Member>(data);
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
 
-    if (newWindow) {
-        // Write the image data to the new window
-        newWindow.document.write(`<img src="${imageURL}" alt="Image" />`);
-    } else {
-        console.error('Failed to open new window');
-    }
-};
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
+    const open = Boolean(anchorEl);
+    const id = open ? 'simple-popover' : undefined;
 
-const ApprovedMember = () => {
     // 
     const navigate = useNavigate();
 
     const dispatch = useDispatch();
-    const [members, setMembers] = useState<Member>();
     const { memberId } = useParams();
     const [isSclChecked, setIsSclChecked] = useState(true);
     const [ispayChecked, setIsPayChecked] = useState(true);
@@ -165,16 +173,16 @@ const ApprovedMember = () => {
     useEffect(() => {
         dispatch(setPageTitle('Approved Members'));
 
-        fetch(`http://localhost:3000/api/member/${memberId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.result) {
-                    setMembers(data.result);
-                }
-            })
-            .catch(error => console.error('Error fetching data:', error));
+        // fetch(`http://localhost:3000/api/member/memberPayment/${memberId}`)
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         if (data.result) {
+        //             setMembers(data.result[0]);
+        //         }
+        //     })
+        //     .catch(error => console.error('Error fetching data:', error));
 
-    }, [dispatch, memberId]);
+    }, [dispatch, memberId, data]);
 
     const [tabs, setTabs] = useState('home');
 
@@ -197,8 +205,8 @@ const ApprovedMember = () => {
     ];
     const hableRemove = () => {
 
-            setRemoveLoading(true);
-            handleStatus("REMOVED")
+        setRemoveLoading(true);
+        handleStatus("REMOVED")
 
     }
     const handleStatus = async (status: string) => {
@@ -242,95 +250,8 @@ const ApprovedMember = () => {
     };
     return (
         <div className="mb-5 space-y-5">
-
-            <div className="sm:flex-1 ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex flex-col sm:flex-row items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
-                <div className="sm:ltr:mr-auto sm:rtl:ml-auto">
-                    <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
-                        <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl">
-                            Approved Members
-                        </h1>
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex flex-col space-y-5 sm:flex-row sm:space-y-0 sm:space-x-5">
-                <div className="max-w-[60rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
-                    <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
-                        <div className="w-60 h-60 rounded-md overflow-hidden object-cover mb-5 sm:mb-0">
-                            <img
-                                src={`data:image/png;base64,${members?.profilePicture}`}
-                                alt="profile"
-                                className="w-full h-full object-cover"
-                                style={{ borderRadius: '30px', maxWidth: '100%', maxHeight: '300px' }}
-                            />
-                        </div>
-                        <div className="text-center sm:text-left ml-10 mr-5">
-                            <h3 className="text-[#3b3f5c] text-2xl sm:text-4xl font-semibold mb-2 dark:text-black bold">
-                                {members?.firstName} {members?.lastName}
-                            </h3>
-                            <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Membership Type - {members?.membershipCategory}
-                            </p>
-                            <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Status - {members?.memberApprovalStatus}
-                            </p>
-                            <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Member Request - {members?.created_at}
-                            </p>
-                            <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Membership Approval Date - {members?.updated_at}
-                            </p>
-                            <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Membership ID - {members?.membershipId}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="max-w-[40rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
-                    <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
-                        <div className="text-center sm:text-left mr-5">
-                            <h3 className="text-[#3b3f5c] text-2xl sm:text-4xl font-semibold mb-2 dark:text-black bold">
-                                Verification Process
-                            </h3>
-
-                            <label className="inline-flex mt-5 text-xl">
-                                <span className="peer-checked:text-success">School and Club Details</span>
-                                <input onChange={handleSchoolCheckboxChange} checked={formValues.isSchoolDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
-                            </label>
-                            <label className="inline-flex mt-5 ml-10 text-xl">
-                                <span className="peer-checked:text-success">Payment Details</span>
-                                <input onChange={handlePaymentCheckboxChange} checked={formValues.isPaymentDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
-                            </label>
-                            <form className="space-y-5 mt-5">
-                                <div className="sm:flex justify-between items-center md:gap-20">
-                                    <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership Id</label>
-                                    <div>
-                                        <input onChange={handleChange} name="memberID" value={ members?.membershipId} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
-                                        <p className="w-full sm:w-1/2 text-sm text-red-400 ps-4"  >{memberIdErrorMsg}</p>
-
-                                    </div>
-                                    {/* MemberIdErrorMsg */}
-                                </div>
-                            </form>
-
-                            <div className="flex mt-5 ml-5 justify-center">
-                                <button onClick={hableRemove} type="button" className="btn btn-outline-danger rounded-full text-2xl">
-                                    {removeLoading ? 'Loading ...' : " Remove From Membership"}
-                                    {/* removeLoading */}
-                                </button>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
             {/* Body Start */}
-
             <div>
-
                 <div className="pt-5">
 
                     <div>
@@ -443,30 +364,81 @@ const ApprovedMember = () => {
                                 </h2>
 
                             </div>
-
-                            {members && members.paymentDetails && members.paymentDetails.length > 0 && (
-                                <div className="table-responsive mb-5">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Member Id</th>
-                                                <th>Bank</th>
-                                                <th>Branch</th>
-                                                <th>Total</th>
-                                                <th>Date</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {members.paymentDetails.map((data, index) => (
-                                                <tr key={index}>
+                            <div className="table-responsive mb-5">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Member Type</th>
+                                            <th>Bank</th>
+                                            <th>Branch</th>
+                                            <th>Total</th>
+                                            <th>Date</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {/* {members && members.schoolDetails && members.schoolDetails.length > 0 && ( */}
+                                        {members && members.paymentDetails && members.paymentDetails.filter(data => Object.keys(data).length !== 0).map((data, index) => {
+                                            return (
+                                                <tr key={index + 1}>
                                                     <td>{index + 1}</td>
-                                                    <td>{data.memberId}</td>
-                                                    <td>{data.bank}</td>
+                                                    <td>
+                                                        <div className="whitespace-nowrap">{data.memberId}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="whitespace-nowrap">{data.bank}</div>
+                                                    </td>
                                                     <td>{data.branch}</td>
                                                     <td>{data.total}</td>
                                                     <td>{data.date}</td>
+                                                    <td>
+                                                        {data.paymentSlip ?
+                                                            <>
+                                                                <button
+                                                                    aria-describedby={id} onClick={handleClick}
+                                                                    className="badge whitespace-nowrap badge-outline-primary"
+                                                                >
+
+
+                                                                    View Image
+                                                                </button>
+                                                                <Popover
+                                                                    id={id}
+                                                                    open={open}
+                                                                    anchorEl={anchorEl}
+                                                                    onClose={handleClose}
+                                                                    anchorOrigin={{
+                                                                        vertical: 'bottom',
+                                                                        horizontal: 'left',
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={`data:image/png;base64,${data.paymentSlip}`}
+                                                                        alt="Mountain"
+                                                                        className='w-full'
+                                                                    />
+                                                                </Popover>
+                                                            </>
+                                                            : <>
+                                                                <button
+                                                                    className="badge whitespace-nowrap badge-outline-primary"
+                                                                >
+
+
+                                                                    No Image
+                                                                </button>
+                                                            </>
+                                                        }
+                                                    </td>
+
+                                                </tr>
+                                            );
+                                        })}
+                                        {/* {tableData.map((data) => {
+                                            return (
+                                                <tr key={data.id}>
+                                                    <td>{data.id}</td>
                                                     <td>
                                                         <button
                                                             className="badge whitespace-nowrap badge-outline-primary"
@@ -476,13 +448,37 @@ const ApprovedMember = () => {
                                                             View Image
                                                         </button>
                                                     </td>
+                                                    <td>
+                                                        <div className="whitespace-nowrap">{data.lastname}</div>
+                                                    </td>
+                                                    <td>{data.membershiptype}</td>
+                                                    <td>{data.dateapplied}</td>
+                                                    <td>{data.nic}</td>
+                                                    <td>
+                                                        <Popover
+                                                            id={id}
+                                                            open={open}
+                                                            anchorEl={anchorEl}
+                                                            onClose={handleClose}
+                                                            anchorOrigin={{
+                                                                vertical: 'bottom',
+                                                                horizontal: 'left',
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={`data:image/png;base64,${data.paymentSlip}`}
+                                                                alt="Mountain"
+                                                                className='w-full'
+                                                            />
+                                                        </Popover>
+                                                    </td>
+
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )} 
-                    </div>
+                                            );
+                                        })} */}
+                                    </tbody>
+                                </table>
+                            </div></div>
 
                     ) : (
                         ''
@@ -639,31 +635,23 @@ const ApprovedMember = () => {
                                         dir={themeConfig.rtlClass}
                                         key={themeConfig.rtlClass === 'rtl' ? 'true' : 'false'}
                                     >
-                                        {items.map((item, i) => {
+                                        {members && members.gallery && members.gallery.length > 0 && members.gallery.map((item, i) => {
                                             return (
                                                 <SwiperSlide key={i}>
-                                                    <img src={`/assets/images/${item}`} className="w-full" alt="itemImg" />
-                                                    <div className="flex justify-center mt-3"> {/* Add this div */}
-                                                        <button className="badge whitespace-nowrap ml-3 badge-outline-danger">
-                                                            <IconTrash />
-                                                        </button>
-                                                    </div>
+
+
+                                                    <img
+                                                        src={`${item}`}
+                                                        alt="profile"
+                                                        className="w-full"
+                                                        style={{maxWidth:"200px"}}
+                                                    />
+                                                    {/* <img src={`/assets/images/${item}`} className="w-full" alt="itemImg" /> */}
                                                 </SwiperSlide>
 
                                             );
                                         })}
-                                        {items.map((item, i) => {
-                                            return (
-                                                <SwiperSlide key={i}>
-                                                    <img src={`/assets/images/${item}`} className="w-full" alt="itemImg" />
-                                                    <div className="flex justify-center mt-3"> {/* Add this div */}
-                                                        <button className="badge whitespace-nowrap ml-3 badge-outline-danger">
-                                                            <IconTrash />
-                                                        </button>
-                                                    </div>
-                                                </SwiperSlide>
-                                            );
-                                        })}
+                                      
                                     </Swiper>
                                 </div>
                             </div>
@@ -690,4 +678,4 @@ const ApprovedMember = () => {
     );
 };
 
-export default ApprovedMember;
+export default ViewAllStatusMember;
