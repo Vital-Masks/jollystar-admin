@@ -1,11 +1,11 @@
 import { lazy } from 'react';
 import Pending from '../pages/Pending';
-import AddMember from '../pages/AddMember';
-import ApprovedMember from '../pages/ApprovedMember';
+import AddMember from '../pages/memberShip/AddMember';
+import ApprovedMember from '../pages/memberShip/ApprovedMember';
 import Approved from '../pages/Approved';
 import Declined from '../pages/Declined';
-import DeclineRequest from '../pages/DeclineRequest';
-import RemovedMembers from '../pages/RemovedMembers';
+import DeclineRequest from '../pages/memberShip/DeclineRequest';
+import RemovedMembers from '../pages/memberShip/RemovedMembers';
 import FileManagement from '../pages/FileManagement';
 import Posts from '../pages/Posts';
 import Login from '../pages/Login';

@@ -66,7 +66,7 @@ const Dashboard = () => {
                     </thead>
                     <tbody>
                         {members
-                            .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'PENDING'))
+                            .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) )
                             .slice(0, 15)
                             .map((data) => (
                                 <tr key={data._id}>

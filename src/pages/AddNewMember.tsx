@@ -30,6 +30,8 @@ import themeConfig from '../theme.config';
 import { convertFileToBase64 } from '../components/utils/fileUtils'
 import axios, { AxiosResponse } from 'axios';
 import CustomSelect from '../components/core/select';
+import Popover from '@mui/material/Popover';
+import React from 'react';
 // import imageSize from 'image-size';
 
 interface SchoolDetail {
@@ -51,6 +53,7 @@ interface ClubDetail {
 }
 
 interface PaymentDetails {
+    paymentCategory: string;
     memberId: string;
     bank: string;
     branch: string;
@@ -123,7 +126,7 @@ interface MemberData {
     schoolDetails: any[]; // Replace with the actual type of schoolDetails
     clubDetails: any[]; // Replace with the actual type of clubDetails
     paymentDetails: any; // Replace with the actual type of paymentDetails
-    gallery: number[];
+    gallery: any[];
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
     memberApprovalStatus: string;
@@ -132,6 +135,21 @@ interface MemberData {
 }
 
 const AddNewMember = () => {
+    const [maxDate, setMaxDate] = useState(new Date().toISOString().split("T")[0]);
+
+    const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const open = Boolean(anchorEl);
+    const id = open ? 'simple-popover' : undefined;
+
     const dispatch = useDispatch();
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | ArrayBuffer | null>(null);
@@ -171,8 +189,9 @@ const AddNewMember = () => {
     };
     const [isSclChecked, setIsSclChecked] = useState(true);
     const [ispayChecked, setIsPayChecked] = useState(true);
-    const [formValues, setFormValues] = useState<FormValues>({
+    const intialValue = {
         // Define your form fields here
+        gallery: [],
         category: '',
         userName: '',
         title: 'mr',
@@ -187,9 +206,9 @@ const AddNewMember = () => {
         maritalStatus: '',
         password: '',
         confirmPassword: '',
-        "workPlaceName": "Virtusa",
-        "occupation": "Software engineer",
-        "officeAddress": "Colombo",
+        "workPlaceName": "",
+        "occupation": "",
+        "officeAddress": "",
         profilePicture: null, // Store the file in the state
         schoolDetails: [],
         sdschoolName: '', sdparticipated: '', sdgame: '', sdfrom: '', sdto: '', sdrole: '',
@@ -199,10 +218,12 @@ const AddNewMember = () => {
         pdcategory: '', pdbank: '', pdbranch: '', pdtotal: '', pddate: '', pdpaymentImage: '',
         isSchoolDetailVerified: isSclChecked,
         isPaymentDetailVerified: ispayChecked,
-    });
+
+    }
+    const [formValues, setFormValues] = useState<FormValues>(intialValue);
 
     const items = ['carousel1.jpeg', 'carousel2.jpeg', 'carousel3.jpeg'];
-   
+
 
 
     const submitForm = () => {
@@ -231,7 +252,7 @@ const AddNewMember = () => {
             padding: '10px 20px',
         });
     };
-    const failForm = () => {
+    const failForm = (msg: String) => {
         const toast = Swal.mixin({
             toast: true,
             position: 'top',
@@ -240,7 +261,7 @@ const AddNewMember = () => {
         });
         toast.fire({
             icon: 'error',
-            title: 'Member add unsuccessfully',
+            title: msg,
             padding: '10px 20px',
         });
     };
@@ -269,16 +290,25 @@ const AddNewMember = () => {
             console.log('Member added successfully:', response.data);
             // Call your success function here
             sucessForm()
+            setFormValues(intialValue)
             return response;
         } catch (error) {
             console.error('Error adding member:', error);
-            failForm()
+            failForm('Member add unsuccessfully')
             throw error;
         }
     };
 
 
     const handleSubmit = async () => {
+
+        if (formValues.phoneNumber.length < 10 && formValues.telephoneNumber.length < 10) {
+            console.log(formValues.phoneNumber.length, "formValues.phoneNumber.length");
+            failForm('Phone Number must be 10 digit')
+            return
+        }
+
+
         setLoading(true);
 
         console.log(formValues, "ALL DAta");
@@ -303,11 +333,7 @@ const AddNewMember = () => {
             "schoolDetails": formValues.schoolDetails,
             "clubDetails": formValues.clubDetails,
             "paymentDetails": formValues.paymentDetails[0],
-            "gallery": [
-                1,
-                2,
-                3
-            ],
+            "gallery": formValues.gallery,
             "isSchoolDetailVerified": false,
             "isPaymentDetailVerified": false,
             "memberApprovalStatus": "APPROVED",
@@ -350,6 +376,16 @@ const AddNewMember = () => {
             ...prevValues,
             schoolDetails: [...prevValues.schoolDetails, schoolDetail],
         }));
+
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            sdschoolName: "",
+            sdparticipated: "",
+            sdgame: "",
+            sdfrom: "",
+            sdto: "",
+            sdrole: ""
+        }));
     }
     const addClub = () => {
         let clbdetails: ClubDetail = {
@@ -364,6 +400,16 @@ const AddNewMember = () => {
             ...prevValues,
             clubDetails: [...prevValues.clubDetails, clbdetails],
         }));
+
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            cdclubName: "",
+            cdinvloved: "",
+            cdgame: "",
+            cdfrom: "",
+            cdto: "",
+            cdrole: ""
+        }));
     }
     const addPayment = () => {
         let paydetails: PaymentDetails = {
@@ -372,8 +418,10 @@ const AddNewMember = () => {
             "branch": formValues.pdbranch,
             "total": formValues.pdtotal,
             "date": formValues.pddate,
-            "paymentSlip": formValues.pdpaymentImage
+            "paymentSlip": formValues.pdpaymentImage,
+            "paymentCategory": formValues.pdcategory,
         }
+
         setFormValues((prevValues) => ({
             ...prevValues,
             paymentDetails: [...prevValues.paymentDetails, paydetails],
@@ -394,109 +442,144 @@ const AddNewMember = () => {
 
         if (file) {
             // Load the image using FileReader to get its dimensions
-            const dimensions = await loadImageDimensions(file);
+            // const dimensions = await loadImageDimensions(file);
 
-            // Compress the image using canvas
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            if (!ctx) {
-                // Handle the case where context is null
-                console.error('Canvas context is null');
-                return;
-            }
-            canvas.width = dimensions.width;
-            canvas.height = dimensions.height;
+            // // Compress the image using canvas
+            // const canvas = document.createElement('canvas');
+            // const ctx = canvas.getContext('2d');
+            // if (!ctx) {
+            //     // Handle the case where context is null
+            //     console.error('Canvas context is null');
+            //     return;
+            // }
+            // canvas.width = dimensions.width;
+            // canvas.height = dimensions.height;
 
-            const img = new Image();
-            img.src = URL.createObjectURL(file);
+            // const img = new Image();
+            // img.src = URL.createObjectURL(file);
 
-            await new Promise<void>((resolve) => {
-                img.onload = () => {
-                    ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
-                    resolve();
-                };
-            });
+            // await new Promise<void>((resolve) => {
+            //     img.onload = () => {
+            //         ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
+            //         resolve();
+            //     };
+            // });
 
-            // Convert the compressed image back to a Blob
-            var cimg = null
-            canvas.toBlob((blob) => {
-                //   setSelectedFile(blob);
-                console.log(blob?.size, "compress");
-                cimg = blob
+            // // Convert the compressed image back to a Blob
+            // var cimg = null
+            // canvas.toBlob((blob) => {
+            //     //   setSelectedFile(blob);
+            //     console.log(blob?.size, "compress");
+            //     cimg = blob
 
-            }, file.type || '');
+            // }, file.type || '');
 
             var base64String = ""
-            if (cimg) {
-                base64String = await convertFileToBase64(cimg);
+            if (file) {
+                base64String = await convertFileToBase64(file);
             }
-            const newPaymentDetail: PaymentDetails = {
-                memberId: formValues.pdcategory,
-                bank: formValues.pdbank,
-                branch: formValues.pdbranch,
-                total: formValues.pdtotal,
-                date: formValues.pddate,
-                paymentSlip: base64String,
-            };
-
+            // const newPaymentDetail: PaymentDetails = {
+            //     memberId: formValues.pdcategory,
+            //     bank: formValues.pdbank,
+            //     branch: formValues.pdbranch,
+            //     total: formValues.pdtotal,
+            //     date: formValues.pddate,
+            //     paymentSlip: base64String,
+            // };
+            // console.log(newPaymentDetail);
             setFormValues((prevValues) => ({
                 ...prevValues,
-                paymentDetails: [
-                    {
-                        ...prevValues.paymentDetails[0], // Preserve other properties
-                        ...newPaymentDetail, // Update specific properties
-                    },
-                    ...prevValues.paymentDetails.slice(1), // Keep the rest of the array
-                ],
+                pdpaymentImage: base64String,
             }));
+            // setFormValues((prevValues) => ({
+            //     ...prevValues,
+            //     paymentDetails: [
+            //         {
+            //             ...prevValues.paymentDetails[0],
+            //             pdpaymentImage: // Preserve other properties
+            //             // Update specific properties
+            //         },
+            //     ],
+            // }));
         }
 
     };
     const handleImageChange2 = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log("start");
+
         const file = e.target.files?.[0];
 
         if (file) {
-            // Load the image using FileReader to get its dimensions
-            const dimensions = await loadImageDimensions(file);
-
-            // Compress the image using canvas
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            if (!ctx) {
-                // Handle the case where context is null
-                console.error('Canvas context is null');
-                return;
-            }
-            canvas.width = dimensions.width;
-            canvas.height = dimensions.height;
-
-            const img = new Image();
-            img.src = URL.createObjectURL(file);
-
-            await new Promise<void>((resolve) => {
-                img.onload = () => {
-                    ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
-                    resolve();
-                };
-            });
-
-            // Convert the compressed image back to a Blob
-            var cimg = null
-            canvas.toBlob((blob) => {
-                //   setSelectedFile(blob);
-                console.log(blob?.size, "compress");
-                cimg = blob
-
-            }, file.type || '');
-
             var base64String = ""
-            if (cimg) {
-                base64String = await convertFileToBase64(cimg);
+            if (file) {
+                base64String = await convertFileToBase64(file);
+                console.log(base64String, "00000looping");
+
             }
+            console.log(base64String, "dfmdf");
+
             setFormValues((prevValues) => ({
                 ...prevValues,
                 profilePicture: base64String,
             }));
+        } else {
+            console.log("noonondd");
+
+        }
+
+    };
+    const handleImageChange3 = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files) return;
+    
+        const imageFiles = Array.from(files);
+        const promises: Promise<string>[] = [];
+    
+        // Convert each selected image to base64 string
+        imageFiles.forEach(file => {
+          const reader = new FileReader();
+          promises.push(
+            new Promise<string>((resolve, reject) => {
+              reader.onload = (event: ProgressEvent<FileReader>) => {
+                if (!event.target) return;
+                resolve(event.target.result as string);
+              };
+              reader.onerror = (error) => {
+                reject(error);
+              };
+              reader.readAsDataURL(file);
+            })
+          );
+        });
+    
+        // After all images are converted, update state with base64 strings
+        Promise.all(promises)
+          .then(base64Strings => {
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                gallery: base64Strings,
+            }));
+          })
+          .catch(error => {
+            console.error('Error converting image to base64:', error);
+          });
+      };
+    const handleImageChange4 = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log("start");
+        const fileList = e.target.files;
+        var base64Strings = ""
+        if (fileList) {
+            const selectedImages: File[] = Array.from(fileList);
+            const base64Strings = await selectedImages.map(image => convertFileToBase64(image));
+            console.log(base64Strings, "00000looping");
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                gallery: base64Strings,
+            }));
+            //   setImages([...images, ...selectedImages]);
+        } else {
+            console.log("jesappahhh");
+
         }
     };
     // Array of options for the select box
@@ -533,7 +616,6 @@ const AddNewMember = () => {
     };
     return (
         <div className="mb-5 space-y-5">
-
             <div className="sm:flex-1 ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex flex-col sm:flex-row items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
                 <div className="sm:ltr:mr-auto sm:rtl:ml-auto">
                     <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
@@ -700,7 +782,7 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Date of birth</label>
-                                            <input onChange={handleChange} name='dateOfBirth' value={formValues.dateOfBirth} id="profession" type="date" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} max={maxDate} name='dateOfBirth' value={formValues.dateOfBirth} id="profession" type="date" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
                                         </div>
 
                                         <div>
@@ -782,7 +864,7 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="name">Date</label>
-                                            <input onChange={handleChange} name='pddate' value={formValues.pddate} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input type="date" onChange={handleChange} max={maxDate} name='pddate' value={formValues.pddate} id="name" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Payment Image</label>
@@ -815,7 +897,7 @@ const AddNewMember = () => {
                                     </thead>
                                     <tbody>
 
-                                        {formValues && formValues.paymentDetails && formValues.paymentDetails.map((data, index) => {
+                                        {formValues && formValues.paymentDetails && formValues.paymentDetails.filter(data => Object.keys(data).length !== 0).map((data, index) => {
                                             return (
                                                 <tr key={index + 1}>
                                                     <td>{index + 1}</td>
@@ -828,10 +910,33 @@ const AddNewMember = () => {
                                                     <td>{data.branch}</td>
                                                     <td>{data.total}</td>
                                                     <td>{data.date}</td>
-                                                    <td><button className="badge whitespace-nowrap badge-outline-primary"
-                                                    >
-                                                        View Image
-                                                    </button>
+                                                    <td>
+                                                        <button
+                                                            aria-describedby={id} onClick={handleClick}
+                                                            className="badge whitespace-nowrap badge-outline-primary"
+                                                        >
+
+                                                            {data.paymentSlip &&
+
+                                                                " View Image"
+                                                            }
+                                                        </button>
+                                                        <Popover
+                                                            id={id}
+                                                            open={open}
+                                                            anchorEl={anchorEl}
+                                                            onClose={handleClose}
+                                                            anchorOrigin={{
+                                                                vertical: 'bottom',
+                                                                horizontal: 'left',
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={`data:image/png;base64,${data.paymentSlip}`}
+                                                                alt="Mountain"
+                                                                className='w-full'
+                                                            />
+                                                        </Popover>
                                                     </td>
 
                                                 </tr>
@@ -1033,7 +1138,31 @@ const AddNewMember = () => {
                                     </tbody>
                                 </table>
                             </div>
+                            {/* Proof images */}
+                            <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
+                                <h2>
+                                    Proof Images
+                                </h2>
 
+                            </div>
+
+                            <form className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black" onSubmit={(e) => { e.preventDefault(); submitForm(); }}>
+
+                                <div className="flex flex-col sm:flex-row">
+                                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-5">
+                                        <div>
+                                            <label htmlFor="gallery">Proof Images</label>
+                                            <input type="file" accept="image/*" name='gallery' onChange={handleImageChange3} multiple />
+                                            {/* <input onChange={handleChange} name='gallery' value={formValues.sdschoolName} id="name" type="file" multiple placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required /> */}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="sm:col-span-2 mt-6 align-center flex justify-center"   >
+                                    <button type="submit" className="btn btn-outline-primary rounded-full" onClick={addSchool}>
+                                        Add School
+                                    </button>
+                                </div>
+                            </form>
 
                         </div>
                     ) : (
@@ -1054,7 +1183,7 @@ const AddNewMember = () => {
             </div> */}
 
 
-        </div>
+        </div >
 
 
 
