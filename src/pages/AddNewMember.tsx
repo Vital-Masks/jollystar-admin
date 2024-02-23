@@ -103,7 +103,7 @@ interface FormValues {
     pdpaymentImage: string;
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
-    membershipId:string;
+    membershipId: string;
 }
 
 interface MemberData {
@@ -223,7 +223,7 @@ const AddNewMember = () => {
     }
     const [formValues, setFormValues] = useState<FormValues>(intialValue);
 
-    
+
 
     const items = ['carousel1.jpeg', 'carousel2.jpeg', 'carousel3.jpeg'];
 
@@ -289,7 +289,7 @@ const AddNewMember = () => {
     ];
     const addMember = async (data: MemberData): Promise<AxiosResponse<any>> => {
         try {
-            
+
             const response = await axios.post('http://localhost:3000/api/member', data);
             console.log('Member added successfully:', response.data);
             // Call your success function here
@@ -302,16 +302,44 @@ const AddNewMember = () => {
             throw error;
         }
     };
-    
+
 
 
     const handleSubmit = async () => {
+        if (formValues.password !== formValues.confirmPassword) {
+            failForm('Conform Password Is Not Correct')
+
+            return
+        }
+        if (!formValues.userName ||
+            !formValues.title ||
+            !formValues.firstName ||
+            !formValues.lastName ||
+
+            !formValues.dateOfBirth ||
+            !formValues.passportNumber ||
+            !formValues.email ||
+            !formValues.phoneNumber ||
+
+            !formValues.telephoneNumber ||
+            !formValues.address ||
+            !formValues.maritalStatus ||
+            !formValues.password ||
+
+            !formValues.confirmPassword ||
+            !formValues.profilePicture
+        ) {
+            console.log(formValues.phoneNumber.length, "formValues.phoneNumber.length");
+            failForm('Fill The All Personal Information')
+            return
+        }
 
         if (formValues.phoneNumber.length < 10 && formValues.telephoneNumber.length < 10) {
             console.log(formValues.phoneNumber.length, "formValues.phoneNumber.length");
             failForm('Phone Number must be 10 digit')
             return
         }
+
 
 
         setLoading(true);
@@ -397,8 +425,12 @@ const AddNewMember = () => {
             setLoading(false);
         }
     };
-    
+
     const addSchool = () => {
+        if (!formValues.sdschoolName) {
+            alert("no")
+            return
+        }
         let schoolDetail: SchoolDetail = {
             "schoolName": formValues.sdschoolName,
             "participated": formValues.sdparticipated,
@@ -421,6 +453,7 @@ const AddNewMember = () => {
             sdto: "",
             sdrole: ""
         }));
+
     }
     const addClub = () => {
         let clbdetails: ClubDetail = {
@@ -566,39 +599,39 @@ const AddNewMember = () => {
     const handleImageChange3 = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files) return;
-    
+
         const imageFiles = Array.from(files);
         const promises: Promise<string>[] = [];
-    
+
         // Convert each selected image to base64 string
         imageFiles.forEach(file => {
-          const reader = new FileReader();
-          promises.push(
-            new Promise<string>((resolve, reject) => {
-              reader.onload = (event: ProgressEvent<FileReader>) => {
-                if (!event.target) return;
-                resolve(event.target.result as string);
-              };
-              reader.onerror = (error) => {
-                reject(error);
-              };
-              reader.readAsDataURL(file);
-            })
-          );
+            const reader = new FileReader();
+            promises.push(
+                new Promise<string>((resolve, reject) => {
+                    reader.onload = (event: ProgressEvent<FileReader>) => {
+                        if (!event.target) return;
+                        resolve(event.target.result as string);
+                    };
+                    reader.onerror = (error) => {
+                        reject(error);
+                    };
+                    reader.readAsDataURL(file);
+                })
+            );
         });
-    
+
         // After all images are converted, update state with base64 strings
         Promise.all(promises)
-          .then(base64Strings => {
-            setFormValues((prevValues) => ({
-                ...prevValues,
-                gallery: base64Strings,
-            }));
-          })
-          .catch(error => {
-            console.error('Error converting image to base64:', error);
-          });
-      };
+            .then(base64Strings => {
+                setFormValues((prevValues) => ({
+                    ...prevValues,
+                    gallery: base64Strings,
+                }));
+            })
+            .catch(error => {
+                console.error('Error converting image to base64:', error);
+            });
+    };
     const handleImageChange4 = async (e: React.ChangeEvent<HTMLInputElement>) => {
         console.log("start");
         const fileList = e.target.files;
@@ -631,6 +664,12 @@ const AddNewMember = () => {
         setFormValues((prevValues) => ({
             ...prevValues,
             category: event.target.value,
+        }));
+    };
+    const handleSelectChangePayment = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            pdcategory: event.target.value,
         }));
     };
 
@@ -785,7 +824,6 @@ const AddNewMember = () => {
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-5">
                                         <div>
                                             <label htmlFor="name">Category</label>
-
                                             <CustomSelect options={options} value={formValues.category} onChange={handleSelectChange} />
                                         </div>
                                     </div>
@@ -871,13 +909,13 @@ const AddNewMember = () => {
                             </div>
 
 
-                            <form className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black" onSubmit={(e) => { e.preventDefault(); submitForm(); }}>
+                            <form className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black" onSubmit={(e) => { e.preventDefault(); addPayment(); }}>
 
                                 <div className="flex flex-col sm:flex-row">
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-5">
                                         <div>
-                                            <label htmlFor="profession">Category</label>
-                                            <input onChange={handleChange} name='pdcategory' value={formValues.pdcategory} id="profession" type="text" placeholder="Category" className="form-input rounded-full border-dark" required />
+                                            <label htmlFor="name">Category</label>
+                                            <CustomSelect options={options} value={formValues.pdcategory} onChange={handleSelectChangePayment} />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Bank</label>
@@ -905,7 +943,7 @@ const AddNewMember = () => {
                                     </div>
                                 </div>
                                 <div className="sm:col-span-2 mt-6 align-center flex justify-center"  >
-                                    <button type="submit" className="btn btn-outline-primary rounded-full" onClick={addPayment}  >
+                                    <button type="submit" className="btn btn-outline-primary rounded-full"  >
                                         Add Payment
                                     </button>
                                 </div>
@@ -1013,7 +1051,7 @@ const AddNewMember = () => {
 
                             </div>
 
-                            <form className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black" onSubmit={(e) => { e.preventDefault(); submitForm(); }}>
+                            <form className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black" onSubmit={(e) => { e.preventDefault(); addSchool(); }}>
 
                                 <div className="flex flex-col sm:flex-row">
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-5">
@@ -1031,11 +1069,11 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="name">From</label>
-                                            <input onChange={handleChange} name='sdfrom' value={formValues.sdfrom} id="name" type="text" placeholder="From" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdfrom' value={formValues.sdfrom} id="name" type="date" max={formValues.sdto ? formValues.sdto : new Date().toISOString().split("T")[0]} placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">To</label>
-                                            <input onChange={handleChange} name='sdto' value={formValues.sdto} id="name" type="text" placeholder="To" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdto' value={formValues.sdto} id="name" type="date" min={formValues.sdfrom} placeholder="To" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Role</label>
@@ -1044,7 +1082,7 @@ const AddNewMember = () => {
                                     </div>
                                 </div>
                                 <div className="sm:col-span-2 mt-6 align-center flex justify-center"   >
-                                    <button type="submit" className="btn btn-outline-primary rounded-full" onClick={addSchool}>
+                                    <button type="submit" className="btn btn-outline-primary rounded-full" >
                                         Add School
                                     </button>
                                 </div>
@@ -1094,7 +1132,7 @@ const AddNewMember = () => {
 
                             </div>
 
-                            <form className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black" onSubmit={(e) => { e.preventDefault(); submitForm(); }}>
+                            <form className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black" onSubmit={(e) => { e.preventDefault(); addClub(); }}>
 
                                 <div className="flex flex-col sm:flex-row">
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-5">
@@ -1113,11 +1151,11 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="name">From</label>
-                                            <input onChange={handleChange} name='cdfrom' value={formValues.cdfrom} id="name" type="text" placeholder="From" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdfrom' value={formValues.cdfrom} id="name" type="date" max={formValues.sdto ? formValues.sdto : new Date().toISOString().split("T")[0]} placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">To</label>
-                                            <input onChange={handleChange} name='cdto' value={formValues.cdto} id="name" type="text" placeholder="To" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdto' value={formValues.cdto} id="name" type="date" min={formValues.cdfrom} placeholder="To" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Role</label>
@@ -1126,7 +1164,7 @@ const AddNewMember = () => {
                                     </div>
                                 </div>
                                 <div className="sm:col-span-2 mt-6 align-center flex justify-center"   >
-                                    <button type="submit" className="btn btn-outline-primary rounded-full" onClick={addClub} >
+                                    <button type="submit" className="btn btn-outline-primary rounded-full" >
                                         Add Club
                                     </button>
                                 </div>

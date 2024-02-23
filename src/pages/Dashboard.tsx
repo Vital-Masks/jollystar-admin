@@ -36,9 +36,8 @@ const Dashboard = () => {
         dispatch(setPageTitle('Dashboard Admin'));
 
         const fetchData = async () => {
-            let status = "PENDING"
             try {
-                const response = await axios.get('http://localhost:3000/api/member/getMemberStatusMembers/' + status);
+                const response = await axios.get('http://localhost:3000/api/member/getAllmembers/' );
                 setMembers(response.data.result);
             } catch (error) {
                 setError("error");
@@ -86,7 +85,7 @@ const Dashboard = () => {
                                     <td>{data.updated_at}</td>
                                     <td>{data.passportNumber}</td>
                                     <td>{data.phoneNumber}</td>
-                                    
+                                    <td>View</td>
                                 </tr>
                             ))
                         }
