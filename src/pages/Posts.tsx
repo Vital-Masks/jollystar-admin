@@ -51,7 +51,7 @@ const Posts = () => {
     const [error, setError] = useState<string | null>(null);
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/newsManagement/getAllNews');
+            const response = await axios.get('https://api.jollystarssc.com/api/newsManagement/getAllNews');
             setAllPosts(response.data.result);
         } catch (error) {
             setError("error");
@@ -62,7 +62,7 @@ const Posts = () => {
     const postData = async (data: any) => {
         setPostLoading(true)
         try {
-            const response = await axios.post('http://localhost:3000/api/newsManagement', data).then((res) => {
+            const response = await axios.post('https://api.jollystarssc.com/api/newsManagement', data).then((res) => {
                 fetchData()
             })
             // setAllPosts(response.data.result);
@@ -75,7 +75,7 @@ const Posts = () => {
     const putData = async (data: any) => {
         setPostLoading(true)
         try {
-            const response = await axios.put('http://localhost:3000/api/newsManagement/' + data._id, data).then((res) => {
+            const response = await axios.put('https://api.jollystarssc.com/api/newsManagement/' + data._id, data).then((res) => {
                 fetchData()
             })
             // setAllPosts(response.data.result);
@@ -87,7 +87,7 @@ const Posts = () => {
     };
     const deletePostsData = async (data: any) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/newsManagement/${data._id}`, {
+            const response = await fetch(`https://api.jollystarssc.com/api/newsManagement/${data._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

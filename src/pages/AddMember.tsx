@@ -143,7 +143,7 @@ const AddMember = () => {
     useEffect(() => {
         dispatch(setPageTitle('AddMember Admin'));
 
-        fetch(`http://localhost:3000/api/member/${memberId}`)
+        fetch(`https://api.jollystarssc.com/api/member/${memberId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.result) {
@@ -190,7 +190,7 @@ const AddMember = () => {
         console.log(status);
         try {
 
-            const response = await axios.put(`http://localhost:3000/api/member/memberApproval/${memberId}`, data
+            const response = await axios.put(`https://api.jollystarssc.com/api/member/memberApproval/${memberId}`, data
             );
             // Handle the response as needed
             console.log('PUT request successful:', response.data);

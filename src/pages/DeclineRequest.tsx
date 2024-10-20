@@ -93,7 +93,7 @@ const DeclineRequest = () => {
     useEffect(() => {
         dispatch(setPageTitle('Approved Members'));
 
-            fetch(`http://localhost:3000/api/member/${memberId}`)
+            fetch(`https://api.jollystarssc.com/api/member/${memberId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.result) {
