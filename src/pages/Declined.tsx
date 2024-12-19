@@ -173,7 +173,6 @@ const Declined = () => {
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>#</th>
                                             <th>First Name</th>
                                             <th>Last Name</th>
                                             <th>Membership Type</th>
@@ -187,7 +186,6 @@ const Declined = () => {
                                             .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'DECLINED'))
                                             .map((data) => (
                                                 <tr key={data._id}>
-                                                    <td>{data._id}</td>
                                                     <td>{data.firstName}</td>
                                                     <td>{data.lastName}</td>
                                                     <td>{data.membershipCategory}</td>
@@ -224,7 +222,6 @@ const Declined = () => {
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>#</th>
                                             <th>First Name</th>
                                             <th>Last Name</th>
                                             <th>Membership Type</th>
@@ -238,7 +235,6 @@ const Declined = () => {
                                             .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'REMOVED'))
                                             .map((data) => (
                                                 <tr key={data._id}>
-                                                    <td>{data._id}</td>
                                                     <td>{data.firstName}</td>
                                                     <td>{data.lastName}</td>
                                                     <td>{data.membershipCategory}</td>
