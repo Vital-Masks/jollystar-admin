@@ -32,6 +32,7 @@ import mongoose from 'mongoose';
 import axios from 'axios';
 import ViewAllMemberProfile from './ViewAllMemberProfile';
 import ViewAllStatusMember from '../../components/memberShip/viewAllMemberDatas';
+import DeclineMemberReason from './dialog/declineReason';
 // import ViewAllStatusMember from './viewAllMemberDatas';
 
 interface Member {
@@ -65,6 +66,8 @@ interface Member {
     membershipId?: string;
     declinedMessage?: string;
     created_at?: string;
+    
+
 }
 
 interface SchoolDetail {
@@ -96,7 +99,7 @@ interface GalleryItem {
     // Define the properties of your gallery item
 }
 interface FormValues {
-    memberID: string;
+    memberID: String;
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
 }
@@ -116,7 +119,8 @@ const AddMember = () => {
     const [formValues, setFormValues] = useState<FormValues>({
         isSchoolDetailVerified: isSclChecked,
         isPaymentDetailVerified: ispayChecked,
-        memberID: ""
+        memberID:""
+ 
     });
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -153,6 +157,10 @@ const AddMember = () => {
             .then(data => {
                 if (data.result) {
                     setMembers(data.result[0]);
+                    setFormValues((prevValues) => ({
+                        ...prevValues,
+                        memberID: data.result[0].membershipId,
+                    }));
                 }
             })
             .catch(error => console.error('Error fetching data:', error));
@@ -166,10 +174,36 @@ const AddMember = () => {
     };
 
     const items = ['carousel1.jpeg', 'carousel2.jpeg', 'carousel3.jpeg'];
+     const alertFormMsg = (msg: string, type: 'success' | 'error' | 'warning' | 'info' | 'question' = 'success') => {
+           const toast = Swal.mixin({
+               toast: true,
+               position: 'top',
+               showConfirmButton: false,
+               timer: 3000,
+           });
+   
+           toast.fire({
+               icon: type, // Valid SweetAlert2 icon type
+               title: msg, // Ensure msg is a primitive string
+               padding: '10px 20px',
+           });
+       };
     const handleApprove = () => {
+        // VALIDATION
+        if (formValues.isSchoolDetailVerified===false) {
+            alertFormMsg('Please verify school and details','error');
+            return false;
+        }
+    
+        // Validate payment details checkbox
+        if (formValues.isPaymentDetailVerified ===false) {
+            alertFormMsg('Please verify school and details','error');
+            return false;
+        }
+
         if (formValues.memberID !== "") {
             setApproveLoading(true);
-            handleStatus("APPROVED")
+            handleStatus("APPROVED","success")
 
         } else {
             setMemberIdErrorMsg("Required")
@@ -177,20 +211,20 @@ const AddMember = () => {
 
     }
 
-    const handleDecline = () => {
+    const handleDecline = (reason:String) => {
 
         if (formValues.memberID !== "") {
             setDeclineLoading(true);
-            handleStatus("DECLINED")
+            handleStatus("DECLINED",reason)
         } else {
             setMemberIdErrorMsg("Required")
         }
 
     }
-    const handleStatus = async (status: string) => {
+    const handleStatus = async (status: string,reason:String) => {
         let data = {
             "memberApprovalStatus": status.toUpperCase(),
-            "declinedMessage": "wrong info"
+            "declinedMessage": reason
         }
         console.log(status);
         try {
@@ -278,9 +312,11 @@ const AddMember = () => {
 
 
                             <div className="flex mt-5 ml-5 justify-center">
-                                <button type="button" className="btn btn-outline-danger rounded-full text-2xl" onClick={handleDecline} >
+                            <DeclineMemberReason hableRemove={handleDecline} removeLoading={declineLoading} memberID={formValues.memberID} />
+
+                                {/* <button type="button" onClick={handleDecline} >
                                     {declineLoading ? 'Loading...' : "Decline"}
-                                </button>
+                                </button> */}
                                 <button type="button" className="btn btn-outline-success rounded-full ml-5 text-2xl" onClick={handleApprove}>{approveLoading ? 'Loading...' : "Approve"}</button>
                             </div>
 

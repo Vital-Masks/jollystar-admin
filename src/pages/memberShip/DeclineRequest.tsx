@@ -153,16 +153,16 @@ const DeclineRequest = () => {
 
                             <label className="inline-flex mt-5 text-xl">
                                 <span className="peer-checked:text-success">School and Club Details</span>
-                                <input type="checkbox" value={members?.isSchoolDetailVerified?.toString()} className="form-checkbox text-success border-white peer ml-5" />
+                                <input type="checkbox" disabled value={members?.isSchoolDetailVerified?.toString()} className="form-checkbox text-success border-white peer ml-5" />
                             </label>
                             <label className="inline-flex mt-5 ml-10 text-xl">
                                 <span className="peer-checked:text-success">Payment Details</span>
-                                <input type="checkbox" value={members?.isPaymentDetailVerified?.toString()} className="form-checkbox text-success border-white peer ml-5" />
+                                <input type="checkbox" disabled  value={members?.isPaymentDetailVerified?.toString()} className="form-checkbox text-success border-white peer ml-5" />
                             </label>
                             <form className="space-y-5 mt-5">
                                 <div className="sm:flex justify-between items-center md:gap-20">
                                     <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership Id</label>
-                                    <input id="hrLargeinput" type="text" value={members?.membershipId} className="w-full sm:w-1/2 form-input text-2xl" />
+                                    <input id="hrLargeinput" disabled type="text" value={members?.membershipId} className="w-full sm:w-1/2 form-input text-2xl" />
                                 </div>
                             </form>
 
