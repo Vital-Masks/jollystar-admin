@@ -80,7 +80,6 @@ const Approved = () => {
                 <table>
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Membership Type</th>
@@ -95,7 +94,6 @@ const Approved = () => {
                             .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'APPROVED'))
                             .map((data) => (
                                 <tr key={data._id}>
-                                    <td>{data._id}</td>
                                     <td>{data.firstName}</td>
                                     <td>{data.lastName}</td>
                                     <td>{data.membershipCategory}</td>

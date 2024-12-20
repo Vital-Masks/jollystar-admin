@@ -83,7 +83,6 @@ const Pending = () => {
                 <table>
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Membership Type</th>
@@ -100,7 +99,6 @@ const Pending = () => {
                                 (data.memberApprovalStatus && data.memberApprovalStatus === 'PENDING'))
                             .map((data) => (
                                 <tr key={data._id}>
-                                    <td>{data._id}</td>
                                     <td>{data.firstName}</td>
                                     <td>{data.lastName}</td>
                                     <td>{data.membershipCategory}</td>
