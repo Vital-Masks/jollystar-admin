@@ -33,6 +33,7 @@ import axios from 'axios';
 import Popover from '@mui/material/Popover';
 import ViewAllStatusMember from '../../components/memberShip/viewAllMemberDatas';
 import ViewAllMemberProfile from './ViewAllMemberProfile';
+import RemoveMemberReason from './dialog/removeReason';
 interface PaymentDetail {
 
     memberId?: string;
@@ -190,16 +191,15 @@ const ApprovedMember = () => {
             mobile: '073777777777',
         }
     ];
-    const hableRemove = () => {
-
+    const hableRemove = (reason:String) => {
         setRemoveLoading(true);
-        handleStatus("REMOVED")
+        handleStatus("REMOVED",reason)
 
     }
-    const handleStatus = async (status: string) => {
+    const handleStatus = async (status: string,reason:String) => {
         let data = {
             "memberApprovalStatus": status.toUpperCase(),
-            "declinedMessage": "wrong info"
+            "declinedMessage": reason
         }
         console.log(status);
         try {
@@ -253,7 +253,7 @@ const ApprovedMember = () => {
                     <ViewAllMemberProfile data={members} />
                 }
 
-             {members &&   <div className="max-w-[40rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
+                {members && <div className="max-w-[40rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
                     <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
                         <div className="text-center sm:text-left mr-5">
                             <h3 className="text-[#3b3f5c] text-2xl sm:text-4xl font-semibold mb-2 dark:text-black bold">
@@ -262,11 +262,11 @@ const ApprovedMember = () => {
 
                             <label className="inline-flex mt-5 text-xl">
                                 <span className="peer-checked:text-success">School and Club Details</span>
-                                <input onChange={handleSchoolCheckboxChange} checked={formValues.isSchoolDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
+                                <input checked={formValues.isSchoolDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
                             </label>
                             <label className="inline-flex mt-5 ml-10 text-xl">
                                 <span className="peer-checked:text-success">Payment Details</span>
-                                <input onChange={handlePaymentCheckboxChange} checked={formValues.isPaymentDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
+                                <input checked={formValues.isPaymentDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
                             </label>
                             <form className="space-y-5 mt-5">
                                 <div className="sm:flex justify-between items-center md:gap-20">
@@ -279,13 +279,8 @@ const ApprovedMember = () => {
                                     {/* MemberIdErrorMsg */}
                                 </div>
                             </form>
-
-                            <div className="flex mt-5 ml-5 justify-center">
-                                <button onClick={hableRemove} type="button" className="btn btn-outline-danger rounded-full text-2xl">
-                                    {removeLoading ? 'Loading ...' : " Remove From Membership"}
-                                    {/* removeLoading */}
-                                </button>
-                            </div>
+                        <RemoveMemberReason hableRemove={hableRemove} removeLoading={removeLoading} />
+                            
 
                         </div>
                     </div>

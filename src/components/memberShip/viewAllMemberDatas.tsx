@@ -386,14 +386,15 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
                                                         {data.paymentSlip ?
                                                             <>
                                                                 <button
-                                                                    aria-describedby={id} onClick={handleClick}
+                                                                    // aria-describedby={id} onClick={handleClick}
                                                                     className="badge whitespace-nowrap badge-outline-primary"
                                                                 >
 
+                                                                    <a href={`${data.paymentSlip}`} target="_blank">  View Image</a>
 
-                                                                    View Image
+
                                                                 </button>
-                                                                <Popover
+                                                                {/* <Popover
                                                                     id={id}
                                                                     open={open}
                                                                     anchorEl={anchorEl}
@@ -403,12 +404,14 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
                                                                         horizontal: 'left',
                                                                     }}
                                                                 >
-                                                                    <img
-                                                                        src={`data:image/png;base64,${data.paymentSlip}`}
+                                                                   <div style={{width:'300px'}} >
+                                                                   <img
+                                                                        src={`${data.paymentSlip}`}
                                                                         alt="Mountain"
                                                                         className='w-full'
                                                                     />
-                                                                </Popover>
+                                                                   </div>
+                                                                </Popover> */}
                                                             </>
                                                             : <>
                                                                 <button
@@ -591,53 +594,19 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
                             </div>
 
                             {/* Images */}
-                            <div className="swiper" id="slider5">
-                                <div className="swiper-wrapper">
-                                    <Swiper
-                                        modules={[Navigation, Pagination]}
-                                        navigation={{
-                                            nextEl: '.swiper-button-next-ex5',
-                                            prevEl: '.swiper-button-prev-ex5',
-                                        }}
-                                        pagination={{
-                                            clickable: true,
-                                        }}
-                                        breakpoints={{
-                                            1024: {
-                                                slidesPerView: 3,
-                                                spaceBetween: 30,
-                                            },
-                                            768: {
-                                                slidesPerView: 2,
-                                                spaceBetween: 40,
-                                            },
-                                            320: {
-                                                slidesPerView: 1,
-                                                spaceBetween: 20,
-                                            },
-                                        }}
-                                        dir={themeConfig.rtlClass}
-                                        key={themeConfig.rtlClass === 'rtl' ? 'true' : 'false'}
-                                    >
-                                        {members && members.gallery && members.gallery.length > 0 && members.gallery.map((item, i) => {
-                                            return (
-                                                <SwiperSlide key={i}>
+                            <div className="flex items-center text-red wrap justify-start gap-5 overflow-auto lg:grid-cols-3 xl:grid-cols-4 md:grid md:grid-cols-2 lg:justify-center p-5">
+                                {members && members.gallery && members.gallery.length > 0 && members.gallery.map((item, i) => {
+                                    return (
 
-
-                                                    <img
-                                                        src={`${item}`}
-                                                        alt="profile"
-                                                        className="w-full"
-                                                        style={{maxWidth:"200px"}}
-                                                    />
-                                                    {/* <img src={`/assets/images/${item}`} className="w-full" alt="itemImg" /> */}
-                                                </SwiperSlide>
-
-                                            );
-                                        })}
-                                      
-                                    </Swiper>
-                                </div>
+                                        <>
+                                            <img
+                                                src={`${item}`}
+                                                alt="profile"
+                                                className="w-full"
+                                                style={{ maxWidth: "200px" }}
+                                            /></>
+                                    );
+                                })}
                             </div>
 
                         </div>

@@ -33,6 +33,7 @@ import IconUserPlus from '../components/Icon/IconUserPlus';
 import IconUsers from '../components/Icon/IconUsers';
 import IconMenuUsers from '../components/Icon/Menu/IconMenuUsers';
 import axios from 'axios';
+import { formatDate } from '../utils/utils';
 
 interface Member {
     _id: string;
@@ -173,7 +174,6 @@ const Declined = () => {
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>#</th>
                                             <th>First Name</th>
                                             <th>Last Name</th>
                                             <th>Membership Type</th>
@@ -187,11 +187,10 @@ const Declined = () => {
                                             .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'DECLINED'))
                                             .map((data) => (
                                                 <tr key={data._id}>
-                                                    <td>{data._id}</td>
                                                     <td>{data.firstName}</td>
                                                     <td>{data.lastName}</td>
                                                     <td>{data.membershipCategory}</td>
-                                                    <td>{data.updated_at}</td>
+                                                    <td>{  formatDate( data.updated_at)}</td>
                                                     <td>{data.declinedMessage}</td>
                                                     <td>
                                                         <button className="badge whitespace-nowrap badge-outline-success">
@@ -224,7 +223,6 @@ const Declined = () => {
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>#</th>
                                             <th>First Name</th>
                                             <th>Last Name</th>
                                             <th>Membership Type</th>
@@ -238,11 +236,10 @@ const Declined = () => {
                                             .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'REMOVED'))
                                             .map((data) => (
                                                 <tr key={data._id}>
-                                                    <td>{data._id}</td>
                                                     <td>{data.firstName}</td>
                                                     <td>{data.lastName}</td>
                                                     <td>{data.membershipCategory}</td>
-                                                    <td>{data.updated_at}</td>
+                                                    <td>{  formatDate( data.updated_at)}</td>
                                                     <td>{data.declinedMessage}</td>
                                                     <td>
                                                         <button className="badge whitespace-nowrap badge-outline-success">

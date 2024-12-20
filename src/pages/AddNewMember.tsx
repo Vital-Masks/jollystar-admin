@@ -32,6 +32,8 @@ import axios, { AxiosResponse } from 'axios';
 import CustomSelect from '../components/core/select';
 import Popover from '@mui/material/Popover';
 import React from 'react';
+import { MembershipTypeDetails, MembershipPriceDetails } from "../const/variable";
+
 // import imageSize from 'image-size';
 
 interface SchoolDetail {
@@ -45,7 +47,7 @@ interface SchoolDetail {
 
 interface ClubDetail {
     clubName: string;
-    invloved: string;
+    involved: string;
     game: string;
     from: string;
     to: string;
@@ -89,7 +91,7 @@ interface FormValues {
     sdrole: string;
     clubDetails: ClubDetail[];
     cdclubName: string;
-    cdinvloved: string;
+    cdinvolved: string;
     cdgame: string;
     cdfrom: string;
     cdto: string;
@@ -187,8 +189,9 @@ const AddNewMember = () => {
     const toggleTabs = (name: string) => {
         setTabs(name);
     };
-    const [isSclChecked, setIsSclChecked] = useState(true);
-    const [ispayChecked, setIsPayChecked] = useState(true);
+    const [isSclChecked, setIsSclChecked] = useState(false);
+    const [ispayChecked, setIsPayChecked] = useState(false);
+    const [UserMemberShipID, setUserMemberShipID] = useState('');
     const intialValue = {
         // Define your form fields here
         gallery: [],
@@ -213,7 +216,7 @@ const AddNewMember = () => {
         schoolDetails: [],
         sdschoolName: '', sdparticipated: '', sdgame: '', sdfrom: '', sdto: '', sdrole: '',
         clubDetails: [],
-        cdclubName: '', cdinvloved: '', cdgame: '', cdfrom: '', cdto: '', cdrole: '',
+        cdclubName: '', cdinvolved: '', cdgame: '', cdfrom: '', cdto: '', cdrole: '',
         paymentDetails: [],
         pdcategory: '', pdbank: '', pdbranch: '', pdtotal: '', pddate: '', pdpaymentImage: '',
         isSchoolDetailVerified: isSclChecked,
@@ -252,6 +255,21 @@ const AddNewMember = () => {
             padding: '10px 20px',
         });
     };
+    const alertFormMsg = (msg: string, type: 'success' | 'error' | 'warning' | 'info' | 'question' = 'success') => {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+        });
+
+        toast.fire({
+            icon: type, // Valid SweetAlert2 icon type
+            title: msg, // Ensure msg is a primitive string
+            padding: '10px 20px',
+        });
+    };
+
     const failForm = (msg: String) => {
         const toast = Swal.mixin({
             toast: true,
@@ -301,14 +319,45 @@ const AddNewMember = () => {
 
 
     const handleSubmit = async () => {
-
+        console.log(formValues);
+      
         if (formValues.phoneNumber.length < 10 && formValues.telephoneNumber.length < 10) {
             console.log(formValues.phoneNumber.length, "formValues.phoneNumber.length");
             failForm('Phone Number must be 10 digit')
             return
         }
+        // School data must be filled
+        if (formValues.schoolDetails.length === 0) {
+            failForm('School Details must be filled');
+            return false;
+        }
+        // Gallery validation
+        if (formValues.gallery && formValues.gallery.length === 0) {
+            failForm('Please upload at least one image to the Proof Images');
+            return false;
+        }
+        if (formValues.paymentDetails.length === 0) {
+            failForm('Payment Details must be filled');
+            return false;
+        }
+        // formValues.gallery
 
-
+        if (formValues.isSchoolDetailVerified===false) {
+            failForm('Please verify school and details');
+            return false;
+        }
+    
+        // Validate payment details checkbox
+        if (formValues.isPaymentDetailVerified ===false) {
+            failForm('Please verify payment details');
+            return false;
+        }
+    
+        // Validate membership ID
+        if (!UserMemberShipID || UserMemberShipID.trim() === '') {
+            failForm('Membership ID is required');
+            return false;
+        }
         setLoading(true);
 
         console.log(formValues, "ALL DAta");
@@ -337,7 +386,7 @@ const AddNewMember = () => {
             "isSchoolDetailVerified": false,
             "isPaymentDetailVerified": false,
             "memberApprovalStatus": "APPROVED",
-            "membershipId": "",
+            "membershipId": UserMemberShipID,
             "declinedMessage": ""
         }
         try {
@@ -364,6 +413,17 @@ const AddNewMember = () => {
         //   };
     }
     const addSchool = () => {
+        if (
+            !formValues.sdschoolName ||
+            !formValues.sdparticipated ||
+            !formValues.sdgame ||
+            !formValues.sdfrom ||
+            !formValues.sdto ||
+            !formValues.sdrole
+        ) {
+            alertFormMsg('Please fill in all the fields.', 'error')
+            return; // Stop the function execution
+        }
         let schoolDetail: SchoolDetail = {
             "schoolName": formValues.sdschoolName,
             "participated": formValues.sdparticipated,
@@ -372,11 +432,22 @@ const AddNewMember = () => {
             "to": formValues.sdto,
             "role": formValues.sdrole
         }
-        setFormValues((prevValues) => ({
-            ...prevValues,
-            schoolDetails: [...prevValues.schoolDetails, schoolDetail],
-        }));
-
+        // Check if editing an existing entry
+        if (editingIndex !== null) {
+            const updatedSchoolDetails = [...formValues.schoolDetails];
+            updatedSchoolDetails[editingIndex] = schoolDetail;
+            setFormValues({
+                ...formValues,
+                schoolDetails: updatedSchoolDetails,
+            });
+            setEditingIndex(null); // Reset editing index
+        } else {
+            if (schoolDetail.schoolName)
+                setFormValues((prevValues) => ({
+                    ...prevValues,
+                    schoolDetails: [...prevValues.schoolDetails, schoolDetail],
+                }));
+        }
         setFormValues((prevValues) => ({
             ...prevValues,
             sdschoolName: "",
@@ -388,45 +459,104 @@ const AddNewMember = () => {
         }));
     }
     const addClub = () => {
-        let clbdetails: ClubDetail = {
-            "clubName": formValues.cdclubName,
-            "invloved": formValues.cdinvloved,
-            "game": formValues.cdgame,
-            "from": formValues.cdfrom,
-            "to": formValues.cdto,
-            "role": formValues.cdrole,
+        // Validation: Check if any field is empty
+        if (
+            !formValues.cdclubName ||
+            !formValues.cdinvolved ||
+            !formValues.cdgame ||
+            !formValues.cdfrom ||
+            !formValues.cdto ||
+            !formValues.cdrole
+        ) {
+            alertFormMsg("Please fill in all the fields.", "error");
+            return; // Stop function execution
         }
-        setFormValues((prevValues) => ({
-            ...prevValues,
-            clubDetails: [...prevValues.clubDetails, clbdetails],
-        }));
 
+        let clbdetails: ClubDetail = {
+            clubName: formValues.cdclubName,
+            involved: formValues.cdinvolved,
+            game: formValues.cdgame,
+            from: formValues.cdfrom,
+            to: formValues.cdto,
+            role: formValues.cdrole,
+        };
+
+        if (editingClubIndex !== null) {
+            // Update the existing entry
+            setFormValues((prevValues) => {
+                const updatedClubDetails = [...prevValues.clubDetails];
+                updatedClubDetails[editingClubIndex] = clbdetails;
+                return {
+                    ...prevValues,
+                    clubDetails: updatedClubDetails
+                };
+            });
+            setEditingClubIndex(null); // Reset editing state
+        } else {
+            // Add a new entry
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                clubDetails: [...prevValues.clubDetails, clbdetails],
+            }));
+        }
+
+        // Reset the form fields
         setFormValues((prevValues) => ({
             ...prevValues,
             cdclubName: "",
-            cdinvloved: "",
+            cdinvolved: "",
             cdgame: "",
             cdfrom: "",
             cdto: "",
-            cdrole: ""
+            cdrole: "",
         }));
-    }
+    };
+
     const addPayment = () => {
-        let paydetails: PaymentDetails = {
-            "memberId": formValues.pdcategory,
-            "bank": formValues.pdbank,
-            "branch": formValues.pdbranch,
-            "total": formValues.pdtotal,
-            "date": formValues.pddate,
-            "paymentSlip": formValues.pdpaymentImage,
-            "paymentCategory": formValues.pdcategory,
+        if (!formValues.pdcategory || !formValues.pdbank || !formValues.pdbranch || !formValues.pdtotal || !formValues.pddate || !formValues.pdpaymentImage) {
+            alert('Please fill in all fields before submitting.');
+            return;
         }
 
+        const paydetails: PaymentDetails = {
+            memberId: formValues.pdcategory,
+            bank: formValues.pdbank,
+            branch: formValues.pdbranch,
+            total: formValues.pdtotal,
+            date: formValues.pddate,
+            paymentSlip: formValues.pdpaymentImage,
+            paymentCategory: formValues.pdcategory,
+        };
+
+        if (editIndex !== null) {
+            // Editing an existing payment
+            const updatedPayments = [...formValues.paymentDetails];
+            updatedPayments[editIndex] = paydetails;
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                paymentDetails: updatedPayments,
+            }));
+        } else {
+            // Adding a new payment
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                paymentDetails: [...prevValues.paymentDetails, paydetails],
+            }));
+        }
+
+        // Reset form after adding or editing
         setFormValues((prevValues) => ({
             ...prevValues,
-            paymentDetails: [...prevValues.paymentDetails, paydetails],
+            pdcategory: '',
+            pdbank: '',
+            pdbranch: '',
+            pdtotal: '',
+            pddate: '',
+            pdpaymentImage: '',
         }));
-    }
+
+        setEditIndex(null); // Reset edit state
+    };
     const loadImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
         return new Promise((resolve) => {
             const img = new Image();
@@ -436,6 +566,7 @@ const AddNewMember = () => {
             };
         });
     };
+
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         console.log(file?.size, "org");
@@ -531,39 +662,39 @@ const AddNewMember = () => {
     const handleImageChange3 = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files) return;
-    
+
         const imageFiles = Array.from(files);
         const promises: Promise<string>[] = [];
-    
+
         // Convert each selected image to base64 string
         imageFiles.forEach(file => {
-          const reader = new FileReader();
-          promises.push(
-            new Promise<string>((resolve, reject) => {
-              reader.onload = (event: ProgressEvent<FileReader>) => {
-                if (!event.target) return;
-                resolve(event.target.result as string);
-              };
-              reader.onerror = (error) => {
-                reject(error);
-              };
-              reader.readAsDataURL(file);
-            })
-          );
+            const reader = new FileReader();
+            promises.push(
+                new Promise<string>((resolve, reject) => {
+                    reader.onload = (event: ProgressEvent<FileReader>) => {
+                        if (!event.target) return;
+                        resolve(event.target.result as string);
+                    };
+                    reader.onerror = (error) => {
+                        reject(error);
+                    };
+                    reader.readAsDataURL(file);
+                })
+            );
         });
-    
+
         // After all images are converted, update state with base64 strings
         Promise.all(promises)
-          .then(base64Strings => {
-            setFormValues((prevValues) => ({
-                ...prevValues,
-                gallery: base64Strings,
-            }));
-          })
-          .catch(error => {
-            console.error('Error converting image to base64:', error);
-          });
-      };
+            .then(base64Strings => {
+                setFormValues((prevValues) => ({
+                    ...prevValues,
+                    gallery: base64Strings,
+                }));
+            })
+            .catch(error => {
+                console.error('Error converting image to base64:', error);
+            });
+    };
     const handleImageChange4 = async (e: React.ChangeEvent<HTMLInputElement>) => {
         console.log("start");
         const fileList = e.target.files;
@@ -584,7 +715,13 @@ const AddNewMember = () => {
     };
     // Array of options for the select box
 
-    const options = ['Ordinary Member', 'Life time Member', 'Hon Life time Member'];
+    const options = [MembershipTypeDetails.RESIDENT_LIFE_MEMBER,
+    MembershipTypeDetails.OVERSEAS_LIFE_MEMBER,
+    MembershipTypeDetails.ORDINARY_MEMBERS,
+    MembershipTypeDetails.PLAYING_MEMBER
+    ];
+    const Maritaloptions = ['Single', "Married", "Divorced"
+    ];
     const options2 = ['MR', 'MS', 'MRS'];
     const handleSelectChange2 = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setFormValues((prevValues) => ({
@@ -598,6 +735,13 @@ const AddNewMember = () => {
             category: event.target.value,
         }));
     };
+    const handleSelectChangeMaritalStatus = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            maritalStatus: event.target.value,
+        }));
+    };
+
 
     const handleSchoolCheckboxChange = () => {
         console.log(formValues.isPaymentDetailVerified);
@@ -614,6 +758,139 @@ const AddNewMember = () => {
             isPaymentDetailVerified: !ispayChecked,
         }));
     };
+
+    // club and school edit
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+    const editSchoolDetail = (index: number) => {
+        const schoolDetail = formValues.schoolDetails[index];
+        setFormValues({
+            ...formValues,
+            sdschoolName: schoolDetail.schoolName,
+            sdparticipated: schoolDetail.participated,
+            sdgame: schoolDetail.game,
+            sdfrom: schoolDetail.from,
+            sdto: schoolDetail.to,
+            sdrole: schoolDetail.role,
+        });
+        setEditingIndex(index); // Set the index being edited
+    };
+    const deleteSchoolDetail = (index: number) => {
+        const updatedSchoolDetails = formValues.schoolDetails.filter((_, i) => i !== index);
+        setFormValues({
+            ...formValues,
+            schoolDetails: updatedSchoolDetails,
+        });
+    };
+    const [editingClubIndex, setEditingClubIndex] = useState<number | null>(null);
+
+    // club edit
+    const editClubDetail = (index: number) => {
+        const clubDetail = formValues.clubDetails[index];
+        setFormValues({
+            ...formValues,
+            cdclubName: clubDetail.clubName,
+            cdinvolved: clubDetail.involved,
+            cdgame: clubDetail.game,
+            cdfrom: clubDetail.from,
+            cdto: clubDetail.to,
+            cdrole: clubDetail.role,
+        });
+        setEditingClubIndex(index); // Set the index being edited
+    };
+
+    const deleteClubDetail = (index: number) => {
+        const updatedClubDetails = formValues.clubDetails.filter((_, i) => i !== index);
+        setFormValues({
+            ...formValues,
+            clubDetails: updatedClubDetails,
+        });
+    };
+    useEffect(() => {
+        // Get the selected category
+        const selectedCategory = formValues.category;
+
+        // Find the price based on the selected category
+        const selectedMembership = MembershipPriceDetails.find(
+            (membership: any) => membership.name === selectedCategory
+        );
+
+        // If a valid membership is found, update pdtotal
+        if (selectedMembership) {
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                pdtotal: selectedMembership.price,
+                pdcategory: selectedCategory, // Set the price
+            }));
+        }
+    }, [formValues.category]); // Trigger the effect when formValues.category changes
+
+    const handleImageChangePreview = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        console.log(file?.size, "org");
+
+        if (file) {
+            // Convert the file to base64
+            const base64String = await convertFileToBase64Preview(file);
+
+            // Update form values with the base64 string
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                pdpaymentImage: base64String,
+            }));
+        }
+    };
+
+    // Function to convert file to base64
+    const convertFileToBase64Preview = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = (error) => reject(error);
+        });
+    };
+
+
+    // payment 
+    const [editIndex, setEditIndex] = useState<number | null>(null); // To track which payment is being edited
+    const handleImageChangePreviewNew = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormValues((prevValues) => ({
+                    ...prevValues,
+                    pdpaymentImage: reader.result as string,
+                }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleEdit = (index: number) => {
+        const payment = formValues.paymentDetails[index];
+        setFormValues({
+            ...formValues,
+            pdcategory: payment.memberId,
+            pdbank: payment.bank,
+            pdbranch: payment.branch,
+            pdtotal: payment.total,
+            pddate: payment.date,
+            pdpaymentImage: payment.paymentSlip,
+        });
+        setEditIndex(index); // Set the edit index
+    };
+
+    // Handle deleting a payment
+    const handleDelete = (index: number) => {
+        const updatedPayments = formValues.paymentDetails.filter((_, i) => i !== index);
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            paymentDetails: updatedPayments,
+        }));
+    };
+
     return (
         <div className="mb-5 space-y-5">
             <div className="sm:flex-1 ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex flex-col sm:flex-row items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
@@ -627,7 +904,7 @@ const AddNewMember = () => {
             </div>
 
             <div className="flex flex-col space-y-5 sm:flex-row sm:space-y-0 sm:space-x-5">
-                <div className="max-w-[60rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
+                {/* <div className="max-w-[60rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
                     <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
                         <div className="w-60 h-60 rounded-md overflow-hidden object-cover mb-5 sm:mb-0">
                             <img
@@ -658,7 +935,7 @@ const AddNewMember = () => {
                             </p>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="max-w-[40rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
                     <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
@@ -677,8 +954,8 @@ const AddNewMember = () => {
                             </label>
                             <form className="space-y-5 mt-5">
                                 <div className="sm:flex justify-between items-center md:gap-20">
-                                    <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership Id</label>
-                                    <input id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
+                                    <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership ID</label>
+                                    <input value={UserMemberShipID} onChange={(e)=>setUserMemberShipID(e.target.value)} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
                                 </div>
                             </form>
 
@@ -760,7 +1037,7 @@ const AddNewMember = () => {
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-5">
                                         <div>
                                             <label htmlFor="name">User Name</label>
-                                            <input onChange={handleChange} name='userName' value={formValues.userName} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='userName' value={formValues.userName} id="name" type="text" placeholder="User Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="title">Title</label>
@@ -774,11 +1051,11 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="name">First Name</label>
-                                            <input id="name" onChange={handleChange} name='firstName' value={formValues.firstName} type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input id="name" onChange={handleChange} name='firstName' value={formValues.firstName} type="text" placeholder="First Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Last Name</label>
-                                            <input onChange={handleChange} name='lastName' value={formValues.lastName} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='lastName' value={formValues.lastName} id="name" type="text" placeholder="Last Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Date of birth</label>
@@ -786,36 +1063,45 @@ const AddNewMember = () => {
                                         </div>
 
                                         <div>
-                                            <label htmlFor="address">NIC/Passport Id</label>
-                                            <input onChange={handleChange} name='passportNumber' value={formValues.passportNumber} id="address" type="text" placeholder="New York" className="form-input rounded-full border-dark" required />
+                                            <label htmlFor="address">NIC/Passport ID</label>
+                                            <input onChange={handleChange} name='passportNumber' value={formValues.passportNumber} id="address" type="text" placeholder="NIC/Passport ID" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="email">Email</label>
-                                            <input onChange={handleChange} name='email' value={formValues.email} id="email" type="email" placeholder="Jimmy@gmail.com" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='email' value={formValues.email} id="email" type="email" placeholder="sample@gmail.com" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
-                                            <label htmlFor="phone">phoneNumber Number</label>
-                                            <input onChange={handleChange} name='phoneNumber' value={formValues.phoneNumber} id="phone" type="tel" placeholder="+1 (530) 555-12121" className="form-input rounded-full border-dark" required />
+                                            <label htmlFor="phone">Mobile Number</label>
+                                            <input onChange={handleChange} name='phoneNumber' value={formValues.phoneNumber} id="phone" type="tel" placeholder="Mobile Number" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="phone">Telephone Number</label>
-                                            <input onChange={handleChange} name='telephoneNumber' value={formValues.telephoneNumber} id="phone" type="text" placeholder="+1 (530) 555-12121" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='telephoneNumber' value={formValues.telephoneNumber} id="phone" type="text" placeholder="Telephone Number" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="location">Resident Address</label>
-                                            <input onChange={handleChange} name='address' value={formValues.address} id="location" type="text" placeholder="Location" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='address' value={formValues.address} id="location" type="text" placeholder="Address" className="form-input rounded-full border-dark" required />
                                         </div>
-                                        <div>
+                                        <div className="flex flex-col sm:flex-row">
+                                            <div className="flex-1 grid  gap-5">
+                                                <div>
+                                                    <label htmlFor="name">Marital Status</label>
+
+                                                    <CustomSelect options={Maritaloptions} value={formValues.maritalStatus} onChange={handleSelectChangeMaritalStatus} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {/* <div>
                                             <label htmlFor="web">Marital Status</label>
                                             <input onChange={handleChange} name='maritalStatus' value={formValues.maritalStatus} id="web" type="text" placeholder="Enter URL" className="form-input rounded-full border-dark" required />
-                                        </div>
+                                        </div> */}
                                         <div>
                                             <label htmlFor="name">Password</label>
-                                            <input onChange={handleChange} name='password' value={formValues.password} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='password' value={formValues.password} id="name" type="Password" placeholder="Password" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Confirm Password</label>
-                                            <input onChange={handleChange} name='confirmPassword' value={formValues.confirmPassword} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='confirmPassword' value={formValues.confirmPassword} id="name" type="Password" placeholder="Re Enter The Password" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Profile Picture</label>
@@ -842,42 +1128,47 @@ const AddNewMember = () => {
                             </div>
 
 
-                            <form className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black" onSubmit={(e) => { e.preventDefault(); submitForm(); }}>
+                            <form className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black" onSubmit={(e) => { e.preventDefault(); addPayment(); }}>
 
+                                {/* Form Fields */}
                                 <div className="flex flex-col sm:flex-row">
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-5">
                                         <div>
                                             <label htmlFor="profession">Category</label>
-                                            <input onChange={handleChange} name='pdcategory' value={formValues.pdcategory} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input disabled onChange={handleChange} name="pdcategory" value={formValues.pdcategory} id="profession" type="text" placeholder="Category" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Bank</label>
-                                            <input onChange={handleChange} name='pdbank' value={formValues.pdbank} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name="pdbank" value={formValues.pdbank} id="name" type="text" placeholder="Bank" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Branch</label>
-                                            <input onChange={handleChange} name='pdbranch' value={formValues.pdbranch} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name="pdbranch" value={formValues.pdbranch} id="name" type="text" placeholder="Branch" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Total</label>
-                                            <input onChange={handleChange} name='pdtotal' value={formValues.pdtotal} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input disabled onChange={handleChange} name="pdtotal" value={formValues.pdtotal} id="profession" type="text" placeholder="Total" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Date</label>
                                             <input type="date" onChange={handleChange} max={maxDate} name='pddate' value={formValues.pddate} id="name" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
                                         </div>
+                                       
                                         <div>
                                             <label htmlFor="name">Payment Image</label>
-                                            <input type="file" accept="image/*" onChange={handleImageChange} />
-
-                                            {/* <input  onChange={handleChange} name='pdpaymentImage' value={formValues.pdpaymentImage} id="name" type="File" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required /> */}
+                                            <input type="file" accept="image/*" onChange={handleImageChangePreview} />
                                         </div>
-
+                                        {formValues.pdpaymentImage && (
+                                            <div>
+                                                <p>Image Preview:</p>
+                                                <img src={formValues.pdpaymentImage} alt="Payment Preview" style={{ width: '200px', height: 'auto', marginTop: '10px' }} />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                                <div className="sm:col-span-2 mt-6 align-center flex justify-center"  >
-                                    <button type="submit" className="btn btn-outline-primary rounded-full" onClick={addPayment}  >
-                                        Add Payment
+                                <div className="sm:col-span-2 mt-6 align-center flex justify-center">
+                                    <button type="submit" className="btn btn-outline-primary rounded-full">
+                                        {editIndex !== null ? 'Edit Payment' : 'Add Payment'}
                                     </button>
                                 </div>
                             </form>
@@ -892,59 +1183,29 @@ const AddNewMember = () => {
                                             <th>Branch</th>
                                             <th>Total</th>
                                             <th>Date</th>
+                                            <th>Actions</th>
                                             <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-
-                                        {formValues && formValues.paymentDetails && formValues.paymentDetails.filter(data => Object.keys(data).length !== 0).map((data, index) => {
-                                            return (
-                                                <tr key={index + 1}>
-                                                    <td>{index + 1}</td>
-                                                    <td>
-                                                        <div className="whitespace-nowrap">{data.memberId}</div>
-                                                    </td>
-                                                    <td>
-                                                        <div className="whitespace-nowrap">{data.bank}</div>
-                                                    </td>
-                                                    <td>{data.branch}</td>
-                                                    <td>{data.total}</td>
-                                                    <td>{data.date}</td>
-                                                    <td>
-                                                        <button
-                                                            aria-describedby={id} onClick={handleClick}
-                                                            className="badge whitespace-nowrap badge-outline-primary"
-                                                        >
-
-                                                            {data.paymentSlip &&
-
-                                                                " View Image"
-                                                            }
-                                                        </button>
-                                                        <Popover
-                                                            id={id}
-                                                            open={open}
-                                                            anchorEl={anchorEl}
-                                                            onClose={handleClose}
-                                                            anchorOrigin={{
-                                                                vertical: 'bottom',
-                                                                horizontal: 'left',
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={`data:image/png;base64,${data.paymentSlip}`}
-                                                                alt="Mountain"
-                                                                className='w-full'
-                                                            />
-                                                        </Popover>
-                                                    </td>
-
-                                                </tr>
-                                            );
-                                        })}
+                                        {formValues.paymentDetails.map((data, index) => (
+                                            <tr key={index}>
+                                                <td>{index + 1}</td>
+                                                <td>{data.memberId}</td>
+                                                <td>{data.bank}</td>
+                                                <td>{data.branch}</td>
+                                                <td>{data.total}</td>
+                                                <td>{data.date}</td>
+                                                <td>
+                                                    <button onClick={() => handleEdit(index)} className="btn btn-outline-success">Edit</button>
+                                                </td>      <td>   <button onClick={() => handleDelete(index)} className="btn btn-outline-danger">Delete</button>
+                                                </td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
-                            </div></div>
+                            </div>
+                        </div>
 
                     ) : (
                         ''
@@ -958,15 +1219,15 @@ const AddNewMember = () => {
 
                                         <div>
                                             <label htmlFor="name">Workplace Name</label>
-                                            <input onChange={handleChange} name='workPlaceName' value={formValues.workPlaceName} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='workPlaceName' value={formValues.workPlaceName} id="name" type="text" placeholder="Workplace Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Occupation</label>
-                                            <input onChange={handleChange} name='occupation' value={formValues.occupation} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='occupation' value={formValues.occupation} id="name" type="text" placeholder="Occupation" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Office Address</label>
-                                            <input onChange={handleChange} name='officeAddress' value={formValues.officeAddress} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='officeAddress' value={formValues.officeAddress} id="profession" type="text" placeholder="Address" className="form-input rounded-full border-dark" required />
                                         </div>
                                     </div>
                                 </div>
@@ -990,33 +1251,36 @@ const AddNewMember = () => {
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-5">
                                         <div>
                                             <label htmlFor="name">School Name</label>
-                                            <input onChange={handleChange} name='sdschoolName' value={formValues.sdschoolName} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdschoolName' value={formValues.sdschoolName} id="name" type="text" placeholder="School Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Team you played</label>
-                                            <input onChange={handleChange} name='sdparticipated' value={formValues.sdparticipated} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdparticipated' value={formValues.sdparticipated} id="name" type="text" placeholder="Team you played" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Game</label>
-                                            <input onChange={handleChange} name='sdgame' value={formValues.sdgame} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdgame' value={formValues.sdgame} id="profession" type="text" placeholder="Game" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">From</label>
-                                            <input onChange={handleChange} name='sdfrom' value={formValues.sdfrom} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdfrom' value={formValues.sdfrom} id="name" type="text" placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">To</label>
-                                            <input onChange={handleChange} name='sdto' value={formValues.sdto} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdto' value={formValues.sdto} id="name" type="text" placeholder="To" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Role</label>
-                                            <input onChange={handleChange} name='sdrole' value={formValues.sdrole} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdrole' value={formValues.sdrole} id="profession" type="text" placeholder="Role" className="form-input rounded-full border-dark" required />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="sm:col-span-2 mt-6 align-center flex justify-center"   >
                                     <button type="submit" className="btn btn-outline-primary rounded-full" onClick={addSchool}>
-                                        Add School
+
+                                        {
+                                            editingIndex === null ? 'Add' : 'Edit'
+                                        } School
                                     </button>
                                 </div>
                             </form>
@@ -1032,6 +1296,8 @@ const AddNewMember = () => {
                                             <th>From</th>
                                             <th>To</th>
                                             <th>Role</th>
+                                            <th></th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1049,7 +1315,23 @@ const AddNewMember = () => {
                                                     <td>{data.from}</td>
                                                     <td>{data.to}</td>
                                                     <td>{data.role}</td>
+                                                    <td colSpan={2} >
+                                                        <button
+                                                            className="btn btn-outline-success"
+                                                            onClick={() => editSchoolDetail(index)}
+                                                        >
+                                                            Edit
+                                                        </button>
 
+                                                    </td>                                                    <td colSpan={2} >
+
+                                                        <button
+                                                            className="btn btn-outline-danger ml-2"
+                                                            onClick={() => deleteSchoolDetail(index)}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             );
                                         })}
@@ -1072,33 +1354,36 @@ const AddNewMember = () => {
 
                                         <div>
                                             <label htmlFor="name">Club Name</label>
-                                            <input onChange={handleChange} name='cdclubName' value={formValues.cdclubName} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdclubName' value={formValues.cdclubName} id="name" type="text" placeholder="Club Name" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">Team you played</label>
-                                            <input onChange={handleChange} name='cdinvloved' value={formValues.cdinvloved} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdinvolved' value={formValues.cdinvolved} id="name" type="text" placeholder="Team you played" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Game</label>
-                                            <input onChange={handleChange} name='cdgame' value={formValues.cdgame} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdgame' value={formValues.cdgame} id="profession" type="text" placeholder="Game" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">From</label>
-                                            <input onChange={handleChange} name='cdfrom' value={formValues.cdfrom} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdfrom' value={formValues.cdfrom} id="name" type="text" placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">To</label>
-                                            <input onChange={handleChange} name='cdto' value={formValues.cdto} id="name" type="text" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdto' value={formValues.cdto} id="name" type="text" placeholder="To" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Role</label>
-                                            <input onChange={handleChange} name='cdrole' value={formValues.cdrole} id="profession" type="text" placeholder="Web Developer" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdrole' value={formValues.cdrole} id="profession" type="text" placeholder="Role" className="form-input rounded-full border-dark" required />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="sm:col-span-2 mt-6 align-center flex justify-center"   >
                                     <button type="submit" className="btn btn-outline-primary rounded-full" onClick={addClub} >
-                                        Add Club
+                                        {
+                                            editingClubIndex === null ? "Add" :
+                                                "Edit"
+                                        } Club
                                     </button>
                                 </div>
                             </form>
@@ -1114,6 +1399,8 @@ const AddNewMember = () => {
                                             <th>From</th>
                                             <th>To</th>
                                             <th>Role</th>
+                                            <th></th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1125,13 +1412,29 @@ const AddNewMember = () => {
                                                         <div className="whitespace-nowrap">{data.clubName}</div>
                                                     </td>
                                                     <td>
-                                                        <div className="whitespace-nowrap">{data.invloved}</div>
+                                                        <div className="whitespace-nowrap">{data.involved}</div>
                                                     </td>
                                                     <td>{data.game}</td>
                                                     <td>{data.from}</td>
                                                     <td>{data.to}</td>
                                                     <td>{data.role}</td>
+                                                    <td>
+                                                        <button
+                                                            className="btn btn-outline-success"
+                                                            onClick={() => editClubDetail(index)}
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                    </td>
+                                                    <td>
 
+                                                        <button
+                                                            className="btn btn-outline-danger ml-2"
+                                                            onClick={() => deleteClubDetail(index)}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             );
                                         })}
@@ -1146,23 +1449,50 @@ const AddNewMember = () => {
 
                             </div>
 
-                            <form className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black" onSubmit={(e) => { e.preventDefault(); submitForm(); }}>
-
+                            <form
+                                className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black"
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    alertFormMsg('Images Uploaded', 'success');
+                                }}
+                            >
                                 <div className="flex flex-col sm:flex-row">
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-5">
                                         <div>
                                             <label htmlFor="gallery">Proof Images</label>
-                                            <input type="file" accept="image/*" name='gallery' onChange={handleImageChange3} multiple />
-                                            {/* <input onChange={handleChange} name='gallery' value={formValues.sdschoolName} id="name" type="file" multiple placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required /> */}
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                name="gallery"
+                                                onChange={handleImageChange3}
+                                                multiple
+                                            />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="sm:col-span-2 mt-6 align-center flex justify-center"   >
-                                    <button type="submit" className="btn btn-outline-primary rounded-full" onClick={addSchool}>
-                                        Add School
+                                <div className="mt-4">
+
+                                    <div className="flex flex-wrap gap-4">
+                                        <h3 className="mb-2">Image Preview:</h3>
+                                        {formValues.gallery &&
+                                            formValues.gallery.map((image: string, index: number) => (
+                                                <div key={index} className="w-24 h-24 border border-gray-300 rounded-md overflow-hidden">
+                                                    <img
+                                                        src={image}
+                                                        alt={`Proof ${index + 1}`}
+                                                        className="object-cover w-full h-full"
+                                                    />
+                                                </div>
+                                            ))}
+                                    </div>
+                                </div>
+                                <div className="sm:col-span-2 mt-6 align-center flex justify-center">
+                                    <button type="submit" className="btn btn-outline-primary rounded-full">
+                                        Add Proof Images
                                     </button>
                                 </div>
                             </form>
+
 
                         </div>
                     ) : (

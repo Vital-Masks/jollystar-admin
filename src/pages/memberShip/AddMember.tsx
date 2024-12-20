@@ -106,8 +106,8 @@ const AddMember = () => {
     const [members, setMembers] = useState<Member>();
     const { memberId } = useParams();
 
-    const [isSclChecked, setIsSclChecked] = useState(true);
-    const [ispayChecked, setIsPayChecked] = useState(true);
+    const [isSclChecked, setIsSclChecked] = useState(false);
+    const [ispayChecked, setIsPayChecked] = useState(false);
 
     const [declineLoading, setDeclineLoading] = useState(false)
     const [approveLoading, setApproveLoading] = useState(false)

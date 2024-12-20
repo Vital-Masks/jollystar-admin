@@ -246,17 +246,17 @@ const RemovedMembers = () => {
 
                             <label className="inline-flex mt-5 text-xl">
                                 <span className="peer-checked:text-success">School and Club Details</span>
-                                <input onChange={handleSchoolCheckboxChange} checked={formValues.isSchoolDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
+                                <input checked={formValues.isSchoolDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
                             </label>
                             <label className="inline-flex mt-5 ml-10 text-xl">
                                 <span className="peer-checked:text-success">Payment Details</span>
-                                <input onChange={handlePaymentCheckboxChange} checked={formValues.isPaymentDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
+                                <input checked={formValues.isPaymentDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
                             </label>
                             <form className="space-y-5 mt-5">
                                 <div className="sm:flex justify-between items-center md:gap-20">
                                     <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership Id</label>
                                     <div>
-                                        <input onChange={handleChange} name="memberID" value={formValues.memberID} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
+                                        <input disabled onChange={handleChange} name="memberID" value={members.membershipId} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
                                         <p className="w-full sm:w-1/2 text-sm text-red-400 ps-4"  >{memberIdErrorMsg}</p>
 
                                     </div>
@@ -264,11 +264,11 @@ const RemovedMembers = () => {
                                 </div>
                             </form>
 
-                            <div className="flex mt-5 ml-5 justify-center">
+                            {/* <div className="flex mt-5 ml-5 justify-center">
                                 <button className="btn btn-danger rounded-full text-2xl" onClick={handleRemove}>
                                     {reomveLoading ? 'Loading...' : " Removed Membership"}
                                 </button>
-                            </div>
+                            </div> */}
 
                         </div>
                     </div>

@@ -189,7 +189,6 @@ const FileManagement = () => {
                         <table className="table-striped table-hover">
                             <thead>
                                 <tr>
-                                <th>Id</th>
                                     <th>File Name</th>
                                     <th>Description</th>
                                     <th>File</th>
@@ -200,7 +199,6 @@ const FileManagement = () => {
                                 {filteredItems.map((data, index) => {
                                     return (
                                         <tr key={index+1}>
-                                            <td>{data._id}</td>
                                             <td>{data.title}</td>
                                             <td>{data.description}</td>
                                             <td>{data.file}</td>
