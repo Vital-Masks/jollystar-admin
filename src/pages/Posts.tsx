@@ -21,7 +21,6 @@ const Posts = () => {
 
     const [value, setValue] = useState<any>('list');
     const [defaultParams] = useState({
-
         "_id": "",
         "title": "",
         "description": "",
@@ -49,6 +48,11 @@ const Posts = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [postLoading, setPostLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [coverImage64New, setCoverImage64New] = useState<string | null>(null);
+    const [gallery64Previews, setGallery64Previews] = useState([]);
+
+    // const [error, setError] = useState<string | null>(null);
+
     const fetchData = async () => {
         try {
             const response = await axios.get('http://localhost:3000/api/newsManagement/getAllNews');
@@ -97,7 +101,6 @@ const Posts = () => {
 
             if (response.ok) {
                 // File deleted successfully, you may want to update your local state or do other actions.
-                console.log('File deleted successfully');
                 showMessage('Post Data has been deleted successfully.');
 
                 fetchData();
@@ -127,9 +130,6 @@ const Posts = () => {
     }, [search, AllPosts]);
 
     const saveUser = async () => {
-        console.log(params);
-        console.log(!params.gallery, !params.gallery, params.gallery.length > 0);
-
         if (!params.title) {
             showMessage('Title is required.', 'error');
             return true;
@@ -141,16 +141,44 @@ const Posts = () => {
 
         if (params._id) {
             //update user
+            let coverImage64 = params.coverImage;
+            let gallery64 = [];
+            gallery64 = params.gallery
+
+            if (params.coverImage instanceof File) {
+                try {
+                    coverImage64 = await convertFileToBase64(params.coverImage);
+                    // setCoverImage64New(coverImage64);
+                } catch (error) {
+                    console.error('Error converting file to Base64:', error);
+                }
+            } else {
+                coverImage64 = params.coverImage;
+            }
+            if (params.gallery instanceof File) {
+                try {
+                    for (let index = 0; index < params.gallery.length; index++) {
+                        const element = params.gallery[index];
+                        let binImage = ''
+                        binImage = await convertFileToBase64(element);
+                        gallery64.push(binImage)
+                    }
+                } catch (error) {
+                    console.error('Error converting file to Base64:', error);
+                }
+            } else {
+                gallery64 = params.gallery
+            }
+
+
             let postObj = {
                 title: params.title,
-                gallery: params.gallery,
+                gallery: gallery64,
                 description: quilvalue,
-                coverImage: params.coverImage,
+                coverImage: coverImage64,
                 _id: params._id
             };
             putData(postObj)
-
-
         } else {
             if (!(params.gallery.length > 0)) {
                 showMessage('Gallery is required.', 'error');
@@ -163,19 +191,8 @@ const Posts = () => {
 
             //add user
             let gallery64 = [];
-            let coverImage64 = null;
-            if (params.coverImage) {
-                coverImage64 = await convertFileToBase64(params.coverImage);
-            }
-            for (let index = 0; index < params.gallery.length; index++) {
-                const element = params.gallery[index];
-                let binImage = ''
-                binImage = await convertFileToBase64(element);
-                gallery64.push(binImage)
-            }
-            console.log(gallery64, coverImage64, "0000000001");
-
-
+            gallery64 = params.gallery
+            let coverImage64 = params.coverImage;
             let postObj = {
                 title: params.title,
                 gallery: gallery64,
@@ -197,6 +214,9 @@ const Posts = () => {
         if (user) {
             let json1 = JSON.parse(JSON.stringify(user));
             setParams(json1);
+            setQuilValue(json1.description)
+            setCoverImage64New(json1.coverImage)
+            setGallery64Previews(json1.gallery)
         }
         setAddContactModal(true);
     };
@@ -220,18 +240,38 @@ const Posts = () => {
         });
     };
 
-    const handleSingleFileChange = (e: any) => {
+    const handleSingleFileChange = async (e: any) => {
         const file = e.target.files[0];
+        let coverImage64 = ""
+        if (file instanceof File) {
+            try {
+                coverImage64 = await convertFileToBase64(file);
+                // setCoverImage64New(coverImage64);
+            } catch (error) {
+                console.error('Error converting file to Base64:', error);
+            }
+        }
         // Handle the single file logic
-        console.log('Single file:', file);
-        setParams({ ...params, ['coverImage']: file });
+        setParams({ ...params, ['coverImage']: coverImage64 });
     };
 
-    const handleMultipleFilesChange = (e: any) => {
+    const handleMultipleFilesChange = async (e: any) => {
+        if (!e.target.files) return; // Ensure there are files selected
         const files = e.target.files;
-        // Handle the multiple files logic
-        console.log('Multiple files:', files);
-        setParams({ ...params, ['gallery']: files });
+        let gallery64: string[] = [];
+        if (files instanceof FileList) {
+            for (const file of files) {
+                try {
+                    const coverImage = await convertFileToBase64(file);
+                    gallery64.push(coverImage);
+                } catch (error) {
+                    console.error('Error converting file to Base64:', error);
+                }
+            }
+        } else {
+            console.error('Input is not a FileList.');
+        }
+        setParams({ ...params, ['gallery']: gallery64 });
     };
     return (
         <div>
@@ -273,13 +313,6 @@ const Posts = () => {
                                         <tr key={contact.id}>
                                             <td>
                                                 <div className="flex items-center w-max">
-
-
-                                                    {/* {!contact.path && !contact.name && (
-                                                        <div className="border border-gray-300 dark:border-gray-800 rounded-full p-2 ltr:mr-2 rtl:ml-2">
-                                                            <IconUser className="w-4.5 h-4.5" />
-                                                        </div>
-                                                    )} */}
                                                     <div>{contact.title}</div>
                                                 </div>
                                             </td>
@@ -354,6 +387,19 @@ const Posts = () => {
                                                 />
                                             </div>
                                             <div className="mb-5">
+                                                <label htmlFor="ctnFile">Single File Preview</label>
+                                                {params.coverImage && (
+                                                    <img
+                                                        src={"data:image/png;base64," + params.coverImage}
+
+                                                        // src={params.coverImage}
+                                                        alt="Preview"
+                                                        className="w-40 h-40 object-cover rounded mt-3"
+                                                    />
+                                                )}
+
+                                            </div>
+                                            <div className="mb-5">
                                                 <label htmlFor="ctnFile">Upload Gallery</label>
                                                 <input
                                                     id="ctnFile"
@@ -365,6 +411,14 @@ const Posts = () => {
 
                                                 />
                                             </div>
+                                            {params.gallery && params.gallery.length > 0 && params.gallery.map((preview, index) => (
+                                                <img
+                                                    src={"data:image/png;base64," + preview}
+                                                    alt="Preview"
+                                                    className="w-40 h-40 object-cover rounded mt-3"
+                                                />
+
+                                            ))}
                                             <div className="flex justify-end items-center mt-8">
                                                 <button type="button" className="btn btn-outline-danger" onClick={() => setAddContactModal(false)}>
                                                     Cancel

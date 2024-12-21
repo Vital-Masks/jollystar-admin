@@ -158,7 +158,7 @@ const Posts = () => {
             let postObj = {
                 albumName: params.albumName,
                 albumLink: params.albumLink,
-                coverImage: coverImage64 ? coverImage64 : params.coverImage64,
+                coverImage: params.coverImage,
                 description: params.description,
                 _id: params._id
             };
@@ -171,10 +171,10 @@ const Posts = () => {
                 return true;
             }
             //add user
-            let coverImage64 = null;
-            if (params.coverImage) {
-                coverImage64 = await convertFileToBase64(params.coverImage);
-            }
+            let coverImage64 = params.coverImage;
+            // if (params.coverImage) {
+            //     coverImage64 = await convertFileToBase64(params.coverImage);
+            // }
 
             console.log(coverImage64, "0000000001");
 
@@ -223,11 +223,22 @@ const Posts = () => {
         });
     };
 
-    const handleSingleFileChange = (e: any) => {
+    const handleSingleFileChange = async (e: any) => {
         const file = e.target.files[0];
         // Handle the single file logic
+        let coverImage64 = ""
+
+        if (file instanceof File) {
+            try {
+                coverImage64 = await convertFileToBase64(file);
+                // setCoverImage64New(coverImage64);
+            } catch (error) {
+                console.error('Error converting file to Base64:', error);
+            }
+        }
+
         console.log('Single file:', file);
-        setParams({ ...params, ['coverImage']: file });
+        setParams({ ...params, ['coverImage']: coverImage64 });
     };
 
     const handleMultipleFilesChange = (e: any) => {
@@ -368,7 +379,15 @@ const Posts = () => {
 
                                                 />
                                             </div>
+                                            {params.coverImage && (
+                                                <img
+                                                    src={"data:image/png;base64," + params.coverImage}
 
+                                                    // src={params.coverImage}
+                                                    alt="Preview"
+                                                    className="w-40 h-40 object-cover rounded mt-3"
+                                                />
+                                            )}
                                             <div className="flex justify-end items-center mt-8">
                                                 <button type="button" className="btn btn-outline-danger" onClick={() => setAddContactModal(false)}>
                                                     Cancel
