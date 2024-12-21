@@ -39,8 +39,7 @@ const Posts = () => {
     };
 
     const [quilvalue, setQuilValue] = useState(
-        '<h1>This is a heading text...</h1><br /><p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla dui arcu, pellentesque id mattis sed, mattis semper erat. Etiam commodo arcu a mollis consequat. Curabitur pretium auctor tortor, bibendum placerat elit feugiat et. Ut ac turpis nec dui ullamcorper ornare. Vestibulum finibus quis magna at accumsan. Praesent a purus vitae tortor fringilla tempus vel non purus. Suspendisse eleifend nibh porta dolor ullamcorper laoreet. Ut sit amet ipsum vitae lectus pharetra tincidunt. In ipsum quam, iaculis at erat ut, fermentum efficitur ipsum. Nunc odio diam, fringilla in auctor et, scelerisque at lorem. Sed convallis tempor dolor eu dictum. Cras ornare ornare imperdiet. Pellentesque sagittis lacus non libero fringilla faucibus. Aenean ullamcorper enim et metus vestibulum, eu aliquam nunc placerat. Praesent fringilla dolor sit amet leo pulvinar semper. </p><br /><p> Curabitur vel tincidunt dui. Duis vestibulum eget velit sit amet aliquet. Curabitur vitae cursus ex. Aliquam pulvinar vulputate ullamcorper. Maecenas luctus in eros et aliquet. Cras auctor luctus nisl a consectetur. Morbi hendrerit nisi nunc, quis egestas nibh consectetur nec. Aliquam vel lorem enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc placerat, enim quis varius luctus, enim arcu tincidunt purus, in vulputate tortor mi a tortor. Praesent porta ornare fermentum. Praesent sed ligula at ante tempor posuere a at lorem. </p><br /><p> Curabitur vel tincidunt dui. Duis vestibulum eget velit sit amet aliquet. Curabitur vitae cursus ex. Aliquam pulvinar vulputate ullamcorper. Maecenas luctus in eros et aliquet. Cras auctor luctus nisl a consectetur. Morbi hendrerit nisi nunc, quis egestas nibh consectetur nec. Aliquam vel lorem enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc placerat, enim quis varius luctus, enim arcu tincidunt purus, in vulputate tortor mi a tortor. Praesent porta ornare fermentum. Praesent sed ligula at ante tempor posuere a at lorem. </p><br /><p> Aliquam diam felis, vehicula ut ipsum eu, consectetur tincidunt ipsum. Vestibulum sed metus ac nisi tincidunt mollis sed non urna. Vivamus lacinia ullamcorper interdum. Sed sed erat vel leo venenatis pretium. Sed aliquet sem nunc, ut iaculis dolor consectetur et. Vivamus ligula sapien, maximus nec pellentesque ut, imperdiet at libero. Vivamus semper nulla lectus, id dapibus nulla convallis id. Quisque elementum lectus ac dui gravida, ut molestie nunc convallis. Pellentesque et odio non dolor convallis commodo sit amet a ante. </p>'
-    );
+      " "    );
 
     const [search, setSearch] = useState<any>('');
 
@@ -70,6 +69,7 @@ const Posts = () => {
             const response = await axios.post('http://localhost:3000/api/newsManagement', data).then((res) => {
                 fetchData()
             })
+            showMessage('News has been saved successfully.');
             // setAllPosts(response.data.result);
         } catch (error) {
             setError("error");
@@ -83,6 +83,7 @@ const Posts = () => {
             const response = await axios.put('http://localhost:3000/api/newsManagement/' + data._id, data).then((res) => {
                 fetchData()
             })
+            showMessage('News has been updated successfully.');
             // setAllPosts(response.data.result);
         } catch (error) {
             setError("error");
@@ -201,11 +202,12 @@ const Posts = () => {
                 coverImage: coverImage64
             };
             postData(postObj);
+           
             // filteredItems.splice(0, 0, postData);
             //   searchContacts();
         }
 
-        showMessage('User has been saved successfully.');
+        
         setAddContactModal(false);
     };
 
@@ -364,7 +366,7 @@ const Posts = () => {
                                         <IconX />
                                     </button>
                                     <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                        {params._id ? 'Edit News Management' : 'Add News Management'}
+                                        {params._id ? 'Edit News' : 'Add News'}
                                     </div>
                                     <div className="p-5">
                                         <form>
@@ -373,7 +375,7 @@ const Posts = () => {
                                                 <input id="title" type="text" placeholder="Enter Title" className="form-input" value={params.title} onChange={(e) => changeValue(e)} />
                                             </div>
                                             <div className="mb-5">
-                                                <label htmlFor="address">Description</label>
+                                                <label htmlFor="address">Body</label>
                                                 <ReactQuill theme="snow" value={quilvalue} onChange={setQuilValue} />
                                             </div>
                                             <div className="mb-5">

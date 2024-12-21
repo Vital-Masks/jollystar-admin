@@ -65,6 +65,7 @@ const Posts = () => {
             const response = await axios.post('http://localhost:3000/api/galleryManagement', data).then((res) => {
                 fetchData()
             })
+            showMessage('Gallery has been saved successfully.');
             // setAllPosts(response.data.result);
         } catch (error) {
             setError("error");
@@ -78,6 +79,7 @@ const Posts = () => {
             const response = await axios.put('http://localhost:3000/api/galleryManagement/' + data._id, data).then((res) => {
                 fetchData()
             })
+            showMessage('Gallery has been updated successfully.');
             // setAllPosts(response.data.result);
         } catch (error) {
             setError("error");
@@ -191,7 +193,7 @@ const Posts = () => {
             //   searchContacts();
         }
 
-        showMessage('Gallery has been saved successfully.');
+        // showMessage('Gallery has been saved successfully.');
         setAddContactModal(false);
     };
 
@@ -355,7 +357,7 @@ const Posts = () => {
                                             </div>
                                             <div className="mb-5">
                                                 <label htmlFor="name">Album link</label>
-                                                <input id="albumLink" type="text" placeholder="Enter Title" className="form-input" value={params.albumLink} onChange={(e) => changeValue(e)} />
+                                                <input id="albumLink" type="text" placeholder="Enter the album link" className="form-input" value={params.albumLink} onChange={(e) => changeValue(e)} />
                                             </div>
                                             <div className="mb-5">
                                                 <label htmlFor="address">Description</label>

@@ -76,11 +76,13 @@ const FileManagement = () => {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
+                showMessage('File has been updated successfully.');
+
             } else {
                 response = await axios.post('http://localhost:3000/api/fileManagement', formData);
+                showMessage('File has been saved successfully.');
             }
 
-            showMessage('File has been saved successfully.');
             setAddContactModal(false);
             fetchFileList();
         } catch (error) {
