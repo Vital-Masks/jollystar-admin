@@ -10,6 +10,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
 import { convertFileToBase64 } from '../components/utils/fileUtils';
+import { formatDate } from '../utils/utils';
 
 
 const Posts = () => {
@@ -297,7 +298,7 @@ const Posts = () => {
                                                     <div>{contact.albumName}</div>
                                                 </div>
                                             </td>
-                                            <td>{contact.created_at}</td>
+                                            <td>{formatDate(contact.created_at)}</td>
                                             <td>
                                                 <div className="flex gap-4 items-center justify-center">
                                                     <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
