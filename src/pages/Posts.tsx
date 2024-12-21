@@ -276,7 +276,7 @@ const Posts = () => {
     return (
         <div>
             <div className="flex items-center justify-between flex-wrap gap-4">
-                <h2 className="text-xl">Post/News Management</h2>
+                <h2 className="text-xl">News Management</h2>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                     <div className="flex gap-3">
 
@@ -363,7 +363,7 @@ const Posts = () => {
                                         <IconX />
                                     </button>
                                     <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                        {params._id ? 'Edit File' : 'Add File'}
+                                        {params._id ? 'Edit News Management' : 'Add News Management'}
                                     </div>
                                     <div className="p-5">
                                         <form>

@@ -10,6 +10,7 @@ import IconThumbUp from '../components/Icon/IconThumbUp';
 import IconTrash from '../components/Icon/IconTrash';
 import IconNotesEdit from '../components/Icon/IconNotesEdit';
 import IconPlus from '../components/Icon/IconPlus';
+import { formatDate } from '../utils/utils';
 
 // Define an interface representing the shape of your MongoDB document
 interface Member {
@@ -97,7 +98,8 @@ const Approved = () => {
                                     <td>{data.firstName}</td>
                                     <td>{data.lastName}</td>
                                     <td>{data.membershipCategory}</td>
-                                    <td>{data.updated_at}</td>
+                                    <td>{formatDate(data.updated_at)}</td>
+
                                     <td>{data.passportNumber}</td>
                                     <td>{data.phoneNumber}</td>
                                     <td>

@@ -94,7 +94,7 @@ const FileManagement = () => {
         setParams(json);
         if (file) {
             let json1 = JSON.parse(JSON.stringify(file));
-            setParams({ ...json1, preview: file.file });
+            setParams({ ...json1, preview: json1.file });
         }
         setAddContactModal(true);
     };
@@ -271,6 +271,7 @@ const FileManagement = () => {
                                                 <input
                                                     type="file"
                                                     className="form-input"
+                                                    accept="application/pdf" // Allow only PDF files
                                                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                                         if (e.target.files && e.target.files[0]) {
                                                             setParams((prev) => ({
@@ -278,18 +279,25 @@ const FileManagement = () => {
                                                                 file: e.target.files[0],
                                                                 preview: URL.createObjectURL(e.target.files[0]),
                                                             }));
+
                                                         }
                                                     }}
                                                 />
                                             </div>
+                                           
                                             {params.preview && (
                                                 <div className="mb-4">
                                                     <label className="form-label">Preview</label>
-                                                    <img
-                                                        src={params.preview}
-                                                        alt="File Preview"
+                                                    <iframe
                                                         className="w-full h-auto rounded-md"
-                                                    />
+                                                        src={
+                                                            params.preview.startsWith('blob:')
+                                                                ? params.preview
+                                                                : `http://localhost:3000/files/${params.preview}`
+                                                        }
+                                                        width="100%"
+                                                        height="500px"
+                                                    ></iframe>
                                                 </div>
                                             )}
                                             <div className="flex justify-end gap-2">

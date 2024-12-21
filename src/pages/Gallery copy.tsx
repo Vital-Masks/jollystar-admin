@@ -373,7 +373,7 @@ const Gallery = () => {
                                         <IconX />
                                     </button>
                                     <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                        {params.id ? 'Edit File' : 'Add File'}
+                                        {params.id ? 'Edit Gallery' : 'Add Gallery'}
                                     </div>
                                     <div className="p-5">
                                         <form>

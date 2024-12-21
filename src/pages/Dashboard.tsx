@@ -9,6 +9,7 @@ import IconUsersGroup from '../components/Icon/IconUsersGroup';
 import IconThumbUp from '../components/Icon/IconThumbUp';
 import IconTrash from '../components/Icon/IconTrash';
 import IconNotesEdit from '../components/Icon/IconNotesEdit';
+import { formatDate } from '../utils/utils';
 
 // Define an interface representing the shape of your MongoDB document
 interface Member {
@@ -42,16 +43,16 @@ const Dashboard = () => {
 
     return (
         <div>
-            
 
-                <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
-                    <h1>
-                        Membership Requests
-                    </h1>
-                    
-                </div>
+
+            <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
+                <h1>
+                    Membership Requests
+                </h1>
+
+            </div>
             <div className="table-responsive mb-5">
-            <table>
+                <table>
                     <thead>
                         <tr>
                             <th>First Name</th>
@@ -65,14 +66,14 @@ const Dashboard = () => {
                     </thead>
                     <tbody>
                         {members
-                            .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) )
+                            .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))))
                             .slice(0, 15)
                             .map((data) => (
                                 <tr key={data._id}>
                                     <td>{data.firstName}</td>
                                     <td>{data.lastName}</td>
                                     <td>{data.membershipCategory}</td>
-                                    <td>{data.updated_at}</td>
+                                    <td>{formatDate(data.updated_at)}</td>
                                     <td>{data.passportNumber}</td>
                                     <td>{data.phoneNumber}</td>
                                     <td>
