@@ -374,7 +374,7 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
                                                 <tr key={index + 1}>
                                                     <td>{index + 1}</td>
                                                     <td>
-                                                        <div className="whitespace-nowrap">{data.memberId}</div>
+                                                        <div className="whitespace-nowrap">{data.memberType}</div>
                                                     </td>
                                                     <td>
                                                         <div className="whitespace-nowrap">{data.bank}</div>

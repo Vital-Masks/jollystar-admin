@@ -320,7 +320,7 @@ const AddNewMember = () => {
 
     const handleSubmit = async () => {
         console.log(formValues);
-      
+
         if (formValues.phoneNumber.length < 10 && formValues.telephoneNumber.length < 10) {
             console.log(formValues.phoneNumber.length, "formValues.phoneNumber.length");
             failForm('Phone Number must be 10 digit')
@@ -342,17 +342,17 @@ const AddNewMember = () => {
         }
         // formValues.gallery
 
-        if (formValues.isSchoolDetailVerified===false) {
+        if (formValues.isSchoolDetailVerified === false) {
             failForm('Please verify school and details');
             return false;
         }
-    
+
         // Validate payment details checkbox
-        if (formValues.isPaymentDetailVerified ===false) {
+        if (formValues.isPaymentDetailVerified === false) {
             failForm('Please verify payment details');
             return false;
         }
-    
+
         // Validate membership ID
         if (!UserMemberShipID || UserMemberShipID.trim() === '') {
             failForm('Membership ID is required');
@@ -460,6 +460,7 @@ const AddNewMember = () => {
     }
     const addClub = () => {
         // Validation: Check if any field is empty
+
         if (
             !formValues.cdclubName ||
             !formValues.cdinvloved ||
@@ -498,6 +499,8 @@ const AddNewMember = () => {
                 ...prevValues,
                 clubDetails: [...prevValues.clubDetails, clbdetails],
             }));
+            console.log(formValues);
+
         }
 
         // Reset the form fields
@@ -722,7 +725,7 @@ const AddNewMember = () => {
     ];
     const Maritaloptions = ['Single', "Married", "Divorced"
     ];
-    const options2 = ['MR', 'MS', 'MRS'];
+    const options2 = ['MR', 'MRS'];
     const handleSelectChange2 = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setFormValues((prevValues) => ({
             ...prevValues,
@@ -955,7 +958,7 @@ const AddNewMember = () => {
                             <form className="space-y-5 mt-5">
                                 <div className="sm:flex justify-between items-center md:gap-20">
                                     <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership ID</label>
-                                    <input value={UserMemberShipID} onChange={(e)=>setUserMemberShipID(e.target.value)} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
+                                    <input value={UserMemberShipID} onChange={(e) => setUserMemberShipID(e.target.value)} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
                                 </div>
                             </form>
 
@@ -1153,7 +1156,7 @@ const AddNewMember = () => {
                                             <label htmlFor="name">Date</label>
                                             <input type="date" onChange={handleChange} max={maxDate} name='pddate' value={formValues.pddate} id="name" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
                                         </div>
-                                       
+
                                         <div>
                                             <label htmlFor="name">Payment Image</label>
                                             <input type="file" accept="image/*" onChange={handleImageChangePreview} />

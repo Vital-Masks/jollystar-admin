@@ -351,7 +351,7 @@ const Posts = () => {
                                         <form>
                                             <div className="mb-5">
                                                 <label htmlFor="name">Album Name</label>
-                                                <input id="albumName" type="text" placeholder="Enter album name" className="form-input" value={params.albumName} onChange={(e) => changeValue(e)} />
+                                                <input id="albumName" type="text" placeholder="Enter album name" maxLength={35} className="form-input" value={params.albumName} onChange={(e) => changeValue(e)} />
                                             </div>
                                             <div className="mb-5">
                                                 <label htmlFor="name">Album link</label>
@@ -360,6 +360,7 @@ const Posts = () => {
                                             <div className="mb-5">
                                                 <label htmlFor="address">Description</label>
                                                 <textarea
+                                                    maxLength={100}
                                                     id="description"
                                                     rows={3}
                                                     placeholder="Enter description"
