@@ -191,13 +191,13 @@ const AddMember = () => {
     const handleApprove = () => {
         // VALIDATION
         if (formValues.isSchoolDetailVerified === false) {
-            alertFormMsg('Please verify school and details', 'error');
+            alertFormMsg('Please verify school and club details', 'error');
             return false;
         }
 
         // Validate payment details checkbox
         if (formValues.isPaymentDetailVerified === false) {
-            alertFormMsg('Please verify school and details', 'error');
+            alertFormMsg('Please verify payment details', 'error');
             return false;
         }
 
