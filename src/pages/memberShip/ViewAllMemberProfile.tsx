@@ -32,6 +32,7 @@ import IconEdit from '../../components/Icon/IconEdit';
 import axios from 'axios';
 import Popover from '@mui/material/Popover';
 import ViewAllStatusMember from '../../components/memberShip/viewAllMemberDatas';
+import { formatDate } from '../../utils/utils';
 interface PaymentDetail {
 
     memberId?: string;
@@ -158,7 +159,7 @@ const ViewAllMemberProfile: React.FC<Member> = ({ data }) => {
         }));
     };
 
-  
+
 
     const [tabs, setTabs] = useState('home');
 
@@ -246,10 +247,14 @@ const ViewAllMemberProfile: React.FC<Member> = ({ data }) => {
                         Status - {members?.memberApprovalStatus}
                     </p>
                     <p className="mb-2 text-lg sm:text-xl text-dark">
-                        Member Request - {members?.created_at}
+                        Member Request -  {members?.created_at ? formatDate(members?.created_at, "dd.MM.yyyy | hh.mm a") : ""}
                     </p>
                     <p className="mb-2 text-lg sm:text-xl text-dark">
-                        Membership Approval Date - {members?.updated_at}
+                        Membership Approval Date -  {members?.memberApprovalStatus === "APPROVED" || members?.memberApprovalStatus === "REMOVED"
+                            ? members?.updated_at
+                                ? formatDate(members?.updated_at, "dd.MM.yyyy | hh.mm a")
+                                : ""
+                            : "Not Approved Yet "}
                     </p>
                     <p className="mb-2 text-lg sm:text-xl text-dark">
                         Membership ID - {members?.membershipId}

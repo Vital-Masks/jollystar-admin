@@ -66,7 +66,7 @@ interface Member {
     membershipId?: string;
     declinedMessage?: string;
     created_at?: string;
-    
+
 
 }
 
@@ -119,8 +119,8 @@ const AddMember = () => {
     const [formValues, setFormValues] = useState<FormValues>({
         isSchoolDetailVerified: isSclChecked,
         isPaymentDetailVerified: ispayChecked,
-        memberID:""
- 
+        memberID: ""
+
     });
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -174,36 +174,36 @@ const AddMember = () => {
     };
 
     const items = ['carousel1.jpeg', 'carousel2.jpeg', 'carousel3.jpeg'];
-     const alertFormMsg = (msg: string, type: 'success' | 'error' | 'warning' | 'info' | 'question' = 'success') => {
-           const toast = Swal.mixin({
-               toast: true,
-               position: 'top',
-               showConfirmButton: false,
-               timer: 3000,
-           });
-   
-           toast.fire({
-               icon: type, // Valid SweetAlert2 icon type
-               title: msg, // Ensure msg is a primitive string
-               padding: '10px 20px',
-           });
-       };
+    const alertFormMsg = (msg: string, type: 'success' | 'error' | 'warning' | 'info' | 'question' = 'success') => {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+        });
+
+        toast.fire({
+            icon: type, // Valid SweetAlert2 icon type
+            title: msg, // Ensure msg is a primitive string
+            padding: '10px 20px',
+        });
+    };
     const handleApprove = () => {
         // VALIDATION
-        if (formValues.isSchoolDetailVerified===false) {
-            alertFormMsg('Please verify school and details','error');
+        if (formValues.isSchoolDetailVerified === false) {
+            alertFormMsg('Please verify school and details', 'error');
             return false;
         }
-    
+
         // Validate payment details checkbox
-        if (formValues.isPaymentDetailVerified ===false) {
-            alertFormMsg('Please verify school and details','error');
+        if (formValues.isPaymentDetailVerified === false) {
+            alertFormMsg('Please verify school and details', 'error');
             return false;
         }
 
         if (formValues.memberID !== "") {
             setApproveLoading(true);
-            handleStatus("APPROVED","success")
+            handleStatus("APPROVED", "success")
 
         } else {
             setMemberIdErrorMsg("Required")
@@ -211,24 +211,28 @@ const AddMember = () => {
 
     }
 
-    const handleDecline = (reason:String) => {
+    const handleDecline = (reason: String) => {
 
         if (formValues.memberID !== "") {
             setDeclineLoading(true);
-            handleStatus("DECLINED",reason)
+            handleStatus("DECLINED", reason)
         } else {
             setMemberIdErrorMsg("Required")
         }
 
     }
-    const handleStatus = async (status: string,reason:String) => {
+    const handleStatus = async (status: string, reason: String) => {
         let data = {
             "memberApprovalStatus": status.toUpperCase(),
-            "declinedMessage": reason
+            "declinedMessage": reason,
+            "membershipId": formValues.memberID,
+            "isPaymentDetailVerified": formValues.isPaymentDetailVerified,
+            "isSchoolDetailVerified": formValues.isSchoolDetailVerified
         }
         console.log(status);
         try {
-
+            const response2 = await axios.put(`http://localhost:3000/api/member/${memberId}`, data
+            );
             const response = await axios.put(`http://localhost:3000/api/member/memberApproval/${memberId}`, data
             );
             // Handle the response as needed
@@ -312,7 +316,7 @@ const AddMember = () => {
 
 
                             <div className="flex mt-5 ml-5 justify-center">
-                            <DeclineMemberReason hableRemove={handleDecline} removeLoading={declineLoading} memberID={formValues.memberID} />
+                                <DeclineMemberReason hableRemove={handleDecline} removeLoading={declineLoading} memberID={formValues.memberID} />
 
                                 {/* <button type="button" onClick={handleDecline} >
                                     {declineLoading ? 'Loading...' : "Decline"}
