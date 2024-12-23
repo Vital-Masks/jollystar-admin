@@ -104,7 +104,15 @@ const Header = () => {
     const [flag, setFlag] = useState(themeConfig.locale);
 
     const { t } = useTranslation();
+    const handleLogout = () => {
+        // Clear user session or authentication data
+        localStorage.removeItem("userData"); // Adjust key name based on your implementation
+        localStorage.removeItem("userData");
+        window.location.href = '/';
 
+        // Redirect to login page
+        // navigate("/login");
+    };
     return (
         <header className={`z-40 ${themeConfig.semidark && themeConfig.menu === 'horizontal' ? 'dark' : ''}`}>
             <div className="shadow-sm">
@@ -273,7 +281,7 @@ const Header = () => {
                                     </li>
 
                                     <li className="border-t border-white-light dark:border-white-light/10">
-                                        <Link to="/" className="text-danger !py-3">
+                                        <Link to="/" className="text-danger !py-3" onClick={handleLogout}>
                                             <IconLogout className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />
                                             Sign Out
                                         </Link>

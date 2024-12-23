@@ -378,7 +378,9 @@ const Posts = () => {
                                                 <ReactQuill theme="snow" value={quilvalue} onChange={setQuilValue} />
                                             </div>
                                             <div className="mb-5">
-                                                <label htmlFor="ctnFile">Upload File</label>
+                                                <label htmlFor="ctnFile">Upload File <span style={{ opacity: "0.5" }}>
+                                                    {" "}  ( 250px X 360px)
+                                                </span> </label>
                                                 <input
                                                     id="ctnFile"
                                                     type="file"
@@ -389,7 +391,7 @@ const Posts = () => {
                                                 />
                                             </div>
                                             <div className="mb-5">
-                                                <label htmlFor="ctnFile">Single File Preview</label>
+                                                {/* <label htmlFor="ctnFile">Single File Preview</label> */}
                                                 {params.coverImage && (
                                                     <img
                                                         src={"data:image/png;base64," + params.coverImage}
@@ -402,7 +404,9 @@ const Posts = () => {
 
                                             </div>
                                             <div className="mb-5">
-                                                <label htmlFor="ctnFile">Upload Gallery</label>
+                                                <label htmlFor="ctnFile">Upload Gallery  <span style={{ opacity: "0.5" }}>
+                                                    {" "}  ( 250px X 360px)
+                                                </span></label>
                                                 <input
                                                     id="ctnFile"
                                                     type="file"

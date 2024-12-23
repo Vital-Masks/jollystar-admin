@@ -267,7 +267,10 @@ const FileManagement = () => {
                                                 />
                                             </div>
                                             <div className="mb-4">
-                                                <label className="form-label">File</label>
+                                                <label className="form-label">File
+                                                    <span style={{ opacity: "0.5" }}>
+                                                        {" "}  ( Pdf only)
+                                                    </span></label>
                                                 <input
                                                     type="file"
                                                     className="form-input"
@@ -284,7 +287,7 @@ const FileManagement = () => {
                                                     }}
                                                 />
                                             </div>
-                                           
+
                                             {params.preview && (
                                                 <div className="mb-4">
                                                     <label className="form-label">Preview</label>
