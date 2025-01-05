@@ -189,6 +189,10 @@ const AddMember = () => {
         });
     };
     const handleApprove = () => {
+        // if (formValues.memberID ===""  ) {
+        //     alertFormMsg('Please enter the member ID', 'error');
+        //     return false;
+        // }
         // VALIDATION
         if (formValues.isSchoolDetailVerified === false) {
             alertFormMsg('Please verify school and club details', 'error');
@@ -200,7 +204,7 @@ const AddMember = () => {
             alertFormMsg('Please verify payment details', 'error');
             return false;
         }
-
+       
         if (formValues.memberID !== "") {
             setApproveLoading(true);
             handleStatus("APPROVED", "success")
