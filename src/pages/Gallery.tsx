@@ -139,7 +139,7 @@ const Posts = () => {
             showMessage('Link is required.', 'error');
             return true;
         }
-        if (!quilvalue) {
+        if (!params.description) {
             showMessage('Description is required.', 'error');
             return true;
         }

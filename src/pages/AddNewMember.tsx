@@ -1026,6 +1026,7 @@ const AddNewMember = () => {
                         <div>
                             <form className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black" onSubmit={(e) => { e.preventDefault(); submitForm(); }}>
                                 <h6 className="text-lg font-bold mb-5">Select Category</h6>
+                                {/*  */}
                                 <div className="flex flex-col sm:flex-row">
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-5">
                                         <div>
