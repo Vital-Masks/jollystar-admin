@@ -189,10 +189,12 @@ const AddMember = () => {
         });
     };
     const handleApprove = () => {
-        // if (formValues.memberID ===""  ) {
-        //     alertFormMsg('Please enter the member ID', 'error');
-        //     return false;
-        // }
+        console.log(formValues.memberID, formValues.memberID === undefined);
+        
+        if (formValues.memberID ==="" || formValues.memberID === undefined ) {
+            alertFormMsg('Please enter the member ID', 'error');
+            return false;
+        }
         // VALIDATION
         if (formValues.isSchoolDetailVerified === false) {
             alertFormMsg('Please verify school and club details', 'error');
