@@ -55,7 +55,7 @@ interface ClubDetail {
 }
 
 interface PaymentDetails {
-    paymentCategory: string;
+    membershipCategory: string;
     memberId: string;
     bank: string;
     branch: string;
@@ -525,7 +525,7 @@ const AddNewMember = () => {
             total: formValues.pdtotal,
             date: formValues.pddate,
             paymentSlip: formValues.pdpaymentImage,
-            paymentCategory: formValues.pdcategory,
+            membershipCategory: formValues.pdcategory,
         };
 
         if (editIndex !== null) {

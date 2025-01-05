@@ -88,7 +88,7 @@ interface ClubDetail {
     role?: string;
 }
 interface PaymentDetail {
-    paymentCategory: string;
+    membershipCategory: string;
     memberId: number;
     bank: string;
     branch: string;
