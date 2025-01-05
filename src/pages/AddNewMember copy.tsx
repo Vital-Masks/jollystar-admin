@@ -47,7 +47,7 @@ interface SchoolDetail {
 
 interface ClubDetail {
     clubName: string;
-    invloved: string;
+    involved: string;
     game: string;
     from: string;
     to: string;
@@ -91,7 +91,7 @@ interface FormValues {
     sdrole: string;
     clubDetails: ClubDetail[];
     cdclubName: string;
-    cdinvloved: string;
+    cdinvolved: string;
     cdgame: string;
     cdfrom: string;
     cdto: string;
@@ -216,7 +216,7 @@ const AddNewMember = () => {
         schoolDetails: [],
         sdschoolName: '', sdparticipated: '', sdgame: '', sdfrom: '', sdto: '', sdrole: '',
         clubDetails: [],
-        cdclubName: '', cdinvloved: '', cdgame: '', cdfrom: '', cdto: '', cdrole: '',
+        cdclubName: '', cdinvolved: '', cdgame: '', cdfrom: '', cdto: '', cdrole: '',
         paymentDetails: [],
         pdcategory: '', pdbank: '', pdbranch: '', pdtotal: '', pddate: '', pdpaymentImage: '',
         isSchoolDetailVerified: isSclChecked,
@@ -462,7 +462,7 @@ const AddNewMember = () => {
         // Validation: Check if any field is empty
         if (
             !formValues.cdclubName ||
-            !formValues.cdinvloved ||
+            !formValues.cdinvolved ||
             !formValues.cdgame ||
             !formValues.cdfrom ||
             !formValues.cdto ||
@@ -474,7 +474,7 @@ const AddNewMember = () => {
 
         let clbdetails: ClubDetail = {
             clubName: formValues.cdclubName,
-            invloved: formValues.cdinvloved,
+            involved: formValues.cdinvolved,
             game: formValues.cdgame,
             from: formValues.cdfrom,
             to: formValues.cdto,
@@ -504,7 +504,7 @@ const AddNewMember = () => {
         setFormValues((prevValues) => ({
             ...prevValues,
             cdclubName: "",
-            cdinvloved: "",
+            cdinvolved: "",
             cdgame: "",
             cdfrom: "",
             cdto: "",
@@ -790,7 +790,7 @@ const AddNewMember = () => {
         setFormValues({
             ...formValues,
             cdclubName: clubDetail.clubName,
-            cdinvloved: clubDetail.invloved,
+            cdinvolved: clubDetail.involved,
             cdgame: clubDetail.game,
             cdfrom: clubDetail.from,
             cdto: clubDetail.to,
@@ -1358,7 +1358,7 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="name">Team you played</label>
-                                            <input onChange={handleChange} name='cdinvloved' value={formValues.cdinvloved} id="name" type="text" placeholder="Team you played" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdinvolved' value={formValues.cdinvolved} id="name" type="text" placeholder="Team you played" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Game</label>
@@ -1412,7 +1412,7 @@ const AddNewMember = () => {
                                                         <div className="whitespace-nowrap">{data.clubName}</div>
                                                     </td>
                                                     <td>
-                                                        <div className="whitespace-nowrap">{data.invloved}</div>
+                                                        <div className="whitespace-nowrap">{data.involved}</div>
                                                     </td>
                                                     <td>{data.game}</td>
                                                     <td>{data.from}</td>
