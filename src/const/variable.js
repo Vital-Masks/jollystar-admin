@@ -7,18 +7,18 @@ export const MembershipTypeDetails = {
   export const MembershipPriceDetails = [
     {
         name: MembershipTypeDetails.RESIDENT_LIFE_MEMBER,
-        price: "26000"
+        price: "5000 LKR"
     },
     {
         name: MembershipTypeDetails.OVERSEAS_LIFE_MEMBER,
-        price: "30000"
+        price: "100 USD"
     },
     {
         name: MembershipTypeDetails.ORDINARY_MEMBERS,
-        price: "15000"
+        price: "1000 LKR"
     },
     {
         name: MembershipTypeDetails.PLAYING_MEMBER,
-        price: "22000"
+        price: "300 LKR"
     }
 ];

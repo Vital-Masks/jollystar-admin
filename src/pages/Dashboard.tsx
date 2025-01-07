@@ -51,7 +51,7 @@ const Dashboard = () => {
                 </h1>
 
             </div>
-            <div className="table-responsive mb-5">
+            {/* <div className="table-responsive mb-5">
                 <table>
                     <thead>
                         <tr>
@@ -88,7 +88,7 @@ const Dashboard = () => {
             </div>
             <button type="button" className="btn btn-outline-success rounded-full float-right">
                 <NavLink to="/pending-requests">See More</NavLink>
-            </button>
+            </button> */}
         </div>
     );
 };

@@ -51,12 +51,12 @@ const DeclineMemberReason = ({ hableRemove, removeLoading,memberID }) => {
         });
     };
 const clickDecline =()=>{
-    if(!memberID){
+    // if(!memberID){
 
-        return;
-    }else{
+    //     return;
+    // }else{
         setAddReasonModal(true)
-    }
+    // }
 }
     return (
         <div>
@@ -100,7 +100,7 @@ const clickDecline =()=>{
                                         &times;
                                     </button>
                                     <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] pl-5 py-3 pr-10">
-                                        Add Reason for Removal
+                                        Add Reason for Decline
                                     </div>
                                     <div className="p-5">
                                         <form>
@@ -109,7 +109,7 @@ const clickDecline =()=>{
                                                 <textarea
                                                     id="reason"
                                                     rows={3}
-                                                    placeholder="Reason for removing the member"
+                                                    placeholder="Reason for decline the member"
                                                     className="form-textarea resize-none min-h-[130px]"
                                                     value={reason}
                                                     onChange={(e) => setReason(e.target.value)}

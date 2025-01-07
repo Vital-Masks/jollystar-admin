@@ -103,11 +103,13 @@ const RemovedMembers = () => {
     useEffect(() => {
         dispatch(setPageTitle('Approved Members'));
 
-        fetch(`http://localhost:3000/api/member/${memberId}`)
+        fetch(`http://localhost:3000/api/member/memberPayment/${memberId}`)
             .then(response => response.json())
             .then(data => {
+                console.log(data.result);
+                
                 if (data.result) {
-                    setMembers(data.result);
+                    setMembers(data.result[0]);
                 }
             })
             .catch(error => console.error('Error fetching data:', error));

@@ -162,18 +162,18 @@ const FileManagement = () => {
                     </div>
                 </div>
             </div>
-            {fileList && fileList.length > 0 && (
-                <div className="mt-5 panel p-0 border-0 overflow-hidden">
-                    <div className="table-responsive">
-                        <table className="table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>File Name</th>
-                                    <th>Description</th>
-                                    <th>File</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
+            <div className="mt-5 panel p-0 border-0 overflow-hidden">
+                <div className="table-responsive">
+                    <table className="table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Description</th>
+                                <th>File</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        {fileList && fileList.length > 0 ? (
                             <tbody>
                                 {filteredItems.map((data, index) => {
                                     return (
@@ -203,10 +203,16 @@ const FileManagement = () => {
                                     );
                                 })}
                             </tbody>
-                        </table>
-                    </div>
+                        ) : <tbody>
+                            <tr>
+                                <td colSpan={12} style={{ textAlign: 'center' }}>
+                                    No data
+                                </td>
+                            </tr>
+                        </tbody>}
+                    </table>
                 </div>
-            )}
+            </div>
 
             <Transition appear show={addContactModal} as={Fragment}>
                 <Dialog as="div" open={addContactModal} onClose={() => setAddContactModal(false)} className="relative z-[51]">

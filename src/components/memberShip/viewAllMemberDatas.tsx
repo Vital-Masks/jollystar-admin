@@ -32,6 +32,7 @@ import IconEdit from '../../components/Icon/IconEdit';
 import axios from 'axios';
 import Popover from '@mui/material/Popover';
 interface PaymentDetail {
+    membershipCategory: string;
 
     memberId?: string;
     bank?: string;
@@ -238,6 +239,53 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
             padding: '10px 20px',
         });
     };
+    const openImageInNewTab = (base64Data: string | undefined) => {
+        if (!base64Data) {
+          console.error('Invalid base64 data');
+          return;
+        }
+      
+        // Handle data URL prefix (if present)
+        if (base64Data.startsWith("data:image")) {
+          base64Data = base64Data.split(",")[1];  // Remove prefix
+        }
+      
+        // Check if base64 string is valid
+        const isBase64Valid = /^[A-Za-z0-9+/=]+$/.test(base64Data);
+        if (!isBase64Valid) {
+          console.error('Base64 string is not valid');
+          return;
+        }
+      
+        try {
+          const byteCharacters = atob(base64Data);  // Decode base64 string to bytes
+          const byteArrays: Uint8Array[] = [];
+      
+          for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+            const slice = byteCharacters.slice(offset, offset + 1024);
+            const byteNumbers = new Array(slice.length);
+      
+            for (let i = 0; i < slice.length; i++) {
+              byteNumbers[i] = slice.charCodeAt(i);
+            }
+      
+            byteArrays.push(new Uint8Array(byteNumbers));
+          }
+      
+          const blob = new Blob(byteArrays, { type: 'image/png' });
+          const blobURL = URL.createObjectURL(blob);
+      
+          const newWindow = window.open();
+          if (newWindow) {
+            newWindow.document.write(`<img src="${blobURL}" />`);
+            newWindow.document.close();
+          }
+        } catch (error) {
+          console.error('Error decoding base64 data:', error);
+        }
+      };
+      
+      
     return (
         <div className="mb-5 space-y-5">
             {/* Body Start */}
@@ -374,7 +422,7 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
                                                 <tr key={index + 1}>
                                                     <td>{index + 1}</td>
                                                     <td>
-                                                        <div className="whitespace-nowrap">{data.memberType}</div>
+                                                        <div className="whitespace-nowrap">{data.membershipCategory}</div>
                                                     </td>
                                                     <td>
                                                         <div className="whitespace-nowrap">{data.bank}</div>
@@ -390,7 +438,14 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
                                                                     className="badge whitespace-nowrap badge-outline-primary"
                                                                 >
 
-                                                                    <a href={`${data.paymentSlip}`} target="_blank">  View Image</a>
+                                                                    {
+                                                                    data.paymentSlip ? (
+                                                                        <div onClick={() => openImageInNewTab(data.paymentSlip)}>
+                                                                        View Images
+                                                                      </div>
+                                                                    ) : (
+                                                                        <p>No image available</p>
+                                                                    )}
 
 
                                                                 </button>

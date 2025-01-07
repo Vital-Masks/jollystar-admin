@@ -70,6 +70,7 @@ const Posts = () => {
                 fetchData()
             })
             showMessage('News has been saved successfully.');
+            setQuilValue("")
             // setAllPosts(response.data.result);
         } catch (error) {
             setError("error");
@@ -84,6 +85,8 @@ const Posts = () => {
                 fetchData()
             })
             showMessage('News has been updated successfully.');
+            setQuilValue("")
+
             // setAllPosts(response.data.result);
         } catch (error) {
             setError("error");
@@ -212,6 +215,7 @@ const Posts = () => {
     };
 
     const editUser = (user: any = null) => {
+        setQuilValue("")
         const json = JSON.parse(JSON.stringify(defaultParams));
         setParams(json);
         if (user) {
@@ -334,6 +338,13 @@ const Posts = () => {
                                     );
                                 })}
                             </tbody>
+                           {filteredItems&& filteredItems.lenght ===0 && <tbody>
+                            <tr>
+                                <td colSpan={12} style={{ textAlign: 'center' }}>
+                                    No data
+                                </td>
+                            </tr>
+                        </tbody>}
                         </table>
                     </div>
                 </div>
@@ -372,14 +383,15 @@ const Posts = () => {
                                         <form>
                                             <div className="mb-5">
                                                 <label htmlFor="name">Title   <span style={{ opacity: "0.5" }}>
-                                                    {" "}  ( Max 35 letters)
+                                                    {" "}  ( Max 60 letters)
                                                 </span></label>
-                                                <input id="title" type="text" placeholder="Enter Title" className="form-input" maxLength={35} value={params.title} onChange={(e) => changeValue(e)} />
+                                                <input id="title" type="text" placeholder="Enter Title" className="form-input" maxLength={60} value={params.title} onChange={(e) => changeValue(e)} />
                                             </div>
                                             <div className="mb-5">
                                                 <label htmlFor="address">Body</label>
                                                 <ReactQuill theme="snow" value={quilvalue} onChange={setQuilValue} />
                                             </div>
+                                          
                                             <div className="mb-5">
                                                 <label htmlFor="ctnFile">Upload File <span style={{ opacity: "0.5" }}>
                                                     {" "}  ( 250px X 360px)

@@ -137,6 +137,11 @@ interface MemberData {
 }
 
 const AddNewMember = () => {
+    const options = [MembershipTypeDetails.RESIDENT_LIFE_MEMBER,
+    MembershipTypeDetails.OVERSEAS_LIFE_MEMBER,
+    MembershipTypeDetails.ORDINARY_MEMBERS,
+    MembershipTypeDetails.PLAYING_MEMBER
+    ];
     const [maxDate, setMaxDate] = useState(new Date().toISOString().split("T")[0]);
 
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -195,7 +200,7 @@ const AddNewMember = () => {
     const intialValue = {
         // Define your form fields here
         gallery: [],
-        category: '',
+        category: options[0],//s
         userName: '',
         title: 'mr',
         firstName: '',
@@ -718,11 +723,7 @@ const AddNewMember = () => {
     };
     // Array of options for the select box
 
-    const options = [MembershipTypeDetails.RESIDENT_LIFE_MEMBER,
-    MembershipTypeDetails.OVERSEAS_LIFE_MEMBER,
-    MembershipTypeDetails.ORDINARY_MEMBERS,
-    MembershipTypeDetails.PLAYING_MEMBER
-    ];
+
     const Maritaloptions = ['Single', "Married", "Divorced"
     ];
     const options2 = ['MR', 'MRS'];
@@ -1114,6 +1115,15 @@ const AddNewMember = () => {
                                             {/* <input id="name" type="file" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required /> */}
                                         </div>
 
+                                        {
+                                            formValues.profilePicture && <img
+                                                src={"data:image/png;base64," + `${formValues.profilePicture}`}
+                                                alt='profile pic'
+                                                style={{
+                                                    width: "100%",
+                                                    borderRadius: '12px'
+                                                }} />
+                                        }
                                     </div>
                                 </div>
 
@@ -1267,11 +1277,15 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="name">From</label>
-                                            <input onChange={handleChange} name='sdfrom' value={formValues.sdfrom} id="name" type="text" placeholder="From" className="form-input rounded-full border-dark" required />
+                                            <input
+                                            max={formValues.sdto} onChange={handleChange} name='sdfrom' value={formValues.sdfrom} id="name" type="date" placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">To</label>
-                                            <input onChange={handleChange} name='sdto' value={formValues.sdto} id="name" type="text" placeholder="To" className="form-input rounded-full border-dark" required />
+                                            <input max={new Date().toISOString().split("T")[0]}
+                                                min={formValues.sdfrom}
+
+                                                onChange={handleChange} name='sdto' value={formValues.sdto} id="name" type="date" placeholder="To" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Role</label>
@@ -1370,11 +1384,15 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="name">From</label>
-                                            <input onChange={handleChange} name='cdfrom' value={formValues.cdfrom} id="name" type="text" placeholder="From" className="form-input rounded-full border-dark" required />
+                                            <input max={formValues.cdto}
+                                                onChange={handleChange} name='cdfrom' value={formValues.cdfrom} id="name" type="date" placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">To</label>
-                                            <input onChange={handleChange} name='cdto' value={formValues.cdto} id="name" type="text" placeholder="To" className="form-input rounded-full border-dark" required />
+                                            <input
+                                                max={new Date().toISOString().split("T")[0]}
+                                                min={formValues.cdfrom}
+                                                onChange={handleChange} name='cdto' value={formValues.cdto} id="name" type="date" placeholder="To" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Role</label>
