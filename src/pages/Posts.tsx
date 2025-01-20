@@ -135,6 +135,10 @@ const Posts = () => {
     }, [search, AllPosts]);
 
     const saveUser = async () => {
+        if (params.gallery && params.gallery.length > 6) {
+            showMessage('gallery image less than 6', 'error');
+            return true;
+        }
         if (!params.title) {
             showMessage('Title is required.', 'error');
             return true;

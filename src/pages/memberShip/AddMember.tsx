@@ -108,6 +108,8 @@ const AddMember = () => {
     const navigate = useNavigate();
     const [members, setMembers] = useState<Member>();
     const { memberId } = useParams();
+    const [OldApproveMember, setOldApproveMember] = useState(false);
+    const [LastPaymentID, setLastPaymentID] = useState("");
 
     const [isSclChecked, setIsSclChecked] = useState(false);
     const [ispayChecked, setIsPayChecked] = useState(false);
@@ -161,6 +163,13 @@ const AddMember = () => {
                         ...prevValues,
                         memberID: data.result[0].membershipId,
                     }));
+                    if (data.result[0].membershipId) {
+                        setOldApproveMember(true)
+                        // console.log(data.result[0].paymentDetails[0],"sdsdsdsd")
+                        if (data.result[0].paymentDetails[0]) {
+                            setLastPaymentID(data.result[0].paymentDetails[0]._id)
+                        }
+                    }
                 }
             })
             .catch(error => console.error('Error fetching data:', error));
@@ -190,8 +199,8 @@ const AddMember = () => {
     };
     const handleApprove = () => {
         console.log(formValues.memberID, formValues.memberID === undefined);
-        
-        if (formValues.memberID ==="" || formValues.memberID === undefined ) {
+
+        if (formValues.memberID === "" || formValues.memberID === undefined) {
             alertFormMsg('Please enter the member ID', 'error');
             return false;
         }
@@ -206,7 +215,7 @@ const AddMember = () => {
             alertFormMsg('Please verify payment details', 'error');
             return false;
         }
-       
+
         if (formValues.memberID !== "") {
             setApproveLoading(true);
             handleStatus("APPROVED", "success")
@@ -271,6 +280,34 @@ const AddMember = () => {
             padding: '10px 20px',
         });
     };
+    const handleApprovePaymnet = async () => {
+        let data = {
+            "memberApprovalStatus": "APPROVED",
+        }
+        let data2 = {
+            isPaymentDetailVerified: true
+        }
+        console.log(status);
+        try {
+            // LastPaymentID
+            const response = await axios.put(`http://localhost:3000/api/payment/${LastPaymentID}`, data2
+            );
+            const response2 = await axios.put(`http://localhost:3000/api/member/${memberId}`, data
+            );
+
+            alertForm1("Sucessfully " + status, "")
+            // navigate(-1);
+
+        } catch (error) {
+            // Handle errors
+            console.error('Error:', error);
+            alertForm1(status + " Failed", "error")
+        } finally {
+            setApproveLoading(false);
+            setDeclineLoading(false)
+        }
+
+    }
 
     return (
         <div className="mb-5 space-y-5">
@@ -321,15 +358,24 @@ const AddMember = () => {
                             </form>
 
 
-                            <div className="flex mt-5 ml-5 justify-center">
-                                <DeclineMemberReason hableRemove={handleDecline} removeLoading={declineLoading} memberID={formValues.memberID} />
+                            {!OldApproveMember ?
+                                <div className="flex mt-5 ml-5 justify-center">
 
-                                {/* <button type="button" onClick={handleDecline} >
+                                    <DeclineMemberReason hableRemove={handleDecline} removeLoading={declineLoading} memberID={formValues.memberID} />
+
+                                    {/* <button type="button" onClick={handleDecline} >
                                     {declineLoading ? 'Loading...' : "Decline"}
                                 </button> */}
-                                <button type="button" className="btn btn-outline-success rounded-full ml-5 text-2xl" onClick={handleApprove}>{approveLoading ? 'Loading...' : "Approve"}</button>
-                            </div>
+                                    <button type="button" className="btn btn-outline-success rounded-full ml-5 text-2xl" onClick={handleApprove}>{approveLoading ? 'Loading...' : "Approve"}</button>
+                                </div> : (
+                                    <div className="flex mt-5 ml-5 justify-center">
+                                        <button type="button" className="btn btn-outline-danger rounded-full ml-5 text-2xl" onClick={handleApprove}>{approveLoading ? 'Loading...' : "No Appprove"}</button>
 
+                                        <button type="button" className="btn btn-outline-success rounded-full ml-5 text-2xl" onClick={handleApprovePaymnet}>{approveLoading ? 'Loading...' : "Approve"}</button>
+
+
+                                    </div>)
+                            }
                         </div>
                     </div>
                 </div>}

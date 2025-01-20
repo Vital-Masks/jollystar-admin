@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { IRootState } from '../store';
 import Tippy from '@tippyjs/react';
 import { useEffect, useState } from 'react';
@@ -37,17 +37,15 @@ import { formatDate } from '../utils/utils';
 
 interface Member {
     _id: string;
-    firstName: string; // Add "?" to indicate it's optional
-    lastName: string; // Add "?" to indicate it's optional
+    firstName: string;
+    lastName: string;
     membershipCategory: string;
     updated_at: string;
     passportNumber: string;
     phoneNumber: string;
     memberApprovalStatus: string;
     declinedMessage: string;
-    // Add other properties as needed
 }
-
 
 const Declined = () => {
     const dispatch = useDispatch();
@@ -64,61 +62,89 @@ const Declined = () => {
     useEffect(() => {
         dispatch(setPageTitle('Dashboard Admin'));
 
-
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/api/member/getAllmembers/');
                 setMembers(response.data.result);
             } catch (error) {
-                setError("error");
+                setError("Error fetching data");
             } finally {
                 setLoading(false);
             }
         };
 
         fetchData();
-
     }, [dispatch]);
+
+    // Function to download CSV
+    const downloadCSV = () => {
+        const headers = [
+            'First Name',
+            'Last Name',
+            'Membership Type',
+            'Date Declined',
+            'Reason',
+            'Phone Number',
+            'Passport Number'
+        ];
+
+        const rows = [
+            headers, // Header row
+            ...members
+                .filter(data => tabs==="members" ? data.memberApprovalStatus === 'REMOVED' :data.memberApprovalStatus === 'DECLINED' ) // Only Declined members
+                .map(data => [
+                    data.firstName,
+                    data.lastName,
+                    data.membershipCategory,
+                    formatDate(data.updated_at),
+                    data.declinedMessage,
+                    data.phoneNumber,
+                    data.passportNumber
+                ])
+        ];
+
+        // Convert rows into CSV format
+        const csvContent = rows.map(row => row.join(',')).join('\n');
+
+        // Create a blob from CSV content and trigger download
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = tabs==="members" ? "remove_members.csv" :"declined_members.csv"  ;
+        link.click();
+    };
+
     const LoaderData = () => (
         <div>
-            {
-                !loading && !error && members.length === 0 &&
-                (
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td colSpan={12} style={{ textAlign: 'center' }}>
-                                    No data available.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                )
-
-            }
-            {
-                loading &&
-                (
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td colSpan={3} className="p-4 text-center">
-                                    <div className="flex justify-center items-center">
-                                        <div className="loader animate-spin mr-4"></div>
-                                        {/* <span className="text-gray-600">Loading...</span> */}
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                )
-
-            }
+            {!loading && !error && members.length === 0 && (
+                <table>
+                    <tbody>
+                        <tr>
+                            <td colSpan={12} style={{ textAlign: 'center' }}>
+                                No data available.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            )}
+            {loading && (
+                <table>
+                    <tbody>
+                        <tr>
+                            <td colSpan={3} className="p-4 text-center">
+                                <div className="flex justify-center items-center">
+                                    <div className="loader animate-spin mr-4"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            )}
         </div>
-    )
+    );
+
     return (
         <div className="mb-5 space-y-5">
-
             <div className="sm:flex-1 ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex flex-col sm:flex-row items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
                 <div className="sm:ltr:mr-auto sm:rtl:ml-auto">
                     <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
@@ -129,14 +155,19 @@ const Declined = () => {
                 </div>
             </div>
 
-
+            {/* Download Button */}
+            <div className="mb-4 flex justify-end">
+            <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                    onClick={downloadCSV}
+                >
+                    Download {tabs==="members" ? "Remove" :"Decline"} Members
+                </button>
+            </div>
 
             {/* Body Start */}
-
             <div>
-
                 <div className="pt-5">
-
                     <div>
                         <ul className="sm:flex font-semibold border-b border-[#ebedf2] dark:border-[#191e3a] mb-5 whitespace-nowrap overflow-y-auto">
                             <li className="inline-block">
@@ -144,7 +175,6 @@ const Declined = () => {
                                     onClick={() => toggleTabs('requests')}
                                     className={`flex gap-2 p-4 border-b border-transparent hover:border-primary hover:text-primary ${tabs === 'requests' ? '!border-primary text-primary' : ''}`}
                                 >
-                                    <IconUser />
                                     Declined Member Requests
                                 </button>
                             </li>
@@ -153,21 +183,16 @@ const Declined = () => {
                                     onClick={() => toggleTabs('members')}
                                     className={`flex gap-2 p-4 border-b border-transparent hover:border-primary hover:text-primary ${tabs === 'members' ? '!border-primary text-primary' : ''}`}
                                 >
-                                    <IconUsers />
                                     Removed Members
                                 </button>
                             </li>
-
-
                         </ul>
                     </div>
-                    {tabs === 'requests' ? (
+
+                    {tabs === 'requests' && (
                         <div>
                             <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
-                                <h1>
-                                    Declined Membership Requests
-                                </h1>
-
+                                <h1>Declined Membership Requests</h1>
                             </div>
 
                             <div className="table-responsive mb-5">
@@ -184,13 +209,20 @@ const Declined = () => {
                                     </thead>
                                     <tbody>
                                         {members
-                                            .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'DECLINED'))
+                                            .filter(
+                                                data =>
+                                                    ((data.firstName &&
+                                                        data.firstName.toLowerCase().includes(search.toLowerCase())) ||
+                                                        (data.lastName &&
+                                                            data.lastName.toLowerCase().includes(search.toLowerCase()))) &&
+                                                    data.memberApprovalStatus === 'DECLINED'
+                                            )
                                             .map((data) => (
                                                 <tr key={data._id}>
                                                     <td>{data.firstName}</td>
                                                     <td>{data.lastName}</td>
                                                     <td>{data.membershipCategory}</td>
-                                                    <td>{  formatDate( data.updated_at)}</td>
+                                                    <td>{formatDate(data.updated_at)}</td>
                                                     <td>{data.declinedMessage}</td>
                                                     <td>
                                                         <button className="badge whitespace-nowrap badge-outline-success">
@@ -201,23 +233,16 @@ const Declined = () => {
                                             ))}
                                     </tbody>
                                 </table>
-                                <LoaderData/>
+                                <LoaderData />
                             </div>
                         </div>
-
-                    ) : (
-                        ''
                     )}
-                    {tabs === 'members' ? (
+
+                    {tabs === 'members' && (
                         <div>
                             <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
-                                <h1>
-                                    Removed Memberships
-                                </h1>
-
+                                <h1>Removed Memberships</h1>
                             </div>
-
-
 
                             <div className="table-responsive mb-5">
                                 <table>
@@ -233,13 +258,20 @@ const Declined = () => {
                                     </thead>
                                     <tbody>
                                         {members
-                                            .filter(data => ((data.firstName && data.firstName.toLowerCase().includes(search.toLowerCase())) || (data.lastName && data.lastName.toLowerCase().includes(search.toLowerCase()))) && (data.memberApprovalStatus === 'REMOVED'))
+                                            .filter(
+                                                data =>
+                                                    ((data.firstName &&
+                                                        data.firstName.toLowerCase().includes(search.toLowerCase())) ||
+                                                        (data.lastName &&
+                                                            data.lastName.toLowerCase().includes(search.toLowerCase()))) &&
+                                                    data.memberApprovalStatus === 'REMOVED'
+                                            )
                                             .map((data) => (
                                                 <tr key={data._id}>
                                                     <td>{data.firstName}</td>
                                                     <td>{data.lastName}</td>
                                                     <td>{data.membershipCategory}</td>
-                                                    <td>{  formatDate( data.updated_at)}</td>
+                                                    <td>{formatDate(data.updated_at)}</td>
                                                     <td>{data.declinedMessage}</td>
                                                     <td>
                                                         <button className="badge whitespace-nowrap badge-outline-success">
@@ -250,28 +282,14 @@ const Declined = () => {
                                             ))}
                                     </tbody>
                                 </table>
-                                <LoaderData/>
+                                <LoaderData />
                             </div>
                         </div>
-
-                    ) : (
-                        ''
                     )}
                 </div>
             </div>
-
             {/* Body End */}
-
-
-
-
-
-
-
         </div>
-
-
-
     );
 };
 

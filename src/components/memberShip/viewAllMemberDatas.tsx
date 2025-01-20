@@ -32,6 +32,7 @@ import IconEdit from '../../components/Icon/IconEdit';
 import axios from 'axios';
 import Popover from '@mui/material/Popover';
 interface PaymentDetail {
+    isPaymentDetailVerified: boolean;
     membershipCategory: string;
 
     memberId?: string;
@@ -241,51 +242,51 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
     };
     const openImageInNewTab = (base64Data: string | undefined) => {
         if (!base64Data) {
-          console.error('Invalid base64 data');
-          return;
+            console.error('Invalid base64 data');
+            return;
         }
-      
+
         // Handle data URL prefix (if present)
         if (base64Data.startsWith("data:image")) {
-          base64Data = base64Data.split(",")[1];  // Remove prefix
+            base64Data = base64Data.split(",")[1];  // Remove prefix
         }
-      
+
         // Check if base64 string is valid
         const isBase64Valid = /^[A-Za-z0-9+/=]+$/.test(base64Data);
         if (!isBase64Valid) {
-          console.error('Base64 string is not valid');
-          return;
+            console.error('Base64 string is not valid');
+            return;
         }
-      
+
         try {
-          const byteCharacters = atob(base64Data);  // Decode base64 string to bytes
-          const byteArrays: Uint8Array[] = [];
-      
-          for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
-            const slice = byteCharacters.slice(offset, offset + 1024);
-            const byteNumbers = new Array(slice.length);
-      
-            for (let i = 0; i < slice.length; i++) {
-              byteNumbers[i] = slice.charCodeAt(i);
+            const byteCharacters = atob(base64Data);  // Decode base64 string to bytes
+            const byteArrays: Uint8Array[] = [];
+
+            for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+                const slice = byteCharacters.slice(offset, offset + 1024);
+                const byteNumbers = new Array(slice.length);
+
+                for (let i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+
+                byteArrays.push(new Uint8Array(byteNumbers));
             }
-      
-            byteArrays.push(new Uint8Array(byteNumbers));
-          }
-      
-          const blob = new Blob(byteArrays, { type: 'image/png' });
-          const blobURL = URL.createObjectURL(blob);
-      
-          const newWindow = window.open();
-          if (newWindow) {
-            newWindow.document.write(`<img src="${blobURL}" />`);
-            newWindow.document.close();
-          }
+
+            const blob = new Blob(byteArrays, { type: 'image/png' });
+            const blobURL = URL.createObjectURL(blob);
+
+            const newWindow = window.open();
+            if (newWindow) {
+                newWindow.document.write(`<img src="${blobURL}" />`);
+                newWindow.document.close();
+            }
         } catch (error) {
-          console.error('Error decoding base64 data:', error);
+            console.error('Error decoding base64 data:', error);
         }
-      };
-      
-      
+    };
+
+
     return (
         <div className="mb-5 space-y-5">
             {/* Body Start */}
@@ -412,6 +413,7 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
                                             <th>Branch</th>
                                             <th>Total</th>
                                             <th>Date</th>
+                                            <th>Payment Status</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -430,6 +432,11 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
                                                     <td>{data.branch}</td>
                                                     <td>{data.total}</td>
                                                     <td>{data.date}</td>
+                                                    <td
+                                                        className={` ${data.isPaymentDetailVerified === false ? "text-[#ff8383]" : " text-[#008000] "
+                                                            }`}
+                                                    >                      {data.isPaymentDetailVerified === false ? "Pending" : "Approved"}
+                                                    </td>
                                                     <td>
                                                         {data.paymentSlip ?
                                                             <>
@@ -439,13 +446,13 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
                                                                 >
 
                                                                     {
-                                                                    data.paymentSlip ? (
-                                                                        <div onClick={() => openImageInNewTab(data.paymentSlip)}>
-                                                                        View Images
-                                                                      </div>
-                                                                    ) : (
-                                                                        <p>No image available</p>
-                                                                    )}
+                                                                        data.paymentSlip ? (
+                                                                            <div onClick={() => openImageInNewTab(data.paymentSlip)}>
+                                                                                View Images
+                                                                            </div>
+                                                                        ) : (
+                                                                            <p>No image available</p>
+                                                                        )}
 
 
                                                                 </button>
