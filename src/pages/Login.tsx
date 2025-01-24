@@ -59,7 +59,7 @@ const Login = () => {
                     toast.success("Login successfully");
                     // navigate('/');
                     localStorage.setItem('userData', JSON.stringify(response));
-                    window.location.href = '/';
+                    window.location.href = '/approved-member';
 
                 } else {
 

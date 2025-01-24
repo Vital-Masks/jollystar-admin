@@ -1,39 +1,50 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { IRootState } from '../store';
+import { IRootState } from '../../store';
 import Tippy from '@tippyjs/react';
-import { useEffect, useState } from 'react';
-import { setPageTitle } from '../store/themeConfigSlice';
-import IconUsersGroup from '../components/Icon/IconUsersGroup';
-import IconThumbUp from '../components/Icon/IconThumbUp';
-import IconTrash from '../components/Icon/IconTrash';
-import IconFolderPlus from '../components/Icon/IconFolderPlus';
-import IconNotesEdit from '../components/Icon/IconNotesEdit';
-import { Link, NavLink, useParams } from 'react-router-dom';
-import IconPlus from '../components/Icon/IconPlus';
-import IconHome from '../components/Icon/IconHome';
-import IconDollarSignCircle from '../components/Icon/IconDollarSignCircle';
-import IconPhone from '../components/Icon/IconPhone';
-import IconLinkedin from '../components/Icon/IconLinkedin';
-import IconTwitter from '../components/Icon/IconTwitter';
-import IconFacebook from '../components/Icon/IconFacebook';
-import IconGithub from '../components/Icon/IconGithub';
-import IconUser from '../components/Icon/IconUser';
-import IconLaptop from '../components/Icon/IconLaptop';
-import IconPlayCircle from '../components/Icon/IconPlayCircle';
-import IconAt from '../components/Icon/IconAt';
+import React, { useEffect, useState } from 'react';
+import { setPageTitle } from '../../store/themeConfigSlice';
+import IconUsersGroup from '../../components/Icon/IconUsersGroup';
+import IconThumbUp from '../../components/Icon/IconThumbUp';
+import IconTrash from '../../components/Icon/IconTrash';
+import IconFolderPlus from '../../components/Icon/IconFolderPlus';
+import IconNotesEdit from '../../components/Icon/IconNotesEdit';
+import { Link, NavLink, useNavigate, useParams } from 'react-router-dom';
+import IconPlus from '../../components/Icon/IconPlus';
+import IconHome from '../../components/Icon/IconHome';
+import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
+import IconPhone from '../../components/Icon/IconPhone';
+import IconLinkedin from '../../components/Icon/IconLinkedin';
+import IconTwitter from '../../components/Icon/IconTwitter';
+import IconFacebook from '../../components/Icon/IconFacebook';
+import IconGithub from '../../components/Icon/IconGithub';
+import IconUser from '../../components/Icon/IconUser';
+import IconLaptop from '../../components/Icon/IconLaptop';
+import IconPlayCircle from '../../components/Icon/IconPlayCircle';
+import IconAt from '../../components/Icon/IconAt';
 import Swal from 'sweetalert2';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper';
-import themeConfig from '../theme.config';
-import IconEdit from '../components/Icon/IconEdit';
+import themeConfig from '../../theme.config';
+import IconEdit from '../../components/Icon/IconEdit';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
+import Popover from '@mui/material/Popover';
+interface PaymentDetail {
+    isPaymentDetailVerified: boolean;
+    membershipCategory: string;
 
-
+    memberId?: string;
+    bank?: string;
+    branch?: string;
+    total?: string;
+    date?: string;
+    paymentSlip?: string;
+}
 interface Member {
+    data: Member | (() => Member);
+    paymentDetails?: PaymentDetail[];
     _id: string;
     profilePicture: object;
     firstName?: string;
@@ -86,61 +97,43 @@ interface GalleryItem {
     // Define the properties of your gallery item
 }
 interface FormValues {
-    memberID: string;
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
 }
-const RemovedMembers = () => {
-    const dispatch = useDispatch();
-    const [members, setMembers] = useState<Member>();
-    const { memberId } = useParams();
-    const navigate = useNavigate();
+interface ViewAllStatusMemberProps {
+    data: Member[]; // Assuming Member is a type representing your data structure
+}
+const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
 
+    const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
-
-    useEffect(() => {
-        dispatch(setPageTitle('Approved Members'));
-
-        fetch(`https://api.jollystarssc.com/api/member/${memberId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.result) {
-                    setMembers(data.result);
-                }
-            })
-            .catch(error => console.error('Error fetching data:', error));
-
-    }, [dispatch, memberId]);
-
-    const [tabs, setTabs] = useState('home');
-
-    const toggleTabs = (name: string) => {
-        setTabs(name);
+    const [members, setMembers] = useState<Member>(data);
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
     };
 
-    const items = ['carousel1.jpeg', 'carousel2.jpeg', 'carousel3.jpeg'];
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
-    const tableData = [
-        {
-            id: 1,
-            firstname: 'John',
-            lastname: 'Doe',
-            membershiptype: 'johndoe',
-            dateapplied: '10/08/2020',
-            nic: '954646466V',
-            mobile: '073777777777',
-        }
-    ];
+    const open = Boolean(anchorEl);
+    const id = open ? 'simple-popover' : undefined;
+
+    // 
+    const navigate = useNavigate();
+
+    const dispatch = useDispatch();
+    const { memberId } = useParams();
     const [isSclChecked, setIsSclChecked] = useState(true);
     const [ispayChecked, setIsPayChecked] = useState(true);
 
-    const [reomveLoading, setReomveLoading] = useState(false)
+    const [removeLoading, setRemoveLoading] = useState(false)
+    const [approveLoading, setApproveLoading] = useState(false)
     const [memberIdErrorMsg, setMemberIdErrorMsg] = useState("")
 
     const [formValues, setFormValues] = useState<FormValues>({
         isSchoolDetailVerified: isSclChecked,
         isPaymentDetailVerified: ispayChecked,
-        memberID: ""
     });
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -168,14 +161,44 @@ const RemovedMembers = () => {
             isPaymentDetailVerified: !ispayChecked,
         }));
     };
-    const handleRemove = () => {
 
-        if (formValues.memberID !== "") {
-            setReomveLoading(true);
-            handleStatus("DECLINED")
-        } else {
-            setMemberIdErrorMsg("Required")
+    useEffect(() => {
+        dispatch(setPageTitle('Approved Members'));
+
+        // fetch(`https://api.jollystarssc.com/api/member/memberPayment/${memberId}`)
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         if (data.result) {
+        //             setMembers(data.result[0]);
+        //         }
+        //     })
+        //     .catch(error => console.error('Error fetching data:', error));
+
+    }, [dispatch, memberId, data]);
+
+    const [tabs, setTabs] = useState('home');
+
+    const toggleTabs = (name: string) => {
+        setTabs(name);
+    };
+
+    const items = ['carousel1.jpeg', 'carousel2.jpeg', 'carousel3.jpeg'];
+
+    const tableData = [
+        {
+            id: 1,
+            firstname: 'John',
+            lastname: 'Doe',
+            membershiptype: 'johndoe',
+            dateapplied: '10/08/2020',
+            nic: '954646466V',
+            mobile: '073777777777',
         }
+    ];
+    const hableRemove = () => {
+
+        setRemoveLoading(true);
+        handleStatus("REMOVED")
 
     }
     const handleStatus = async (status: string) => {
@@ -198,7 +221,7 @@ const RemovedMembers = () => {
             console.error('Error:', error);
             alertForm1(status + " Failed", "error")
         } finally {
-            setReomveLoading(false)
+            setRemoveLoading(false)
         }
 
     }
@@ -217,96 +240,57 @@ const RemovedMembers = () => {
             padding: '10px 20px',
         });
     };
+    const openImageInNewTab = (base64Data: string | undefined) => {
+        if (!base64Data) {
+            console.error('Invalid base64 data');
+            return;
+        }
+
+        // Handle data URL prefix (if present)
+        if (base64Data.startsWith("data:image")) {
+            base64Data = base64Data.split(",")[1];  // Remove prefix
+        }
+
+        // Check if base64 string is valid
+        const isBase64Valid = /^[A-Za-z0-9+/=]+$/.test(base64Data);
+        if (!isBase64Valid) {
+            console.error('Base64 string is not valid');
+            return;
+        }
+
+        try {
+            const byteCharacters = atob(base64Data);  // Decode base64 string to bytes
+            const byteArrays: Uint8Array[] = [];
+
+            for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+                const slice = byteCharacters.slice(offset, offset + 1024);
+                const byteNumbers = new Array(slice.length);
+
+                for (let i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+
+                byteArrays.push(new Uint8Array(byteNumbers));
+            }
+
+            const blob = new Blob(byteArrays, { type: 'image/png' });
+            const blobURL = URL.createObjectURL(blob);
+
+            const newWindow = window.open();
+            if (newWindow) {
+                newWindow.document.write(`<img src="${blobURL}" />`);
+                newWindow.document.close();
+            }
+        } catch (error) {
+            console.error('Error decoding base64 data:', error);
+        }
+    };
+
+
     return (
         <div className="mb-5 space-y-5">
-            <div className="sm:flex-1 ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex flex-col sm:flex-row items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
-                <div className="sm:ltr:mr-auto sm:rtl:ml-auto">
-                    <div className="space-y-2 prose dark:prose-headings:text-white-dark mt-10 mb-10">
-                        <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl">
-                            Removed Members
-                        </h1>
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex flex-col space-y-5 sm:flex-row sm:space-y-0 sm:space-x-5">
-                <div className="max-w-[60rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
-                    <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
-                        <div className="w-60 h-60 rounded-md overflow-hidden object-cover mb-5 sm:mb-0">
-                            <img
-                                src={`data:image/png;base64,${members?.profilePicture}`}
-                                alt="profile"
-                                className="w-full h-full object-cover"
-                                style={{ borderRadius: '30px', maxWidth: '100%', maxHeight: '300px' }}
-                            />
-
-                        </div>
-                        <div className="text-center sm:text-left ml-10 mr-5">
-                            <h3 className="text-[#3b3f5c] text-2xl sm:text-4xl font-semibold mb-2 dark:text-black bold">
-                                {members?.firstName} {members?.lastName}
-                            </h3>
-                            <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Membership Type - {members?.membershipCategory}
-                            </p>
-                            <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Status - {members?.memberApprovalStatus}
-                            </p>
-                            <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Member Request - {members?.created_at}
-                            </p>
-                            <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Membership Approval Date - {members?.updated_at}
-                            </p>
-                            <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Membership ID - {members?.membershipId}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="max-w-[40rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
-                    <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
-                        <div className="text-center sm:text-left mr-5">
-                            <h3 className="text-[#3b3f5c] text-2xl sm:text-4xl font-semibold mb-2 dark:text-black bold">
-                                Verification Process
-                            </h3>
-
-                            <label className="inline-flex mt-5 text-xl">
-                                <span className="peer-checked:text-success">School and Club Details</span>
-                                <input onChange={handleSchoolCheckboxChange} checked={formValues.isSchoolDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
-                            </label>
-                            <label className="inline-flex mt-5 ml-10 text-xl">
-                                <span className="peer-checked:text-success">Payment Details</span>
-                                <input onChange={handlePaymentCheckboxChange} checked={formValues.isPaymentDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
-                            </label>
-                            <form className="space-y-5 mt-5">
-                                <div className="sm:flex justify-between items-center md:gap-20">
-                                    <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership Id</label>
-                                    <div>
-                                        <input name="memberID" value={members?.membershipId} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
-                                        <p className="w-full sm:w-1/2 text-sm text-red-400 ps-4"  >{memberIdErrorMsg}</p>
-
-                                    </div>
-                                    {/* MemberIdErrorMsg */}
-                                </div>
-                            </form>
-
-                            <div className="flex mt-5 ml-5 justify-center">
-                                <button className="btn btn-danger rounded-full text-2xl" onClick={handleRemove}>
-                                {reomveLoading ? 'Loading...' : " Removed Membership"}
-                                   </button>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
             {/* Body Start */}
-
             <div>
-
                 <div className="pt-5">
 
                     <div>
@@ -405,11 +389,7 @@ const RemovedMembers = () => {
                                     </div>
                                 </div>
 
-                                <div className="sm:col-span-2 mt-6">
-                                    <button type="submit" className="btn btn-outline-primary rounded-full">
-                                        Update Member
-                                    </button>
-                                </div>
+
                             </form>
                         </div>
                     ) : (
@@ -423,7 +403,6 @@ const RemovedMembers = () => {
                                 </h2>
 
                             </div>
-
                             <div className="table-responsive mb-5">
                                 <table>
                                     <thead>
@@ -434,11 +413,84 @@ const RemovedMembers = () => {
                                             <th>Branch</th>
                                             <th>Total</th>
                                             <th>Date</th>
+                                            <th>Payment Status</th>
                                             <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {tableData.map((data) => {
+                                        {/* {members && members.schoolDetails && members.schoolDetails.length > 0 && ( */}
+                                        {members && members.paymentDetails && members.paymentDetails.filter(data => Object.keys(data).length !== 0).map((data, index) => {
+                                            return (
+                                                <tr key={index + 1}>
+                                                    <td>{index + 1}</td>
+                                                    <td>
+                                                        <div className="whitespace-nowrap">{data.membershipCategory}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="whitespace-nowrap">{data.bank}</div>
+                                                    </td>
+                                                    <td>{data.branch}</td>
+                                                    <td>{data.total}</td>
+                                                    <td>{data.date}</td>
+                                                    <td
+                                                        className={` ${data.isPaymentDetailVerified === false ? "text-[#ff8383]" : " text-[#008000] "
+                                                            }`}
+                                                    >                      {data.isPaymentDetailVerified === false ? "Pending" : "Approved"}
+                                                    </td>
+                                                    <td>
+                                                        {data.paymentSlip ?
+                                                            <>
+                                                                <button
+                                                                    // aria-describedby={id} onClick={handleClick}
+                                                                    className="badge whitespace-nowrap badge-outline-primary"
+                                                                >
+
+                                                                    {
+                                                                        data.paymentSlip ? (
+                                                                            <div onClick={() => openImageInNewTab(data.paymentSlip)}>
+                                                                                View Images
+                                                                            </div>
+                                                                        ) : (
+                                                                            <p>No image available</p>
+                                                                        )}
+
+
+                                                                </button>
+                                                                {/* <Popover
+                                                                    id={id}
+                                                                    open={open}
+                                                                    anchorEl={anchorEl}
+                                                                    onClose={handleClose}
+                                                                    anchorOrigin={{
+                                                                        vertical: 'bottom',
+                                                                        horizontal: 'left',
+                                                                    }}
+                                                                >
+                                                                   <div style={{width:'300px'}} >
+                                                                   <img
+                                                                        src={`${data.paymentSlip}`}
+                                                                        alt="Mountain"
+                                                                        className='w-full'
+                                                                    />
+                                                                   </div>
+                                                                </Popover> */}
+                                                            </>
+                                                            : <>
+                                                                <button
+                                                                    className="badge whitespace-nowrap badge-outline-primary"
+                                                                >
+
+
+                                                                    No Image
+                                                                </button>
+                                                            </>
+                                                        }
+                                                    </td>
+
+                                                </tr>
+                                            );
+                                        })}
+                                        {/* {tableData.map((data) => {
                                             return (
                                                 <tr key={data.id}>
                                                     <td>{data.id}</td>
@@ -451,15 +503,28 @@ const RemovedMembers = () => {
                                                     <td>{data.membershiptype}</td>
                                                     <td>{data.dateapplied}</td>
                                                     <td>{data.nic}</td>
-                                                    <td><button className="badge whitespace-nowrap badge-outline-primary"
-                                                    >
-                                                        View Image
-                                                    </button>
+                                                    <td>
+                                                        <Popover
+                                                            id={id}
+                                                            open={open}
+                                                            anchorEl={anchorEl}
+                                                            onClose={handleClose}
+                                                            anchorOrigin={{
+                                                                vertical: 'bottom',
+                                                                horizontal: 'left',
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={`data:image/png;base64,${data.paymentSlip}`}
+                                                                alt="Mountain"
+                                                                className='w-full'
+                                                            />
+                                                        </Popover>
                                                     </td>
 
                                                 </tr>
                                             );
-                                        })}
+                                        })} */}
                                     </tbody>
                                 </table>
                             </div></div>
@@ -489,6 +554,7 @@ const RemovedMembers = () => {
 
                                     </div>
                                 </div>
+
 
                             </form>
                         </div>
@@ -590,61 +656,19 @@ const RemovedMembers = () => {
                             </div>
 
                             {/* Images */}
-                            <div className="swiper" id="slider5">
-                                <div className="swiper-wrapper">
-                                    <Swiper
-                                        modules={[Navigation, Pagination]}
-                                        navigation={{
-                                            nextEl: '.swiper-button-next-ex5',
-                                            prevEl: '.swiper-button-prev-ex5',
-                                        }}
-                                        pagination={{
-                                            clickable: true,
-                                        }}
-                                        breakpoints={{
-                                            1024: {
-                                                slidesPerView: 3,
-                                                spaceBetween: 30,
-                                            },
-                                            768: {
-                                                slidesPerView: 2,
-                                                spaceBetween: 40,
-                                            },
-                                            320: {
-                                                slidesPerView: 1,
-                                                spaceBetween: 20,
-                                            },
-                                        }}
-                                        dir={themeConfig.rtlClass}
-                                        key={themeConfig.rtlClass === 'rtl' ? 'true' : 'false'}
-                                    >
-                                        {items.map((item, i) => {
-                                            return (
-                                                <SwiperSlide key={i}>
-                                                    <img src={`/assets/images/${item}`} className="w-full" alt="itemImg" />
-                                                    <div className="flex justify-center mt-3"> {/* Add this div */}
-                                                        <button className="badge whitespace-nowrap ml-3 badge-outline-danger">
-                                                            <IconTrash />
-                                                        </button>
-                                                    </div>
-                                                </SwiperSlide>
+                            <div className="flex items-center text-red wrap justify-start gap-5 overflow-auto lg:grid-cols-3 xl:grid-cols-4 md:grid md:grid-cols-2 lg:justify-center p-5">
+                                {members && members.gallery && members.gallery.length > 0 && members.gallery.map((item, i) => {
+                                    return (
 
-                                            );
-                                        })}
-                                        {items.map((item, i) => {
-                                            return (
-                                                <SwiperSlide key={i}>
-                                                    <img src={`/assets/images/${item}`} className="w-full" alt="itemImg" />
-                                                    <div className="flex justify-center mt-3"> {/* Add this div */}
-                                                        <button className="badge whitespace-nowrap ml-3 badge-outline-danger">
-                                                            <IconTrash />
-                                                        </button>
-                                                    </div>
-                                                </SwiperSlide>
-                                            );
-                                        })}
-                                    </Swiper>
-                                </div>
+                                        <>
+                                            <img
+                                                src={`${item}`}
+                                                alt="profile"
+                                                className="w-full"
+                                                style={{ maxWidth: "200px" }}
+                                            /></>
+                                    );
+                                })}
                             </div>
 
                         </div>
@@ -669,4 +693,4 @@ const RemovedMembers = () => {
     );
 };
 
-export default RemovedMembers;
+export default ViewAllStatusMember;

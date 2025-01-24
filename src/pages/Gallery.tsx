@@ -10,6 +10,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
 import { convertFileToBase64 } from '../components/utils/fileUtils';
+import { formatDate } from '../utils/utils';
 
 
 const Posts = () => {
@@ -38,8 +39,7 @@ const Posts = () => {
     };
 
     const [quilvalue, setQuilValue] = useState(
-        '<h1>This is a heading text...</h1><br /><p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla dui arcu, pellentesque id mattis sed, mattis semper erat. Etiam commodo arcu a mollis consequat. Curabitur pretium auctor tortor, bibendum placerat elit feugiat et. Ut ac turpis nec dui ullamcorper ornare. Vestibulum finibus quis magna at accumsan. Praesent a purus vitae tortor fringilla tempus vel non purus. Suspendisse eleifend nibh porta dolor ullamcorper laoreet. Ut sit amet ipsum vitae lectus pharetra tincidunt. In ipsum quam, iaculis at erat ut, fermentum efficitur ipsum. Nunc odio diam, fringilla in auctor et, scelerisque at lorem. Sed convallis tempor dolor eu dictum. Cras ornare ornare imperdiet. Pellentesque sagittis lacus non libero fringilla faucibus. Aenean ullamcorper enim et metus vestibulum, eu aliquam nunc placerat. Praesent fringilla dolor sit amet leo pulvinar semper. </p><br /><p> Curabitur vel tincidunt dui. Duis vestibulum eget velit sit amet aliquet. Curabitur vitae cursus ex. Aliquam pulvinar vulputate ullamcorper. Maecenas luctus in eros et aliquet. Cras auctor luctus nisl a consectetur. Morbi hendrerit nisi nunc, quis egestas nibh consectetur nec. Aliquam vel lorem enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc placerat, enim quis varius luctus, enim arcu tincidunt purus, in vulputate tortor mi a tortor. Praesent porta ornare fermentum. Praesent sed ligula at ante tempor posuere a at lorem. </p><br /><p> Curabitur vel tincidunt dui. Duis vestibulum eget velit sit amet aliquet. Curabitur vitae cursus ex. Aliquam pulvinar vulputate ullamcorper. Maecenas luctus in eros et aliquet. Cras auctor luctus nisl a consectetur. Morbi hendrerit nisi nunc, quis egestas nibh consectetur nec. Aliquam vel lorem enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc placerat, enim quis varius luctus, enim arcu tincidunt purus, in vulputate tortor mi a tortor. Praesent porta ornare fermentum. Praesent sed ligula at ante tempor posuere a at lorem. </p><br /><p> Aliquam diam felis, vehicula ut ipsum eu, consectetur tincidunt ipsum. Vestibulum sed metus ac nisi tincidunt mollis sed non urna. Vivamus lacinia ullamcorper interdum. Sed sed erat vel leo venenatis pretium. Sed aliquet sem nunc, ut iaculis dolor consectetur et. Vivamus ligula sapien, maximus nec pellentesque ut, imperdiet at libero. Vivamus semper nulla lectus, id dapibus nulla convallis id. Quisque elementum lectus ac dui gravida, ut molestie nunc convallis. Pellentesque et odio non dolor convallis commodo sit amet a ante. </p>'
-    );
+        "");
 
     const [search, setSearch] = useState<any>('');
 
@@ -64,6 +64,7 @@ const Posts = () => {
             const response = await axios.post('https://api.jollystarssc.com/api/galleryManagement', data).then((res) => {
                 fetchData()
             })
+            showMessage('Gallery has been saved successfully.');
             // setAllPosts(response.data.result);
         } catch (error) {
             setError("error");
@@ -77,6 +78,7 @@ const Posts = () => {
             const response = await axios.put('https://api.jollystarssc.com/api/galleryManagement/' + data._id, data).then((res) => {
                 fetchData()
             })
+            showMessage('Gallery has been updated successfully.');
             // setAllPosts(response.data.result);
         } catch (error) {
             setError("error");
@@ -137,7 +139,7 @@ const Posts = () => {
             showMessage('Link is required.', 'error');
             return true;
         }
-        if (!quilvalue) {
+        if (!params.description) {
             showMessage('Description is required.', 'error');
             return true;
         }
@@ -158,7 +160,7 @@ const Posts = () => {
             let postObj = {
                 albumName: params.albumName,
                 albumLink: params.albumLink,
-                coverImage: coverImage64 ? coverImage64 : params.coverImage64,
+                coverImage: params.coverImage,
                 description: params.description,
                 _id: params._id
             };
@@ -171,10 +173,10 @@ const Posts = () => {
                 return true;
             }
             //add user
-            let coverImage64 = null;
-            if (params.coverImage) {
-                coverImage64 = await convertFileToBase64(params.coverImage);
-            }
+            let coverImage64 = params.coverImage;
+            // if (params.coverImage) {
+            //     coverImage64 = await convertFileToBase64(params.coverImage);
+            // }
 
             console.log(coverImage64, "0000000001");
 
@@ -190,7 +192,7 @@ const Posts = () => {
             //   searchContacts();
         }
 
-        showMessage('Gallery has been saved successfully.');
+        // showMessage('Gallery has been saved successfully.');
         setAddContactModal(false);
     };
 
@@ -223,11 +225,22 @@ const Posts = () => {
         });
     };
 
-    const handleSingleFileChange = (e: any) => {
+    const handleSingleFileChange = async (e: any) => {
         const file = e.target.files[0];
         // Handle the single file logic
+        let coverImage64 = ""
+
+        if (file instanceof File) {
+            try {
+                coverImage64 = await convertFileToBase64(file);
+                // setCoverImage64New(coverImage64);
+            } catch (error) {
+                console.error('Error converting file to Base64:', error);
+            }
+        }
+
         console.log('Single file:', file);
-        setParams({ ...params, ['coverImage']: file });
+        setParams({ ...params, ['coverImage']: coverImage64 });
     };
 
     const handleMultipleFilesChange = (e: any) => {
@@ -286,7 +299,7 @@ const Posts = () => {
                                                     <div>{contact.albumName}</div>
                                                 </div>
                                             </td>
-                                            <td>{contact.created_at}</td>
+                                            <td>{formatDate(contact.created_at)}</td>
                                             <td>
                                                 <div className="flex gap-4 items-center justify-center">
                                                     <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
@@ -333,21 +346,32 @@ const Posts = () => {
                                         <IconX />
                                     </button>
                                     <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                        {params._id ? 'Edit File' : 'Add File'}
+                                        {params._id ? 'Edit Gallery' : 'Add Gallery'}
                                     </div>
                                     <div className="p-5">
                                         <form>
                                             <div className="mb-5">
-                                                <label htmlFor="name">Album Name</label>
-                                                <input id="albumName" type="text" placeholder="Enter album name" className="form-input" value={params.albumName} onChange={(e) => changeValue(e)} />
+                                                <label htmlFor="name">Album Name
+                                                    <span style={{ opacity: "0.5" }}>
+                                                        {" "}  ( Max 35 letters)
+                                                    </span>
+                                                </label>
+                                                <input id="albumName" type="text" placeholder="Enter album name" maxLength={35} className="form-input" value={params.albumName} onChange={(e) => changeValue(e)} />
                                             </div>
                                             <div className="mb-5">
-                                                <label htmlFor="name">Album link</label>
+                                                <label htmlFor="name">Album link
+                                                    <span style={{ opacity: "0.5" }}>
+                                                        {" "}     (Start with https:// )
+                                                    </span>
+                                                </label>
                                                 <input id="albumLink" type="text" placeholder="Enter Title" className="form-input" value={params.albumLink} onChange={(e) => changeValue(e)} />
                                             </div>
                                             <div className="mb-5">
-                                                <label htmlFor="address">Description</label>
+                                                <label htmlFor="address">Description  <span style={{ opacity: "0.5" }}>
+                                                    {" "}  ( Max 100 letters)
+                                                </span> </label>
                                                 <textarea
+                                                    maxLength={100}
                                                     id="description"
                                                     rows={3}
                                                     placeholder="Enter description"
@@ -358,7 +382,11 @@ const Posts = () => {
                                             </div>
                                             {/* albumLink */}
                                             <div className="mb-5">
-                                                <label htmlFor="ctnFile">Upload File</label>
+                                                <label htmlFor="ctnFile">Upload File
+                                                    <span style={{ opacity: "0.5" }}>
+                                                        {" "}  (250px X 360px)
+                                                    </span>
+                                                </label>
                                                 <input
                                                     id="ctnFile"
                                                     type="file"
@@ -368,7 +396,15 @@ const Posts = () => {
 
                                                 />
                                             </div>
+                                            {params.coverImage && (
+                                                <img
+                                                    src={"data:image/png;base64," + params.coverImage}
 
+                                                    // src={params.coverImage}
+                                                    alt="Preview"
+                                                    className="w-40 h-40 object-cover rounded mt-3"
+                                                />
+                                            )}
                                             <div className="flex justify-end items-center mt-8">
                                                 <button type="button" className="btn btn-outline-danger" onClick={() => setAddContactModal(false)}>
                                                     Cancel

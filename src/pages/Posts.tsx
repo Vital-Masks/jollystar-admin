@@ -10,6 +10,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
 import { convertFileToBase64 } from '../components/utils/fileUtils';
+import { formatDate } from '../utils/utils';
 
 
 const Posts = () => {
@@ -21,7 +22,6 @@ const Posts = () => {
 
     const [value, setValue] = useState<any>('list');
     const [defaultParams] = useState({
-
         "_id": "",
         "title": "",
         "description": "",
@@ -39,8 +39,7 @@ const Posts = () => {
     };
 
     const [quilvalue, setQuilValue] = useState(
-        '<h1>This is a heading text...</h1><br /><p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla dui arcu, pellentesque id mattis sed, mattis semper erat. Etiam commodo arcu a mollis consequat. Curabitur pretium auctor tortor, bibendum placerat elit feugiat et. Ut ac turpis nec dui ullamcorper ornare. Vestibulum finibus quis magna at accumsan. Praesent a purus vitae tortor fringilla tempus vel non purus. Suspendisse eleifend nibh porta dolor ullamcorper laoreet. Ut sit amet ipsum vitae lectus pharetra tincidunt. In ipsum quam, iaculis at erat ut, fermentum efficitur ipsum. Nunc odio diam, fringilla in auctor et, scelerisque at lorem. Sed convallis tempor dolor eu dictum. Cras ornare ornare imperdiet. Pellentesque sagittis lacus non libero fringilla faucibus. Aenean ullamcorper enim et metus vestibulum, eu aliquam nunc placerat. Praesent fringilla dolor sit amet leo pulvinar semper. </p><br /><p> Curabitur vel tincidunt dui. Duis vestibulum eget velit sit amet aliquet. Curabitur vitae cursus ex. Aliquam pulvinar vulputate ullamcorper. Maecenas luctus in eros et aliquet. Cras auctor luctus nisl a consectetur. Morbi hendrerit nisi nunc, quis egestas nibh consectetur nec. Aliquam vel lorem enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc placerat, enim quis varius luctus, enim arcu tincidunt purus, in vulputate tortor mi a tortor. Praesent porta ornare fermentum. Praesent sed ligula at ante tempor posuere a at lorem. </p><br /><p> Curabitur vel tincidunt dui. Duis vestibulum eget velit sit amet aliquet. Curabitur vitae cursus ex. Aliquam pulvinar vulputate ullamcorper. Maecenas luctus in eros et aliquet. Cras auctor luctus nisl a consectetur. Morbi hendrerit nisi nunc, quis egestas nibh consectetur nec. Aliquam vel lorem enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc placerat, enim quis varius luctus, enim arcu tincidunt purus, in vulputate tortor mi a tortor. Praesent porta ornare fermentum. Praesent sed ligula at ante tempor posuere a at lorem. </p><br /><p> Aliquam diam felis, vehicula ut ipsum eu, consectetur tincidunt ipsum. Vestibulum sed metus ac nisi tincidunt mollis sed non urna. Vivamus lacinia ullamcorper interdum. Sed sed erat vel leo venenatis pretium. Sed aliquet sem nunc, ut iaculis dolor consectetur et. Vivamus ligula sapien, maximus nec pellentesque ut, imperdiet at libero. Vivamus semper nulla lectus, id dapibus nulla convallis id. Quisque elementum lectus ac dui gravida, ut molestie nunc convallis. Pellentesque et odio non dolor convallis commodo sit amet a ante. </p>'
-    );
+      " "    );
 
     const [search, setSearch] = useState<any>('');
 
@@ -49,6 +48,11 @@ const Posts = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [postLoading, setPostLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [coverImage64New, setCoverImage64New] = useState<string | null>(null);
+    const [gallery64Previews, setGallery64Previews] = useState([]);
+
+    // const [error, setError] = useState<string | null>(null);
+
     const fetchData = async () => {
         try {
             const response = await axios.get('https://api.jollystarssc.com/api/newsManagement/getAllNews');
@@ -65,6 +69,8 @@ const Posts = () => {
             const response = await axios.post('https://api.jollystarssc.com/api/newsManagement', data).then((res) => {
                 fetchData()
             })
+            showMessage('News has been saved successfully.');
+            setQuilValue("")
             // setAllPosts(response.data.result);
         } catch (error) {
             setError("error");
@@ -78,6 +84,9 @@ const Posts = () => {
             const response = await axios.put('https://api.jollystarssc.com/api/newsManagement/' + data._id, data).then((res) => {
                 fetchData()
             })
+            showMessage('News has been updated successfully.');
+            setQuilValue("")
+
             // setAllPosts(response.data.result);
         } catch (error) {
             setError("error");
@@ -97,7 +106,6 @@ const Posts = () => {
 
             if (response.ok) {
                 // File deleted successfully, you may want to update your local state or do other actions.
-                console.log('File deleted successfully');
                 showMessage('Post Data has been deleted successfully.');
 
                 fetchData();
@@ -127,9 +135,10 @@ const Posts = () => {
     }, [search, AllPosts]);
 
     const saveUser = async () => {
-        console.log(params);
-        console.log(!params.gallery, !params.gallery, params.gallery.length > 0);
-
+        if (params.gallery && params.gallery.length > 6) {
+            showMessage('gallery image less than 6', 'error');
+            return true;
+        }
         if (!params.title) {
             showMessage('Title is required.', 'error');
             return true;
@@ -141,16 +150,44 @@ const Posts = () => {
 
         if (params._id) {
             //update user
+            let coverImage64 = params.coverImage;
+            let gallery64 = [];
+            gallery64 = params.gallery
+
+            if (params.coverImage instanceof File) {
+                try {
+                    coverImage64 = await convertFileToBase64(params.coverImage);
+                    // setCoverImage64New(coverImage64);
+                } catch (error) {
+                    console.error('Error converting file to Base64:', error);
+                }
+            } else {
+                coverImage64 = params.coverImage;
+            }
+            if (params.gallery instanceof File) {
+                try {
+                    for (let index = 0; index < params.gallery.length; index++) {
+                        const element = params.gallery[index];
+                        let binImage = ''
+                        binImage = await convertFileToBase64(element);
+                        gallery64.push(binImage)
+                    }
+                } catch (error) {
+                    console.error('Error converting file to Base64:', error);
+                }
+            } else {
+                gallery64 = params.gallery
+            }
+
+
             let postObj = {
                 title: params.title,
-                gallery: params.gallery,
+                gallery: gallery64,
                 description: quilvalue,
-                coverImage: params.coverImage,
+                coverImage: coverImage64,
                 _id: params._id
             };
             putData(postObj)
-
-
         } else {
             if (!(params.gallery.length > 0)) {
                 showMessage('Gallery is required.', 'error');
@@ -163,19 +200,8 @@ const Posts = () => {
 
             //add user
             let gallery64 = [];
-            let coverImage64 = null;
-            if (params.coverImage) {
-                coverImage64 = await convertFileToBase64(params.coverImage);
-            }
-            for (let index = 0; index < params.gallery.length; index++) {
-                const element = params.gallery[index];
-                let binImage = ''
-                binImage = await convertFileToBase64(element);
-                gallery64.push(binImage)
-            }
-            console.log(gallery64, coverImage64, "0000000001");
-
-
+            gallery64 = params.gallery
+            let coverImage64 = params.coverImage;
             let postObj = {
                 title: params.title,
                 gallery: gallery64,
@@ -183,20 +209,25 @@ const Posts = () => {
                 coverImage: coverImage64
             };
             postData(postObj);
+           
             // filteredItems.splice(0, 0, postData);
             //   searchContacts();
         }
 
-        showMessage('User has been saved successfully.');
+        
         setAddContactModal(false);
     };
 
     const editUser = (user: any = null) => {
+        setQuilValue("")
         const json = JSON.parse(JSON.stringify(defaultParams));
         setParams(json);
         if (user) {
             let json1 = JSON.parse(JSON.stringify(user));
             setParams(json1);
+            setQuilValue(json1.description)
+            setCoverImage64New(json1.coverImage)
+            setGallery64Previews(json1.gallery)
         }
         setAddContactModal(true);
     };
@@ -220,23 +251,43 @@ const Posts = () => {
         });
     };
 
-    const handleSingleFileChange = (e: any) => {
+    const handleSingleFileChange = async (e: any) => {
         const file = e.target.files[0];
+        let coverImage64 = ""
+        if (file instanceof File) {
+            try {
+                coverImage64 = await convertFileToBase64(file);
+                // setCoverImage64New(coverImage64);
+            } catch (error) {
+                console.error('Error converting file to Base64:', error);
+            }
+        }
         // Handle the single file logic
-        console.log('Single file:', file);
-        setParams({ ...params, ['coverImage']: file });
+        setParams({ ...params, ['coverImage']: coverImage64 });
     };
 
-    const handleMultipleFilesChange = (e: any) => {
+    const handleMultipleFilesChange = async (e: any) => {
+        if (!e.target.files) return; // Ensure there are files selected
         const files = e.target.files;
-        // Handle the multiple files logic
-        console.log('Multiple files:', files);
-        setParams({ ...params, ['gallery']: files });
+        let gallery64: string[] = [];
+        if (files instanceof FileList) {
+            for (const file of files) {
+                try {
+                    const coverImage = await convertFileToBase64(file);
+                    gallery64.push(coverImage);
+                } catch (error) {
+                    console.error('Error converting file to Base64:', error);
+                }
+            }
+        } else {
+            console.error('Input is not a FileList.');
+        }
+        setParams({ ...params, ['gallery']: gallery64 });
     };
     return (
         <div>
             <div className="flex items-center justify-between flex-wrap gap-4">
-                <h2 className="text-xl">Post/News Management</h2>
+                <h2 className="text-xl">News Management</h2>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                     <div className="flex gap-3">
 
@@ -273,17 +324,10 @@ const Posts = () => {
                                         <tr key={contact.id}>
                                             <td>
                                                 <div className="flex items-center w-max">
-
-
-                                                    {/* {!contact.path && !contact.name && (
-                                                        <div className="border border-gray-300 dark:border-gray-800 rounded-full p-2 ltr:mr-2 rtl:ml-2">
-                                                            <IconUser className="w-4.5 h-4.5" />
-                                                        </div>
-                                                    )} */}
                                                     <div>{contact.title}</div>
                                                 </div>
                                             </td>
-                                            <td>{contact.created_at}</td>
+                                            <td>{formatDate(contact.created_at)}</td>
                                             <td>
                                                 <div className="flex gap-4 items-center justify-center">
                                                     <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
@@ -298,6 +342,13 @@ const Posts = () => {
                                     );
                                 })}
                             </tbody>
+                           {filteredItems&& filteredItems.lenght ===0 && <tbody>
+                            <tr>
+                                <td colSpan={12} style={{ textAlign: 'center' }}>
+                                    No data
+                                </td>
+                            </tr>
+                        </tbody>}
                         </table>
                     </div>
                 </div>
@@ -330,20 +381,25 @@ const Posts = () => {
                                         <IconX />
                                     </button>
                                     <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                        {params._id ? 'Edit File' : 'Add File'}
+                                        {params._id ? 'Edit News' : 'Add News'}
                                     </div>
                                     <div className="p-5">
                                         <form>
                                             <div className="mb-5">
-                                                <label htmlFor="name">Title</label>
-                                                <input id="title" type="text" placeholder="Enter Title" className="form-input" value={params.title} onChange={(e) => changeValue(e)} />
+                                                <label htmlFor="name">Title   <span style={{ opacity: "0.5" }}>
+                                                    {" "}  ( Max 60 letters)
+                                                </span></label>
+                                                <input id="title" type="text" placeholder="Enter Title" className="form-input" maxLength={60} value={params.title} onChange={(e) => changeValue(e)} />
                                             </div>
                                             <div className="mb-5">
-                                                <label htmlFor="address">Description</label>
+                                                <label htmlFor="address">Body</label>
                                                 <ReactQuill theme="snow" value={quilvalue} onChange={setQuilValue} />
                                             </div>
+                                          
                                             <div className="mb-5">
-                                                <label htmlFor="ctnFile">Upload File</label>
+                                                <label htmlFor="ctnFile">Upload File <span style={{ opacity: "0.5" }}>
+                                                    {" "}  ( 250px X 360px)
+                                                </span> </label>
                                                 <input
                                                     id="ctnFile"
                                                     type="file"
@@ -354,7 +410,22 @@ const Posts = () => {
                                                 />
                                             </div>
                                             <div className="mb-5">
-                                                <label htmlFor="ctnFile">Upload Gallery</label>
+                                                {/* <label htmlFor="ctnFile">Single File Preview</label> */}
+                                                {params.coverImage && (
+                                                    <img
+                                                        src={"data:image/png;base64," + params.coverImage}
+
+                                                        // src={params.coverImage}
+                                                        alt="Preview"
+                                                        className="w-40 h-40 object-cover rounded mt-3"
+                                                    />
+                                                )}
+
+                                            </div>
+                                            <div className="mb-5">
+                                                <label htmlFor="ctnFile">Upload Gallery  <span style={{ opacity: "0.5" }}>
+                                                    {" "}  ( 250px X 360px)
+                                                </span></label>
                                                 <input
                                                     id="ctnFile"
                                                     type="file"
@@ -365,6 +436,14 @@ const Posts = () => {
 
                                                 />
                                             </div>
+                                            {params.gallery && params.gallery.length > 0 && params.gallery.map((preview:any, index:any) => (
+                                                <img
+                                                    src={"data:image/png;base64," + preview}
+                                                    alt="Preview"
+                                                    className="w-40 h-40 object-cover rounded mt-3"
+                                                />
+
+                                            ))}
                                             <div className="flex justify-end items-center mt-8">
                                                 <button type="button" className="btn btn-outline-danger" onClick={() => setAddContactModal(false)}>
                                                     Cancel

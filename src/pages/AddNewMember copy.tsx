@@ -55,7 +55,7 @@ interface ClubDetail {
 }
 
 interface PaymentDetails {
-    memberType: string;
+    membershipCategory: string;
     memberId: string;
     bank: string;
     branch: string;
@@ -105,7 +105,6 @@ interface FormValues {
     pdpaymentImage: string;
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
-    membershipId:string;
 }
 
 interface MemberData {
@@ -138,11 +137,6 @@ interface MemberData {
 }
 
 const AddNewMember = () => {
-    const options = [MembershipTypeDetails.RESIDENT_LIFE_MEMBER,
-    MembershipTypeDetails.OVERSEAS_LIFE_MEMBER,
-    MembershipTypeDetails.ORDINARY_MEMBERS,
-    MembershipTypeDetails.PLAYING_MEMBER
-    ];
     const [maxDate, setMaxDate] = useState(new Date().toISOString().split("T")[0]);
 
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -201,7 +195,7 @@ const AddNewMember = () => {
     const intialValue = {
         // Define your form fields here
         gallery: [],
-        category: options[0],//s
+        category: '',
         userName: '',
         title: 'mr',
         firstName: '',
@@ -326,7 +320,7 @@ const AddNewMember = () => {
 
     const handleSubmit = async () => {
         console.log(formValues);
-
+      
         if (formValues.phoneNumber.length < 10 && formValues.telephoneNumber.length < 10) {
             console.log(formValues.phoneNumber.length, "formValues.phoneNumber.length");
             failForm('Phone Number must be 10 digit')
@@ -348,17 +342,17 @@ const AddNewMember = () => {
         }
         // formValues.gallery
 
-        if (formValues.isSchoolDetailVerified === false) {
+        if (formValues.isSchoolDetailVerified===false) {
             failForm('Please verify school and details');
             return false;
         }
-
+    
         // Validate payment details checkbox
-        if (formValues.isPaymentDetailVerified === false) {
+        if (formValues.isPaymentDetailVerified ===false) {
             failForm('Please verify payment details');
             return false;
         }
-
+    
         // Validate membership ID
         if (!UserMemberShipID || UserMemberShipID.trim() === '') {
             failForm('Membership ID is required');
@@ -466,7 +460,6 @@ const AddNewMember = () => {
     }
     const addClub = () => {
         // Validation: Check if any field is empty
-
         if (
             !formValues.cdclubName ||
             !formValues.cdinvolved ||
@@ -505,8 +498,6 @@ const AddNewMember = () => {
                 ...prevValues,
                 clubDetails: [...prevValues.clubDetails, clbdetails],
             }));
-            console.log(formValues);
-
         }
 
         // Reset the form fields
@@ -534,7 +525,7 @@ const AddNewMember = () => {
             total: formValues.pdtotal,
             date: formValues.pddate,
             paymentSlip: formValues.pdpaymentImage,
-            memberType: formValues.pdcategory,
+            membershipCategory: formValues.pdcategory,
         };
 
         if (editIndex !== null) {
@@ -724,10 +715,14 @@ const AddNewMember = () => {
     };
     // Array of options for the select box
 
-
+    const options = [MembershipTypeDetails.RESIDENT_LIFE_MEMBER,
+    MembershipTypeDetails.OVERSEAS_LIFE_MEMBER,
+    MembershipTypeDetails.ORDINARY_MEMBERS,
+    MembershipTypeDetails.PLAYING_MEMBER
+    ];
     const Maritaloptions = ['Single', "Married", "Divorced"
     ];
-    const options2 = ['MR', 'MRS'];
+    const options2 = ['MR', 'MS', 'MRS'];
     const handleSelectChange2 = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setFormValues((prevValues) => ({
             ...prevValues,
@@ -921,7 +916,7 @@ const AddNewMember = () => {
                         </div>
                         <div className="text-center sm:text-left ml-10 mr-5">
                             <h3 className="text-[#3b3f5c] text-2xl sm:text-4xl font-semibold mb-2 dark:text-black bold">
-                            {formValues.firstName} {formValues.lastName} 
+                                Luke Ivory
                             </h3>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
                                 Membership Type - {formValues.category}
@@ -930,13 +925,13 @@ const AddNewMember = () => {
                                 Status - Pending Request
                             </p>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Member Request - {currentDateTime}
+                                Member Request -{currentDateTime}
                             </p>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
                                 Membership Approval Date - Not Approved Yet
                             </p>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Membership ID - 
+                                Membership ID - Not Assigned Yet
                             </p>
                         </div>
                     </div>
@@ -960,7 +955,7 @@ const AddNewMember = () => {
                             <form className="space-y-5 mt-5">
                                 <div className="sm:flex justify-between items-center md:gap-20">
                                     <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership ID</label>
-                                    <input value={UserMemberShipID} onChange={(e) => setUserMemberShipID(e.target.value)} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
+                                    <input value={UserMemberShipID} onChange={(e)=>setUserMemberShipID(e.target.value)} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
                                 </div>
                             </form>
 
@@ -1028,7 +1023,6 @@ const AddNewMember = () => {
                         <div>
                             <form className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black" onSubmit={(e) => { e.preventDefault(); submitForm(); }}>
                                 <h6 className="text-lg font-bold mb-5">Select Category</h6>
-                                {/*  */}
                                 <div className="flex flex-col sm:flex-row">
                                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-5">
                                         <div>
@@ -1116,15 +1110,6 @@ const AddNewMember = () => {
                                             {/* <input id="name" type="file" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required /> */}
                                         </div>
 
-                                        {
-                                            formValues.profilePicture && <img
-                                                src={"data:image/png;base64," + `${formValues.profilePicture}`}
-                                                alt='profile pic'
-                                                style={{
-                                                    width: "100%",
-                                                    borderRadius: '12px'
-                                                }} />
-                                        }
                                     </div>
                                 </div>
 
@@ -1168,7 +1153,7 @@ const AddNewMember = () => {
                                             <label htmlFor="name">Date</label>
                                             <input type="date" onChange={handleChange} max={maxDate} name='pddate' value={formValues.pddate} id="name" placeholder="Jimmy Turner" className="form-input rounded-full border-dark" required />
                                         </div>
-
+                                       
                                         <div>
                                             <label htmlFor="name">Payment Image</label>
                                             <input type="file" accept="image/*" onChange={handleImageChangePreview} />
@@ -1278,15 +1263,11 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="name">From</label>
-                                            <input
-                                            max={formValues.sdto} onChange={handleChange} name='sdfrom' value={formValues.sdfrom} id="name" type="date" placeholder="From" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdfrom' value={formValues.sdfrom} id="name" type="text" placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">To</label>
-                                            <input max={new Date().toISOString().split("T")[0]}
-                                                min={formValues.sdfrom}
-
-                                                onChange={handleChange} name='sdto' value={formValues.sdto} id="name" type="date" placeholder="To" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='sdto' value={formValues.sdto} id="name" type="text" placeholder="To" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Role</label>
@@ -1385,15 +1366,11 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="name">From</label>
-                                            <input max={formValues.cdto}
-                                                onChange={handleChange} name='cdfrom' value={formValues.cdfrom} id="name" type="date" placeholder="From" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdfrom' value={formValues.cdfrom} id="name" type="text" placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">To</label>
-                                            <input
-                                                max={new Date().toISOString().split("T")[0]}
-                                                min={formValues.cdfrom}
-                                                onChange={handleChange} name='cdto' value={formValues.cdto} id="name" type="date" placeholder="To" className="form-input rounded-full border-dark" required />
+                                            <input onChange={handleChange} name='cdto' value={formValues.cdto} id="name" type="text" placeholder="To" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="profession">Role</label>
