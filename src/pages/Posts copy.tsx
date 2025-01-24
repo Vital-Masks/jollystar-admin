@@ -42,7 +42,7 @@ const Posts = () => {
   // Fetch posts
   const fetchPosts = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/posts');
+      const response = await axios.get('https://api.jollystarssc.com/api/posts');
       setAllPosts(response.data.result);
     } catch (error) {
       setError('Failed to fetch posts.');
@@ -97,10 +97,10 @@ const Posts = () => {
 
     try {
       if (editingPost) {
-        await axios.put(`http://localhost:3000/api/posts/${editingPost._id}`, data);
+        await axios.put(`https://api.jollystarssc.com/api/posts/${editingPost._id}`, data);
         Swal.fire('Success', 'Post updated successfully', 'success');
       } else {
-        await axios.post('http://localhost:3000/api/posts', data);
+        await axios.post('https://api.jollystarssc.com/api/posts', data);
         Swal.fire('Success', 'Post created successfully', 'success');
       }
       fetchPosts();
@@ -126,7 +126,7 @@ const Posts = () => {
 
     if (confirm.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:3000/api/posts/${id}`);
+        await axios.delete(`https://api.jollystarssc.com/api/posts/${id}`);
         Swal.fire('Deleted!', 'Post has been deleted.', 'success');
         fetchPosts();
       } catch (error) {

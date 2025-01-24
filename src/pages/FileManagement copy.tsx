@@ -53,7 +53,7 @@ const FileManagement = () => {
 
     const fetchFileList = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/fileManagement/getAllFiles');
+            const response = await axios.get('https://api.jollystarssc.com/api/fileManagement/getAllFiles');
             setFileList(response.data.result); // Adjust this line to use response.data directly if needed
             setLoading(false);
         } catch (error) {
@@ -82,14 +82,14 @@ const FileManagement = () => {
     
                 console.log('FormData before request:', formData); // Double-check the FormData
     
-                response = await axios.put(`http://localhost:3000/api/fileManagement/${params._id}`, formData, {
+                response = await axios.put(`https://api.jollystarssc.com/api/fileManagement/${params._id}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
                 showMessage('File has been updated successfully.');
             } else {
-                response = await axios.post('http://localhost:3000/api/fileManagement', formData);
+                response = await axios.post('https://api.jollystarssc.com/api/fileManagement', formData);
                 showMessage('File has been updated successfully.');
             }
     
@@ -116,7 +116,7 @@ const FileManagement = () => {
 
     const deleteFile = async (data: any) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/fileManagement/delete/${data._id}`, {
+            const response = await fetch(`https://api.jollystarssc.com/api/fileManagement/delete/${data._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
