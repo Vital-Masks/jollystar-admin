@@ -35,10 +35,6 @@ import IconMenuMore from '../Icon/Menu/IconMenuMore';
 
 const Header = () => {
     const location = useLocation();
-    const logout = () => {
-        localStorage.clear();
-        window.location.href = '/';
-    }
     useEffect(() => {
         const selector = document.querySelector('ul.horizontal-menu a[href="' + window.location.pathname + '"]');
         if (selector) {
@@ -268,20 +264,20 @@ const Header = () => {
                                             <img className="rounded-md w-10 h-10 object-cover" src="/assets/images/user-profile.jpeg" alt="userProfile" />
                                             <div className="ltr:pl-4 rtl:pr-4 truncate">
                                                 <h4 className="text-base">
-                                                    Admin
-                                                    {/* <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span> */}
+                                                    John Doe
+                                                    <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span>
                                                 </h4>
                                                 <button type="button" className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
-                                                   
+                                                    johndoe@gmail.com
                                                 </button>
                                             </div>
                                         </div>
                                     </li>
                                     <li>
-                                        {/* <Link to="/users/profile" className="dark:hover:text-white">
+                                        <Link to="/users/profile" className="dark:hover:text-white">
                                             <IconUser className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
                                             Profile
-                                        </Link> */}
+                                        </Link>
                                     </li>
 
                                     <li className="border-t border-white-light dark:border-white-light/10">

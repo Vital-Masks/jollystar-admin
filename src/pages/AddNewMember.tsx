@@ -105,7 +105,6 @@ interface FormValues {
     pdpaymentImage: string;
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
-    membershipId:string;
 }
 
 interface MemberData {
@@ -921,7 +920,7 @@ const AddNewMember = () => {
                         </div>
                         <div className="text-center sm:text-left ml-10 mr-5">
                             <h3 className="text-[#3b3f5c] text-2xl sm:text-4xl font-semibold mb-2 dark:text-black bold">
-                            {formValues.firstName} {formValues.lastName} 
+                                Luke Ivory
                             </h3>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
                                 Membership Type - {formValues.category}
@@ -930,13 +929,13 @@ const AddNewMember = () => {
                                 Status - Pending Request
                             </p>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Member Request - {currentDateTime}
+                                Member Request -{currentDateTime}
                             </p>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
                                 Membership Approval Date - Not Approved Yet
                             </p>
                             <p className="mb-2 text-lg sm:text-xl text-dark">
-                                Membership ID - 
+                                Membership ID - Not Assigned Yet
                             </p>
                         </div>
                     </div>
