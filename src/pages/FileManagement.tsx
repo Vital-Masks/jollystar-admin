@@ -304,7 +304,7 @@ const FileManagement = () => {
                                                         src={
                                                             params.preview.startsWith('blob:')
                                                                 ? params.preview
-                                                                : `https://api.jollystarssc.com/files/${params.preview}`
+                                                                : `http://localhost:3000/files/${params.preview}`
                                                         }
                                                         width="100%"
                                                         height="500px"
