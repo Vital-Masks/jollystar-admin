@@ -304,7 +304,7 @@ const AddNewMember = () => {
     ];
     const addMember = async (data: MemberData): Promise<AxiosResponse<any>> => {
         try {
-            const response = await axios.post('https://api.jollystarssc.com/api/member', data);
+            const response = await axios.post('http://localhost:3000/api/member', data);
             console.log('Member added successfully:', response.data);
             // Call your success function here
             sucessForm()
@@ -402,7 +402,7 @@ const AddNewMember = () => {
 
         // const addMember = async (data: MemberData): Promise<AxiosResponse<any>> => {
         //     try {
-        //       const response = await axios.post('https://api.jollystarssc.com/api/member', data);
+        //       const response = await axios.post('http://localhost:3000/api/member', data);
         //       console.log('Member added successfully:', response.data);
         //       sucessForm()
         //       return response;
@@ -718,7 +718,8 @@ const AddNewMember = () => {
     const options = [MembershipTypeDetails.RESIDENT_LIFE_MEMBER,
     MembershipTypeDetails.OVERSEAS_LIFE_MEMBER,
     MembershipTypeDetails.ORDINARY_MEMBERS,
-    MembershipTypeDetails.PLAYING_MEMBER
+    MembershipTypeDetails.PLAYING_MEMBER,
+    MembershipTypeDetails.PLAYING_MEMBER_STUDENT
     ];
     const Maritaloptions = ['Single', "Married", "Divorced"
     ];

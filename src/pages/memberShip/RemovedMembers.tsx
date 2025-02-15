@@ -103,7 +103,7 @@ const RemovedMembers = () => {
     useEffect(() => {
         dispatch(setPageTitle('Approved Members'));
 
-        fetch(`https://api.jollystarssc.com/api/member/memberPayment/${memberId}`)
+        fetch(`http://localhost:3000/api/member/memberPayment/${memberId}`)
             .then(response => response.json())
             .then(data => {
                 console.log(data.result);
@@ -190,7 +190,7 @@ const RemovedMembers = () => {
         console.log(status);
         try {
 
-            const response = await axios.put(`https://api.jollystarssc.com/api/member/memberApproval/${memberId}`, data
+            const response = await axios.put(`http://localhost:3000/api/member/memberApproval/${memberId}`, data
             );
             // Handle the response as needed
             console.log('PUT request successful:', response.data);

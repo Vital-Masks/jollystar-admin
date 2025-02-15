@@ -48,7 +48,7 @@ const FileManagement = () => {
 
     const fetchFileList = async () => {
         try {
-            const response = await axios.get('https://api.jollystarssc.com/api/fileManagement/getAllFiles');
+            const response = await axios.get('http://localhost:3000/api/fileManagement/getAllFiles');
             setFileList(response.data.result);
             setLoading(false);
         } catch (error) {
@@ -71,7 +71,7 @@ const FileManagement = () => {
 
             let response;
             if (params._id) {
-                response = await axios.put(`https://api.jollystarssc.com/api/fileManagement/${params._id}`, formData, {
+                response = await axios.put(`http://localhost:3000/api/fileManagement/${params._id}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -79,7 +79,7 @@ const FileManagement = () => {
                 showMessage('File has been updated successfully.');
 
             } else {
-                response = await axios.post('https://api.jollystarssc.com/api/fileManagement', formData);
+                response = await axios.post('http://localhost:3000/api/fileManagement', formData);
                 showMessage('File has been saved successfully.');
             }
 
@@ -103,7 +103,7 @@ const FileManagement = () => {
 
     const deleteFile = async (data: any) => {
         try {
-            const response = await fetch(`https://api.jollystarssc.com/api/fileManagement/delete/${data._id}`, {
+            const response = await fetch(`http://localhost:3000/api/fileManagement/delete/${data._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -304,7 +304,7 @@ const FileManagement = () => {
                                                         src={
                                                             params.preview.startsWith('blob:')
                                                                 ? params.preview
-                                                                : `https://api.jollystarssc.com/files/${params.preview}`
+                                                                : `http://localhost:3000/files/${params.preview}`
                                                         }
                                                         width="100%"
                                                         height="500px"

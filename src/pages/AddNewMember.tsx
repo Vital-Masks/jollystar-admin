@@ -140,7 +140,8 @@ const AddNewMember = () => {
     const options = [MembershipTypeDetails.RESIDENT_LIFE_MEMBER,
     MembershipTypeDetails.OVERSEAS_LIFE_MEMBER,
     MembershipTypeDetails.ORDINARY_MEMBERS,
-    MembershipTypeDetails.PLAYING_MEMBER
+    MembershipTypeDetails.PLAYING_MEMBER,
+    MembershipTypeDetails.PLAYING_MEMBER_STUDENT
     ];
     const [maxDate, setMaxDate] = useState(new Date().toISOString().split("T")[0]);
 
@@ -309,7 +310,7 @@ const AddNewMember = () => {
     ];
     const addMember = async (data: MemberData): Promise<AxiosResponse<any>> => {
         try {
-            const response = await axios.post('https://api.jollystarssc.com/api/member', data);
+            const response = await axios.post('http://localhost:3000/api/member', data);
             console.log('Member added successfully:', response.data);
             // Call your success function here
             sucessForm()
@@ -317,7 +318,7 @@ const AddNewMember = () => {
             return response;
         } catch (error) {
             console.error('Error adding member:', error);
-            failForm('Member add unsuccessfully')
+            failForm('Member Already Exist! or Unsuccesful')
             throw error;
         }
     };
@@ -348,13 +349,13 @@ const AddNewMember = () => {
         // formValues.gallery
 
         if (formValues.isSchoolDetailVerified === false) {
-            failForm('Please verify school and details');
+            failForm('Please Verify School Details');
             return false;
         }
 
         // Validate payment details checkbox
         if (formValues.isPaymentDetailVerified === false) {
-            failForm('Please verify payment details');
+            failForm('Please Verify Payment Details');
             return false;
         }
 
@@ -407,7 +408,7 @@ const AddNewMember = () => {
 
         // const addMember = async (data: MemberData): Promise<AxiosResponse<any>> => {
         //     try {
-        //       const response = await axios.post('https://api.jollystarssc.com/api/member', data);
+        //       const response = await axios.post('http://localhost:3000/api/member', data);
         //       console.log('Member added successfully:', response.data);
         //       sucessForm()
         //       return response;

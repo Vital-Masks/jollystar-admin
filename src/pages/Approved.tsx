@@ -28,12 +28,12 @@ const Approved = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        dispatch(setPageTitle('Dashboard Admin'));
+        dispatch(setPageTitle('Approved Members'));
 
         const fetchData = async () => {
             let status = "APPROVED";
             try {
-                const response = await axios.get('https://api.jollystarssc.com/api/member/getMemberStatusMembers/' + status);
+                const response = await axios.get('http://localhost:3000/api/member/getMemberStatusMembers/' + status);
                 setMembers(response.data.result);
             } catch (error) {
                 setError("Error fetching data");
