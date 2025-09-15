@@ -197,7 +197,11 @@ const AddMember = () => {
             padding: '10px 20px',
         });
     };
-    const handleApprove = () => {
+    const handleApprove = async () => {
+
+        let data2 = {
+            isPaymentDetailVerified: true
+        }
         console.log(formValues.memberID, formValues.memberID === undefined);
 
         if (formValues.memberID === "" || formValues.memberID === undefined) {
@@ -218,6 +222,8 @@ const AddMember = () => {
 
         if (formValues.memberID !== "") {
             setApproveLoading(true);
+            const response = await axios.put(`http://localhost:3000/api/payment/${LastPaymentID}`, data2
+            );
             handleStatus("APPROVED", "success")
 
         } else {
@@ -369,9 +375,9 @@ const AddMember = () => {
                                     <button type="button" className="btn btn-outline-success rounded-full ml-5 text-2xl" onClick={handleApprove}>{approveLoading ? 'Loading...' : "Approve"}</button>
                                 </div> : (
                                     <div className="flex mt-5 ml-5 justify-center">
-                                        <button type="button" className="btn btn-outline-danger rounded-full ml-5 text-2xl" onClick={handleApprove}>{approveLoading ? 'Loading...' : "No Appprove"}</button>
+                                        <button type="button" className="btn btn-outline-danger rounded-full ml-5 text-2xl" onClick={() => { }}>{approveLoading ? 'Loading...' : "No Appprove"}</button>
 
-                                        <button type="button" className="btn btn-outline-success rounded-full ml-5 text-2xl" onClick={handleApprovePaymnet}>{approveLoading ? 'Loading...' : "Approve"}</button>
+                                        <button disabled={!formValues?.isPaymentDetailVerified || !formValues.isSchoolDetailVerified} type="button" className="btn btn-outline-success rounded-full ml-5 text-2xl" onClick={handleApprovePaymnet}>{approveLoading ? 'Loading...' : "Approve"}</button>
 
 
                                     </div>)

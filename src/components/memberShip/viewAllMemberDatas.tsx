@@ -420,6 +420,7 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
                                     <tbody>
                                         {/* {members && members.schoolDetails && members.schoolDetails.length > 0 && ( */}
                                         {members && members.paymentDetails && members.paymentDetails.filter(data => Object.keys(data).length !== 0).map((data, index) => {
+                                            console.log(data)
                                             return (
                                                 <tr key={index + 1}>
                                                     <td>{index + 1}</td>

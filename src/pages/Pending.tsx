@@ -133,7 +133,6 @@ const Pending = () => {
               <th>Mobile Number</th>
               <th>Email</th>
               <th>Approval Status</th>
-              <th>Reason</th>
               <th></th>
             </tr>
           </thead>
@@ -157,7 +156,6 @@ const Pending = () => {
                     <td>{data.phoneNumber}</td>
                     <td>{data.email}</td>
                     <td>{data.memberApprovalStatus}</td>
-                    <td>{data.Reason}</td>
                     <td>
                       <button className="badge whitespace-nowrap badge-outline-success">
                         <NavLink to={`/view-member/${data._id}`}>View</NavLink>

@@ -1487,11 +1487,11 @@ const AddNewMember = () => {
                                             ))}
                                     </div>
                                 </div>
-                                <div className="sm:col-span-2 mt-6 align-center flex justify-center">
+                                {/* <div className="sm:col-span-2 mt-6 align-center flex justify-center">
                                     <button type="submit" className="btn btn-outline-primary rounded-full">
                                         Add Proof Images
                                     </button>
-                                </div>
+                                </div> */}
                             </form>
 
 

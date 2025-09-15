@@ -137,6 +137,7 @@ interface MemberData {
 }
 
 const AddNewMember = () => {
+    
     const options = [MembershipTypeDetails.RESIDENT_LIFE_MEMBER,
     MembershipTypeDetails.OVERSEAS_LIFE_MEMBER,
     MembershipTypeDetails.ORDINARY_MEMBERS,
@@ -315,10 +316,11 @@ const AddNewMember = () => {
             // Call your success function here
             sucessForm()
             setFormValues(intialValue)
+            window.location.href = '/approved-member';
             return response;
         } catch (error) {
             console.error('Error adding member:', error);
-            failForm('Member Already Exist! or Unsuccesful')
+            failForm(error?.message ?? 'Oops! Something went wrong!')
             throw error;
         }
     };
@@ -1279,7 +1281,7 @@ const AddNewMember = () => {
                                         <div>
                                             <label htmlFor="name">From</label>
                                             <input
-                                            max={formValues.sdto} onChange={handleChange} name='sdfrom' value={formValues.sdfrom} id="name" type="date" placeholder="From" className="form-input rounded-full border-dark" required />
+                                            max={maxDate} onChange={handleChange} name='sdfrom' value={formValues.sdfrom} id="name" type="date" placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">To</label>
@@ -1385,7 +1387,7 @@ const AddNewMember = () => {
                                         </div>
                                         <div>
                                             <label htmlFor="name">From</label>
-                                            <input max={formValues.cdto}
+                                            <input id="cdto" max={maxDate}
                                                 onChange={handleChange} name='cdfrom' value={formValues.cdfrom} id="name" type="date" placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
@@ -1509,11 +1511,11 @@ const AddNewMember = () => {
                                             ))}
                                     </div>
                                 </div>
-                                <div className="sm:col-span-2 mt-6 align-center flex justify-center">
+                                {/* <div className="sm:col-span-2 mt-6 align-center flex justify-center">
                                     <button type="submit" className="btn btn-outline-primary rounded-full">
                                         Add Proof Images
                                     </button>
-                                </div>
+                                </div> */}
                             </form>
 
 

@@ -191,12 +191,12 @@ const ApprovedMember = () => {
             mobile: '073777777777',
         }
     ];
-    const hableRemove = (reason:String) => {
+    const hableRemove = (reason: String) => {
         setRemoveLoading(true);
-        handleStatus("REMOVED",reason)
+        handleStatus("REMOVED", reason)
 
     }
-    const handleStatus = async (status: string,reason:String) => {
+    const handleStatus = async (status: string, reason: String) => {
         let data = {
             "memberApprovalStatus": status.toUpperCase(),
             "declinedMessage": reason
@@ -279,8 +279,8 @@ const ApprovedMember = () => {
                                     {/* MemberIdErrorMsg */}
                                 </div>
                             </form>
-                        <RemoveMemberReason hableRemove={hableRemove} removeLoading={removeLoading} />
-                            
+                            <RemoveMemberReason hableRemove={hableRemove} removeLoading={removeLoading} />
+
 
                         </div>
                     </div>
