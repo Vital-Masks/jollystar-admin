@@ -7,10 +7,10 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 interface File {
-    _id: number;
-    title: string;
-    description: string;
-    file: any;
+    _id?: number;
+    title?: string;
+    description?: string;
+    file?: any;
 }
 const FileManagement = () => {
     const dispatch = useDispatch();
@@ -37,7 +37,7 @@ const FileManagement = () => {
     useEffect(() => {
         setFilteredItems(() => {
             return fileList.filter((item) => {
-                return item.title.toLowerCase().includes(search.toLowerCase());
+                return item.title && item.title.toLowerCase().includes(search.toLowerCase());
             });
         });
     }, [search, fileList]);
@@ -48,11 +48,22 @@ const FileManagement = () => {
 
     const fetchFileList = async () => {
         try {
+            setLoading(true);
             const response = await axios.get('http://localhost:3000/api/fileManagement/getAllFiles');
-            setFileList(response.data.result);
+            const files = response.data.result || response.data || [];
+            // Ensure all files have required properties
+            const validFiles = files.map((file: any) => ({
+                _id: file._id || null,
+                title: file.title || 'Untitled',
+                description: file.description || '',
+                file: file.file || ''
+            }));
+            setFileList(validFiles);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching file list:', error);
+            showMessage('Failed to fetch files. Please check your connection.', 'error');
+            setFileList([]);
             setLoading(false);
         }
     };
@@ -79,44 +90,48 @@ const FileManagement = () => {
                 showMessage('File has been updated successfully.');
 
             } else {
-                response = await axios.post('http://localhost:3000/api/fileManagement', formData);
+                response = await axios.post('http://localhost:3000/api/fileManagement', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
                 showMessage('File has been saved successfully.');
             }
 
             setAddContactModal(false);
+            setParams(JSON.parse(JSON.stringify(defaultParams)));
             fetchFileList();
         } catch (error) {
             console.error('Error saving file:', error);
-            showMessage('Error saving file.', 'error');
+            showMessage('Error saving file. Please try again.', 'error');
         }
     };
 
     const editFile = (file: any) => {
-        const json = JSON.parse(JSON.stringify(defaultParams));
-        setParams(json);
         if (file) {
-            let json1 = JSON.parse(JSON.stringify(file));
-            setParams({ ...json1, preview: json1.file });
+            // Editing existing file
+            setParams({
+                _id: file._id,
+                title: file.title,
+                description: file.description,
+                file: null, // Reset file input for new selection
+                preview: file.file ? `http://localhost:3000/files/${file.file}` : null,
+            });
+        } else {
+            // Adding new file
+            setParams(JSON.parse(JSON.stringify(defaultParams)));
         }
         setAddContactModal(true);
     };
 
     const deleteFile = async (data: any) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/fileManagement/delete/${data._id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (response.ok) {
-                fetchFileList();
-            } else {
-                console.error('Failed to delete file. Response:', response);
-            }
+            const response = await axios.delete(`http://localhost:3000/api/fileManagement/delete/${data._id}`);
+            showMessage('File has been deleted successfully.');
+            fetchFileList();
         } catch (error) {
             console.error('An error occurred while deleting the file', error);
+            showMessage('Error deleting file. Please try again.', 'error');
         }
     };
 
@@ -173,14 +188,38 @@ const FileManagement = () => {
                                 <th></th>
                             </tr>
                         </thead>
-                        {fileList && fileList.length > 0 ? (
+                        {loading ? (
+                            <tbody>
+                                <tr>
+                                    <td colSpan={4} style={{ textAlign: 'center', padding: '2rem' }}>
+                                        <div className="flex items-center justify-center">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                            <span className="ml-2">Loading files...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        ) : fileList && fileList.length > 0 ? (
                             <tbody>
                                 {filteredItems.map((data, index) => {
                                     return (
                                         <tr key={index + 1}>
-                                            <td>{data.title}</td>
-                                            <td>{data.description}</td>
-                                            <td>{data.file}</td>
+                                            <td>{data.title || 'Untitled'}</td>
+                                            <td>{data.description || 'No description'}</td>
+                                            <td>
+                                                {data.file ? (
+                                                    <a 
+                                                        href={`http://localhost:3000/files/${data.file}`} 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer"
+                                                        className="text-primary hover:underline"
+                                                    >
+                                                        {data.file}
+                                                    </a>
+                                                ) : (
+                                                    <span className="text-gray-500">No file</span>
+                                                )}
+                                            </td>
                                             <td>
                                                 <div className="flex gap-4 items-center justify-center">
                                                     <button
@@ -205,8 +244,8 @@ const FileManagement = () => {
                             </tbody>
                         ) : <tbody>
                             <tr>
-                                <td colSpan={12} style={{ textAlign: 'center' }}>
-                                    No data
+                                <td colSpan={4} style={{ textAlign: 'center', padding: '2rem' }}>
+                                    No files found
                                 </td>
                             </tr>
                         </tbody>}
@@ -260,7 +299,7 @@ const FileManagement = () => {
                                                     className="form-input"
                                                     value={params.title}
                                                     onChange={(e) =>
-                                                        setParams((prev) => ({ ...prev, title: e.target.value }))
+                                                        setParams((prev: any) => ({ ...prev, title: e.target.value }))
                                                     }
                                                 />
                                             </div>
@@ -270,7 +309,7 @@ const FileManagement = () => {
                                                     className="form-input"
                                                     value={params.description}
                                                     onChange={(e) =>
-                                                        setParams((prev) => ({ ...prev, description: e.target.value }))
+                                                        setParams((prev: any) => ({ ...prev, description: e.target.value }))
                                                     }
                                                 />
                                             </div>
@@ -285,10 +324,10 @@ const FileManagement = () => {
                                                     accept="application/pdf" // Allow only PDF files
                                                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                                         if (e.target.files && e.target.files[0]) {
-                                                            setParams((prev) => ({
+                                                            setParams((prev: any) => ({
                                                                 ...prev,
-                                                                file: e.target.files[0],
-                                                                preview: URL.createObjectURL(e.target.files[0]),
+                                                                file: e.target.files![0],
+                                                                preview: URL.createObjectURL(e.target.files![0]),
                                                             }));
 
                                                         }
@@ -299,16 +338,15 @@ const FileManagement = () => {
                                             {params.preview && (
                                                 <div className="mb-4">
                                                     <label className="form-label">Preview</label>
-                                                    <iframe
-                                                        className="w-full h-auto rounded-md"
-                                                        src={
-                                                            params.preview.startsWith('blob:')
-                                                                ? params.preview
-                                                                : `http://localhost:3000/files/${params.preview}`
-                                                        }
-                                                        width="100%"
-                                                        height="500px"
-                                                    ></iframe>
+                                                    <div className="border rounded-md p-4 bg-gray-50">
+                                                        <iframe
+                                                            className="w-full h-auto rounded-md"
+                                                            src={params.preview}
+                                                            width="100%"
+                                                            height="500px"
+                                                            title="File Preview"
+                                                        ></iframe>
+                                                    </div>
                                                 </div>
                                             )}
                                             <div className="flex justify-end gap-2">
