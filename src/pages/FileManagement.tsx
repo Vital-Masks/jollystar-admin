@@ -70,15 +70,32 @@ const FileManagement = () => {
 
     const saveFile = async () => {
         try {
-            if (!params.title || !params.description || !params.file) {
-                showMessage('Title, Description, and File are required.', 'error');
-                return;
+            // For new files, all fields are required
+            if (!params._id) {
+                if (!params.title || !params.description || !params.file) {
+                    showMessage('Title, Description, and File are required for new files.', 'error');
+                    return;
+                }
+            } else {
+                // For updates, at least one field should be provided
+                if (!params.title && !params.description && !params.file) {
+                    showMessage('Please provide at least one field to update.', 'error');
+                    return;
+                }
             }
 
             const formData = new FormData();
-            formData.append('file', params.file);
-            formData.append('title', params.title);
-            formData.append('description', params.description);
+            
+            // Only append fields that have values
+            if (params.file) {
+                formData.append('file', params.file);
+            }
+            if (params.title) {
+                formData.append('title', params.title);
+            }
+            if (params.description) {
+                formData.append('description', params.description);
+            }
 
             let response;
             if (params._id) {
@@ -297,7 +314,8 @@ const FileManagement = () => {
                                                 <input
                                                     type="text"
                                                     className="form-input"
-                                                    value={params.title}
+                                                    value={params.title || ''}
+                                                    placeholder={params._id ? "Leave empty to keep current title" : "Enter file title"}
                                                     onChange={(e) =>
                                                         setParams((prev: any) => ({ ...prev, title: e.target.value }))
                                                     }
@@ -307,7 +325,8 @@ const FileManagement = () => {
                                                 <label className="form-label">Description</label>
                                                 <textarea
                                                     className="form-input"
-                                                    value={params.description}
+                                                    value={params.description || ''}
+                                                    placeholder={params._id ? "Leave empty to keep current description" : "Enter file description"}
                                                     onChange={(e) =>
                                                         setParams((prev: any) => ({ ...prev, description: e.target.value }))
                                                     }
@@ -316,8 +335,9 @@ const FileManagement = () => {
                                             <div className="mb-4">
                                                 <label className="form-label">File
                                                     <span style={{ opacity: "0.5" }}>
-                                                        {" "}  ( Pdf only)
-                                                    </span></label>
+                                                        {" "}  ( PDF only)
+                                                    </span>
+                                                </label>
                                                 <input
                                                     type="file"
                                                     className="form-input"
