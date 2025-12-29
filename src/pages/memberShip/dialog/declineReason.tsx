@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import axios from 'axios';
 
-const DeclineMemberReason = ({ hableRemove, removeLoading,memberID }) => {
+const DeclineMemberReason = ({ hableRemove, removeLoading, memberID }) => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Remove Member Reason'));
@@ -50,21 +50,21 @@ const DeclineMemberReason = ({ hableRemove, removeLoading,memberID }) => {
             padding: '10px 20px',
         });
     };
-const clickDecline =()=>{
-    // if(!memberID){
+    const clickDecline = () => {
+        // if(!memberID){
 
-    //     return;
-    // }else{
+        //     return;
+        // }else{
         setAddReasonModal(true)
-    // }
-}
+        // }
+    }
     return (
         <div>
-                <button onClick={clickDecline} type="button"  className="btn btn-outline-danger rounded-full text-2xl">
-                    {removeLoading ? 'Loading ...' : " Decline" }
-                    {/* removeLoading */}
-                    
-                </button>
+            <button onClick={clickDecline} type="button" className="btn btn-outline-danger rounded-full text-2xl">
+                {removeLoading ? 'Loading ...' : " Decline"}
+                {/* removeLoading */}
+
+            </button>
 
 
             <Transition appear show={addReasonModal} as={Fragment}>
@@ -120,7 +120,7 @@ const clickDecline =()=>{
                                                     Cancel
                                                 </button>
                                                 <button type="button" className="btn btn-primary ml-4" onClick={saveReason}>
-                                                   Decline
+                                                    Decline
                                                 </button>
                                             </div>
                                         </form>

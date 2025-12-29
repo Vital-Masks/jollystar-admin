@@ -107,6 +107,7 @@ const AddMember = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [members, setMembers] = useState<Member>();
+    
     const { memberId } = useParams();
     const [OldApproveMember, setOldApproveMember] = useState(false);
     const [LastPaymentID, setLastPaymentID] = useState("");
@@ -117,7 +118,7 @@ const AddMember = () => {
     const [declineLoading, setDeclineLoading] = useState(false)
     const [approveLoading, setApproveLoading] = useState(false)
     const [memberIdErrorMsg, setMemberIdErrorMsg] = useState("")
-
+console.log(LastPaymentID)
     const [formValues, setFormValues] = useState<FormValues>({
         isSchoolDetailVerified: isSclChecked,
         isPaymentDetailVerified: ispayChecked,
@@ -158,15 +159,18 @@ const AddMember = () => {
             .then(response => response.json())
             .then(data => {
                 if (data.result) {
+                    console.log(data.result)
                     setMembers(data.result[0]);
                     setFormValues((prevValues) => ({
                         ...prevValues,
                         memberID: data.result[0].membershipId,
                     }));
+                    setLastPaymentID(data.result[0].paymentDetails[0]._id)
                     if (data.result[0].membershipId) {
                         setOldApproveMember(true)
                         // console.log(data.result[0].paymentDetails[0],"sdsdsdsd")
                         if (data.result[0].paymentDetails[0]) {
+                            console.log('first')
                             setLastPaymentID(data.result[0].paymentDetails[0]._id)
                         }
                     }
@@ -221,6 +225,7 @@ const AddMember = () => {
         }
 
         if (formValues.memberID !== "") {
+            console.log('first')
             setApproveLoading(true);
             const response = await axios.put(`http://localhost:3000/api/payment/${LastPaymentID}`, data2
             );
@@ -233,6 +238,7 @@ const AddMember = () => {
     }
 
     const handleDecline = (reason: String) => {
+        console.log(reason)
 
         if (formValues.memberID !== "") {
             setDeclineLoading(true);
@@ -302,6 +308,7 @@ const AddMember = () => {
             );
 
             alertForm1("Sucessfully " + status, "")
+            handleStatus("APPROVED", "success")
             // navigate(-1);
 
         } catch (error) {
@@ -339,7 +346,7 @@ const AddMember = () => {
                 {members && <div className="max-w-[40rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
                     <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
                         <div className="text-center sm:text-left mr-5">
-                            <h3 className="text-[#3b3f5c] text-2xl sm:text-4xl font-semibold mb-2 dark:text-black bold">
+                            <h3 className="text-[#] text-2xl sm:text-4xl font-semibold mb-2 bold">
                                 Verification Process
                             </h3>
 
@@ -355,7 +362,7 @@ const AddMember = () => {
                                 <div className="sm:flex justify-between items-center md:gap-20">
                                     <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership Id</label>
                                     <div>
-                                        <input onChange={handleChange} name="memberID" value={formValues.memberID} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
+                                        <input onChange={handleChange} name="memberID" value={formValues.memberID} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-2/3 form-input text-2xl" />
                                         <p className="w-full sm:w-1/2 text-sm text-red-400 ps-4"  >{memberIdErrorMsg}</p>
 
                                     </div>

@@ -226,7 +226,7 @@ const ViewAllMemberProfile: React.FC<Member> = ({ data }) => {
         });
     };
     return (
-        <div className="max-w-[60rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
+        <div className="max-w-[60rem] w-full bg-[#e2e2e7] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
             <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
                 <div className="w-60 h-60 rounded-md overflow-hidden object-cover mb-5 sm:mb-0">
                     <img

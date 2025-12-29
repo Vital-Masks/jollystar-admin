@@ -37,7 +37,7 @@ const FileManagement = () => {
     useEffect(() => {
         setFilteredItems(() => {
             return fileList.filter((item) => {
-                return item.title.toLowerCase().includes(search.toLowerCase());
+                return item?.title?.toLowerCase().includes(search.toLowerCase());
             });
         });
     }, [search, fileList]);
@@ -66,8 +66,8 @@ const FileManagement = () => {
 
             const formData = new FormData();
             formData.append('file', params.file);
-            formData.append('title', params.title);
-            formData.append('description', params.description);
+            formData.append('body', JSON.stringify({ title: params.title, description: params.description }));
+
 
             let response;
             if (params._id) {

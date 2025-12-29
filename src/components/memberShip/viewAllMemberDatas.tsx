@@ -425,7 +425,7 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
                                                 <tr key={index + 1}>
                                                     <td>{index + 1}</td>
                                                     <td>
-                                                        <div className="whitespace-nowrap">{data.membershipCategory}</div>
+                                                        <div className="whitespace-nowrap">{members.membershipCategory}</div>
                                                     </td>
                                                     <td>
                                                         <div className="whitespace-nowrap">{data.bank}</div>
@@ -434,9 +434,9 @@ const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
                                                     <td>{data.total}</td>
                                                     <td>{data.date}</td>
                                                     <td
-                                                        className={` ${data.isPaymentDetailVerified === false ? "text-[#ff8383]" : " text-[#008000] "
+                                                        className={` ${data.isPaymentDetailVerified ? "text-[#008000] " : " text-[#ff8383]"
                                                             }`}
-                                                    >                      {data.isPaymentDetailVerified === false ? "Pending" : "Approved"}
+                                                    >                      {data.isPaymentDetailVerified ? "Approved" : "Pending"}
                                                     </td>
                                                     <td>
                                                         {data.paymentSlip ?

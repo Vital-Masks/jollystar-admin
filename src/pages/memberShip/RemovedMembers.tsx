@@ -242,7 +242,7 @@ const RemovedMembers = () => {
                 {members && <div className="max-w-[40rem] w-full bg-[#e2e2e7] shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none" style={{ borderRadius: '30px' }}>
                     <div className="p-5 sm:p-10 flex flex-col sm:flex-row items-center">
                         <div className="text-center sm:text-left mr-5">
-                            <h3 className="text-[#3b3f5c] text-2xl sm:text-4xl font-semibold mb-2 dark:text-black bold">
+                            <h3 className="text-[#] text-2xl sm:text-4xl font-semibold mb-2 bold">
                                 Verification Process
                             </h3>
 
@@ -255,9 +255,9 @@ const RemovedMembers = () => {
                                 <input checked={formValues.isPaymentDetailVerified} type="checkbox" className="form-checkbox text-success border-white peer ml-5" />
                             </label>
                             <form className="space-y-5 mt-5">
-                                <div className="sm:flex justify-between items-center md:gap-20">
+                                <div className="sm:flex justify-between items-center md:gap-20 bg-red-400">
                                     <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership Id</label>
-                                    <div>
+                                    <div className='w-full'>
                                         <input disabled onChange={handleChange} name="memberID" value={members.membershipId} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-1/2 form-input text-2xl" />
                                         <p className="w-full sm:w-1/2 text-sm text-red-400 ps-4"  >{memberIdErrorMsg}</p>
 
