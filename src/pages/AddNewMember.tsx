@@ -106,6 +106,7 @@ interface FormValues {
     pdpaymentImage: string;
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
+    gallery: string[];
 }
 
 interface MemberData {
@@ -321,7 +322,7 @@ const AddNewMember = () => {
             setFormValues(intialValue)
             window.location.href = '/approved-member';
             return response;
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error adding member:', error);
             failForm(error?.message ?? 'Oops! Something went wrong!')
             throw error;
@@ -716,7 +717,8 @@ const AddNewMember = () => {
         var base64Strings = ""
         if (fileList) {
             const selectedImages: File[] = Array.from(fileList);
-            const base64Strings = await selectedImages.map(image => convertFileToBase64(image));
+            const base64Promises = selectedImages.map(image => convertFileToBase64(image));
+            const base64Strings = await Promise.all(base64Promises);
             console.log(base64Strings, "00000looping");
             setFormValues((prevValues) => ({
                 ...prevValues,
@@ -1390,9 +1392,9 @@ const AddNewMember = () => {
                                             <input onChange={handleChange} name='cdgame' value={formValues.cdgame} id="profession" type="text" placeholder="Game" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
-                                            <label htmlFor="name">From</label>
-                                            <input id="cdto" max={maxDate}
-                                                onChange={handleChange} name='cdfrom' value={formValues.cdfrom} id="name" type="date" placeholder="From" className="form-input rounded-full border-dark" required />
+                                            <label htmlFor="cdfrom">From</label>
+                                            <input id="cdfrom" max={maxDate}
+                                                onChange={handleChange} name='cdfrom' value={formValues.cdfrom} type="date" placeholder="From" className="form-input rounded-full border-dark" required />
                                         </div>
                                         <div>
                                             <label htmlFor="name">To</label>

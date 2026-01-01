@@ -32,7 +32,7 @@ import IconEdit from '../../components/Icon/IconEdit';
 import ViewAllStatusMember from '../../components/memberShip/viewAllMemberDatas';
 import ViewAllMemberProfile from './ViewAllMemberProfile';
 
-interface Member {
+interface MemberData {
     _id: string;
     profilePicture: object;
     firstName?: string;
@@ -63,6 +63,10 @@ interface Member {
     created_at?: string;
 }
 
+interface Member {
+    data: MemberData;
+}
+
 interface SchoolDetail {
     schoolName?: string;
     participated?: string;
@@ -87,7 +91,7 @@ interface GalleryItem {
 
 const DeclineRequest = () => {
     const dispatch = useDispatch();
-    const [members, setMembers] = useState<Member>();
+    const [members, setMembers] = useState<MemberData>();
     const { memberId } = useParams();
 
 

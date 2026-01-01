@@ -42,8 +42,7 @@ interface PaymentDetail {
     date?: string;
     paymentSlip?: string;
 }
-interface Member {
-    data: Member | (() => Member);
+interface MemberData {
     paymentDetails?: PaymentDetail[];
     _id: string;
     profilePicture: object;
@@ -75,6 +74,10 @@ interface Member {
     created_at?: string;
 }
 
+interface Member {
+    data: MemberData;
+}
+
 interface SchoolDetail {
     schoolName?: string;
     participated?: string;
@@ -101,13 +104,13 @@ interface FormValues {
     isPaymentDetailVerified: boolean;
 }
 interface ViewAllStatusMemberProps {
-    data: Member[]; // Assuming Member is a type representing your data structure
+    data: MemberData;
 }
-const ViewAllStatusMember: React.FC<Member> = ({ data }) => {
+const ViewAllStatusMember: React.FC<ViewAllStatusMemberProps> = ({ data }) => {
 
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
-    const [members, setMembers] = useState<Member>(data);
+    const [members, setMembers] = useState<MemberData>(data);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };

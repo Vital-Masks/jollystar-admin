@@ -42,8 +42,7 @@ interface PaymentDetail {
     date?: string;
     paymentSlip?: string;
 }
-interface Member {
-    data: Member | (() => Member);
+interface MemberData {
     paymentDetails?: PaymentDetail[];
     _id: string;
     profilePicture: object;
@@ -75,6 +74,10 @@ interface Member {
     created_at?: string;
 }
 
+interface Member {
+    data: MemberData;
+}
+
 interface SchoolDetail {
     schoolName?: string;
     participated?: string;
@@ -100,7 +103,11 @@ interface FormValues {
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
 }
-const ViewAllMemberProfile: React.FC<Member> = ({ data }) => {
+interface ViewAllMemberProfileProps {
+    data: MemberData;
+}
+
+const ViewAllMemberProfile: React.FC<ViewAllMemberProfileProps> = ({ data }) => {
 
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
@@ -119,7 +126,7 @@ const ViewAllMemberProfile: React.FC<Member> = ({ data }) => {
     const navigate = useNavigate();
 
     const dispatch = useDispatch();
-    const [members, setMembers] = useState<Member>(data);
+    const [members, setMembers] = useState<MemberData>(data);
     const { memberId } = useParams();
     const [isSclChecked, setIsSclChecked] = useState(true);
     const [ispayChecked, setIsPayChecked] = useState(true);

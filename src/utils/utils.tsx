@@ -21,7 +21,7 @@ export function isEmpty(obj: {}) {
     return Object.keys(obj).length === 0;
 }
 
-export const formatDate = (dateString: string): string => {
+export const formatDate = (dateString: string, format?: string): string => {
     const date = new Date(dateString);
 
     // Extract components
@@ -37,6 +37,18 @@ export const formatDate = (dateString: string): string => {
     hours = hours % 12 || 12; // Convert to 12-hour format
     const formattedHours = String(hours).padStart(2, '0');
 
-    // Combine into the desired format
+    // If custom format is provided, use it (basic implementation)
+    if (format) {
+        // Simple format replacement for common patterns
+        return format
+            .replace('dd', day)
+            .replace('MM', month)
+            .replace('yyyy', String(year))
+            .replace('hh', formattedHours)
+            .replace('mm', minutes)
+            .replace('a', ampm);
+    }
+
+    // Default format
     return `${day}-${month}-${year} ${formattedHours}.${minutes}.${seconds} ${ampm}`;
 };

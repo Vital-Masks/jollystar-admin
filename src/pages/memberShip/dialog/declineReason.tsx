@@ -5,7 +5,13 @@ import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import axios from 'axios';
 
-const DeclineMemberReason = ({ hableRemove, removeLoading, memberID }) => {
+interface DeclineMemberReasonProps {
+    hableRemove: (reason: string) => void;
+    removeLoading: boolean;
+    memberID?: string;
+}
+
+const DeclineMemberReason = ({ hableRemove, removeLoading, memberID }: DeclineMemberReasonProps) => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Remove Member Reason'));
@@ -36,7 +42,7 @@ const DeclineMemberReason = ({ hableRemove, removeLoading, memberID }) => {
         }
     };
 
-    const showMessage = (msg = '', type = 'success') => {
+    const showMessage = (msg = '', type: 'success' | 'error' | 'warning' | 'info' | 'question' = 'success') => {
         const toast = Swal.mixin({
             toast: true,
             position: 'top',

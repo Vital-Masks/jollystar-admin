@@ -43,7 +43,7 @@ interface PaymentDetail {
     date?: string;
     paymentSlip?: string;
 }
-interface Member {
+interface MemberData {
     paymentDetails?: PaymentDetail[];
     _id: string;
     profilePicture: object;
@@ -73,6 +73,10 @@ interface Member {
     membershipId?: string;
     declinedMessage?: string;
     created_at?: string;
+}
+
+interface Member {
+    data: MemberData;
 }
 
 interface SchoolDetail {
@@ -118,7 +122,7 @@ const ApprovedMember = () => {
     const navigate = useNavigate();
 
     const dispatch = useDispatch();
-    const [members, setMembers] = useState<Member>();
+    const [members, setMembers] = useState<MemberData>();
     const { memberId } = useParams();
     const [isSclChecked, setIsSclChecked] = useState(true);
     const [ispayChecked, setIsPayChecked] = useState(true);
@@ -293,7 +297,7 @@ const ApprovedMember = () => {
 
             {
                 members &&
-                <ViewAllStatusMember data={members} />
+                <ViewAllStatusMember data={members as any} />
             }
 
 

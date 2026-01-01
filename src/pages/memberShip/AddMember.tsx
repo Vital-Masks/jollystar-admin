@@ -35,8 +35,7 @@ import ViewAllStatusMember from '../../components/memberShip/viewAllMemberDatas'
 import DeclineMemberReason from './dialog/declineReason';
 // import ViewAllStatusMember from './viewAllMemberDatas';
 
-interface Member {
-    data: Member | (() => Member);
+interface MemberData {
     _id: string;
     profilePicture: object;
     firstName?: string;
@@ -66,8 +65,10 @@ interface Member {
     membershipId?: string;
     declinedMessage?: string;
     created_at?: string;
+}
 
-
+interface Member {
+    data: MemberData;
 }
 
 interface SchoolDetail {
@@ -106,7 +107,7 @@ interface FormValues {
 const AddMember = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [members, setMembers] = useState<Member>();
+    const [members, setMembers] = useState<MemberData>();
     
     const { memberId } = useParams();
     const [OldApproveMember, setOldApproveMember] = useState(false);
@@ -339,7 +340,7 @@ console.log(LastPaymentID)
             <div className="flex flex-col space-y-5 sm:flex-row sm:space-y-0 sm:space-x-5">
                 {
                     members &&
-                    <ViewAllMemberProfile data={members} />
+                    <ViewAllMemberProfile data={members as any} />
                 }
 
                 {/* start tickbox */}
@@ -362,7 +363,7 @@ console.log(LastPaymentID)
                                 <div className="sm:flex justify-between items-center md:gap-20">
                                     <label htmlFor="hrLargeinput" className="w-full sm:w-auto text-2xl">Membership Id</label>
                                     <div>
-                                        <input onChange={handleChange} name="memberID" value={formValues.memberID} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-2/3 form-input text-2xl" />
+                                        <input onChange={handleChange} name="memberID" value={String(formValues.memberID || '')} id="hrLargeinput" type="text" placeholder="JSSC000458" className="w-full sm:w-2/3 form-input text-2xl" />
                                         <p className="w-full sm:w-1/2 text-sm text-red-400 ps-4"  >{memberIdErrorMsg}</p>
 
                                     </div>
@@ -374,7 +375,7 @@ console.log(LastPaymentID)
                             {!OldApproveMember ?
                                 <div className="flex mt-5 ml-5 justify-center">
 
-                                    <DeclineMemberReason hableRemove={handleDecline} removeLoading={declineLoading} memberID={formValues.memberID} />
+                                    <DeclineMemberReason hableRemove={handleDecline} removeLoading={declineLoading} memberID={String(formValues.memberID || '')} />
 
                                     {/* <button type="button" onClick={handleDecline} >
                                     {declineLoading ? 'Loading...' : "Decline"}
@@ -398,7 +399,7 @@ console.log(LastPaymentID)
             {/* Body Start */}
             {
                 members &&
-                <ViewAllStatusMember data={members} />
+                <ViewAllStatusMember data={members as any} />
             }
 
             {/* Body End */}

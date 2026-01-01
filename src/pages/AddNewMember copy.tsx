@@ -105,6 +105,7 @@ interface FormValues {
     pdpaymentImage: string;
     isSchoolDetailVerified: boolean;
     isPaymentDetailVerified: boolean;
+    gallery: string[];
 }
 
 interface MemberData {
@@ -701,7 +702,8 @@ const AddNewMember = () => {
         var base64Strings = ""
         if (fileList) {
             const selectedImages: File[] = Array.from(fileList);
-            const base64Strings = await selectedImages.map(image => convertFileToBase64(image));
+            const base64Promises = selectedImages.map(image => convertFileToBase64(image));
+            const base64Strings = await Promise.all(base64Promises);
             console.log(base64Strings, "00000looping");
             setFormValues((prevValues) => ({
                 ...prevValues,
