@@ -64,7 +64,7 @@ const Declined = () => {
 
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/member/getAllmembers/');
+                const response = await axios.get('https://api.jollystars.lk/api/member/getAllmembers/');
                 setMembers(response.data.result);
             } catch (error) {
                 setError("Error fetching data");

@@ -156,7 +156,7 @@ console.log(LastPaymentID)
     useEffect(() => {
         dispatch(setPageTitle('AddMember Admin'));
 
-        fetch(`http://localhost:3000/api/member/memberPayment/${memberId}`)
+        fetch(`https://api.jollystars.lk/api/member/memberPayment/${memberId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.result) {
@@ -228,7 +228,7 @@ console.log(LastPaymentID)
         if (formValues.memberID !== "") {
             console.log('first')
             setApproveLoading(true);
-            const response = await axios.put(`http://localhost:3000/api/payment/${LastPaymentID}`, data2
+            const response = await axios.put(`https://api.jollystars.lk/api/payment/${LastPaymentID}`, data2
             );
             handleStatus("APPROVED", "success")
 
@@ -259,9 +259,9 @@ console.log(LastPaymentID)
         }
         console.log(status);
         try {
-            const response2 = await axios.put(`http://localhost:3000/api/member/${memberId}`, data
+            const response2 = await axios.put(`https://api.jollystars.lk/api/member/${memberId}`, data
             );
-            const response = await axios.put(`http://localhost:3000/api/member/memberApproval/${memberId}`, data
+            const response = await axios.put(`https://api.jollystars.lk/api/member/memberApproval/${memberId}`, data
             );
             // Handle the response as needed
             console.log('PUT request successful:', response.data);
@@ -303,9 +303,9 @@ console.log(LastPaymentID)
         console.log(status);
         try {
             // LastPaymentID
-            const response = await axios.put(`http://localhost:3000/api/payment/${LastPaymentID}`, data2
+            const response = await axios.put(`https://api.jollystars.lk/api/payment/${LastPaymentID}`, data2
             );
-            const response2 = await axios.put(`http://localhost:3000/api/member/${memberId}`, data
+            const response2 = await axios.put(`https://api.jollystars.lk/api/member/${memberId}`, data
             );
 
             alertForm1("Sucessfully " + status, "")

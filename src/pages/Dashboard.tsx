@@ -32,7 +32,7 @@ const Dashboard = () => {
     useEffect(() => {
         dispatch(setPageTitle('Dashboard Admin'));
 
-        axios.get('http://localhost:3000/api/member/getAllmembers')
+        axios.get('https://api.jollystars.lk/api/member/getAllmembers')
             .then(response => {
                 setMembers(response.data.result);
             })

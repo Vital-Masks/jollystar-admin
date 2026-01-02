@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // const usersUrl = 'http://localhost:3003/users';
-const usersUrl = 'http://localhost:3000';
+const usersUrl = 'https://api.jollystars.lk';
 
 export const getUsers = async (id) => {
     id = id || '';

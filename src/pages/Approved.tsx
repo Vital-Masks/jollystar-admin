@@ -33,7 +33,7 @@ const Approved = () => {
         const fetchData = async () => {
             let status = "APPROVED";
             try {
-                const response = await axios.get('http://localhost:3000/api/member/getMemberStatusMembers/' + status);
+                const response = await axios.get('https://api.jollystars.lk/api/member/getMemberStatusMembers/' + status);
                 setMembers(response.data.result);
             } catch (error) {
                 setError("Error fetching data");

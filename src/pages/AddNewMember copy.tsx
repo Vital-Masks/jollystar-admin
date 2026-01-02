@@ -305,7 +305,7 @@ const AddNewMember = () => {
     ];
     const addMember = async (data: MemberData): Promise<AxiosResponse<any>> => {
         try {
-            const response = await axios.post('http://localhost:3000/api/member', data);
+            const response = await axios.post('https://api.jollystars.lk/api/member', data);
             console.log('Member added successfully:', response.data);
             // Call your success function here
             sucessForm()
@@ -403,7 +403,7 @@ const AddNewMember = () => {
 
         // const addMember = async (data: MemberData): Promise<AxiosResponse<any>> => {
         //     try {
-        //       const response = await axios.post('http://localhost:3000/api/member', data);
+        //       const response = await axios.post('https://api.jollystars.lk/api/member', data);
         //       console.log('Member added successfully:', response.data);
         //       sucessForm()
         //       return response;

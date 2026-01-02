@@ -49,7 +49,7 @@ const FileManagement = () => {
     const fetchFileList = async () => {
         try {
             setLoading(true);
-            const response = await axios.get('http://localhost:3000/api/fileManagement/getAllFiles');
+            const response = await axios.get('https://api.jollystars.lk/api/fileManagement/getAllFiles');
             const files = response.data.result || response.data || [];
             // Ensure all files have required properties
             const validFiles = files.map((file: any) => ({
@@ -99,7 +99,7 @@ const FileManagement = () => {
 
             let response;
             if (params._id) {
-                response = await axios.put(`http://localhost:3000/api/fileManagement/${params._id}`, formData, {
+                response = await axios.put(`https://api.jollystars.lk/api/fileManagement/${params._id}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -107,7 +107,7 @@ const FileManagement = () => {
                 showMessage('File has been updated successfully.');
 
             } else {
-                response = await axios.post('http://localhost:3000/api/fileManagement', formData, {
+                response = await axios.post('https://api.jollystars.lk/api/fileManagement', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -132,7 +132,7 @@ const FileManagement = () => {
                 title: file.title,
                 description: file.description,
                 file: null, // Reset file input for new selection
-                preview: file.file ? `http://localhost:3000/files/${file.file}` : null,
+                preview: file.file ? `https://api.jollystars.lk/files/${file.file}` : null,
             });
         } else {
             // Adding new file
@@ -143,7 +143,7 @@ const FileManagement = () => {
 
     const deleteFile = async (data: any) => {
         try {
-            const response = await axios.delete(`http://localhost:3000/api/fileManagement/delete/${data._id}`);
+            const response = await axios.delete(`https://api.jollystars.lk/api/fileManagement/delete/${data._id}`);
             showMessage('File has been deleted successfully.');
             fetchFileList();
         } catch (error) {
@@ -226,7 +226,7 @@ const FileManagement = () => {
                                             <td>
                                                 {data.file ? (
                                                     <a 
-                                                        href={`http://localhost:3000/files/${data.file}`} 
+                                                        href={`https://api.jollystars.lk/files/${data.file}`} 
                                                         target="_blank" 
                                                         rel="noopener noreferrer"
                                                         className="text-primary hover:underline"
