@@ -268,7 +268,7 @@ const Header = () => {
                                                     {/* <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span> */}
                                                 </h4>
                                                 <button type="button" className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
-                                                    admin@jollystarssc.com
+                                                    admin@jollystars.lk
                                                 </button>
                                             </div>
                                         </div>

@@ -48,7 +48,7 @@ const Login = () => {
 
             var response = null
             console.log(values);
-            if (values.email === "admin@gmail.com" && values.password === "123456") {
+            if ((values.email === "admin@gmail.com" && values.password === "123456") || (values.email === "admin@jollystars.lk" && values.password === "AdminJSC@26")) {
                 response = [{
                     _id: "1234",
                     email: "admin@gmail.com"
